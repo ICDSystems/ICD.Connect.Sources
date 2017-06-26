@@ -79,6 +79,7 @@
     <None Include="ObfuscationSettings.cs" />
     <Compile Include="BarcoClickshareProDevice.cs" />
     <Compile Include="BarcoClickshareProDeviceSettings.cs" />
+    <Compile Include="KrangPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Properties\ControlSystem.cfg" />
   </ItemGroup>
