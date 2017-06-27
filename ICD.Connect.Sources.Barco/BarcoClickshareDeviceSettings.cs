@@ -1,5 +1,4 @@
-﻿using ICD.Connect.Settings;
-using ICD.Connect.Settings.Core;
+﻿using System;
 
 namespace ICD.Connect.Sources.Barco
 {
@@ -13,15 +12,8 @@ namespace ICD.Connect.Sources.Barco
 		public override string FactoryName { get { return FACTORY_NAME; } }
 
 		/// <summary>
-		/// Creates a new originator instance from the settings.
+		/// Gets the type of the originator for this settings instance.
 		/// </summary>
-		/// <param name="factory"></param>
-		/// <returns></returns>
-		public override IOriginator ToOriginator(IDeviceFactory factory)
-		{
-			BarcoClickshareDevice output = new BarcoClickshareDevice();
-			output.ApplySettings(this, factory);
-			return output;
-		}
+		public override Type OriginatorType { get { return typeof(BarcoClickshareDevice); } }
 	}
 }
