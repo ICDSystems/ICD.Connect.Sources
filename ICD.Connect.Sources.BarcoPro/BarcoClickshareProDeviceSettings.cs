@@ -1,8 +1,6 @@
 ﻿using System;
 using ICD.Common.Properties;
-using ICD.Connect.Settings;
 using ICD.Connect.Settings.Attributes.Factories;
-using ICD.Connect.Settings.Core;
 using ICD.Connect.Sources.Barco;
 
 namespace ICD.Connect.Sources.BarcoPro
