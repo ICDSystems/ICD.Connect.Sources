@@ -54,7 +54,7 @@ namespace ICD.Connect.Sources.Barco
 		/// <returns></returns>
 		public override bool GetActiveTransmissionState(int output, eConnectionType type)
 		{
-			if (EnumUtils.HasMultipleFlags((int)type))
+			if (EnumUtils.HasMultipleFlags(type))
 			{
 				return EnumUtils.GetFlagsExceptNone(type)
 				                .Select(f => GetActiveTransmissionState(output, f))
