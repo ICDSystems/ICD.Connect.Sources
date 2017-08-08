@@ -21,8 +21,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove=".gitignore" />
     <None Remove="ICD.Connect.Sources.BarcoPro_SimplSharp.suo" />
     <None Remove="ICD.SimplSharp.projectinfo" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ICD.Connect.Sources.Barco\ICD.Connect.Sources.Barco_NetStandard.csproj" />
   </ItemGroup>
 
 </Project>

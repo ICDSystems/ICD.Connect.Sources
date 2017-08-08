@@ -1,9 +1,8 @@
-﻿using System;
+﻿#if SIMPLSHARP
+using System;
 using Crestron.SimplSharp;
 using ICD.Common.EventArguments;
 using ICD.Connect.Protocol.Network.WebPorts.Https;
-
-#if SIMPLSHARP
 
 namespace ICD.Connect.Sources.Barco
 {

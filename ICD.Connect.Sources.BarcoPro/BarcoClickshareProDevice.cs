@@ -34,10 +34,7 @@ namespace ICD.Connect.Sources.BarcoPro
 				Priority = Thread.eThreadPriority.LowestPriority
 			};
 #else
-			m_Thread = new Thread(ThreadCallback)
-			{
-				Priority = ThreadPriority.Lowest
-			};
+			m_Thread = new Thread(ThreadCallback);
 			m_Thread.Start();
 #endif
 		}
