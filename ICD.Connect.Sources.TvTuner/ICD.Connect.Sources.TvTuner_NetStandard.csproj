@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ICD.Connect.Sources.projectinfo" />
     <None Remove="ICD.Connect.Sources.TvTuner_SimplSharp.suo" />
     <None Remove="ICD.SimplSharp.projectinfo" />
   </ItemGroup>

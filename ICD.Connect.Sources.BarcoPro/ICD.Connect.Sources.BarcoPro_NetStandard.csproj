@@ -23,6 +23,7 @@
   <ItemGroup>
     <None Remove=".gitignore" />
     <None Remove="ICD.Connect.Sources.BarcoPro_SimplSharp.suo" />
+    <None Remove="ICD.Connect.Sources.projectinfo" />
     <None Remove="ICD.SimplSharp.projectinfo" />
   </ItemGroup>
 
