@@ -206,6 +206,8 @@ namespace ICD.Connect.Sources.Barco
 
 			if (m_Port != null)
 				m_Port.Accept = PORT_ACCEPT;
+
+			UpdateCachedOnlineStatus();
 		}
 
 		/// <summary>
