@@ -1,7 +1,7 @@
 ﻿#if SIMPLSHARP
 using System;
 using Crestron.SimplSharp;
-using ICD.Common.EventArguments;
+using ICD.Common.Utils.EventArguments;
 using ICD.Connect.Protocol.Network.WebPorts.Https;
 
 namespace ICD.Connect.Sources.Barco

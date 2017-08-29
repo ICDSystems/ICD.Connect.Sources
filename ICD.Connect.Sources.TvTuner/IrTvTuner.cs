@@ -1,4 +1,4 @@
-﻿using ICD.Common.EventArguments;
+﻿using ICD.Common.Utils.EventArguments;
 using ICD.Common.Properties;
 using ICD.Common.Services.Logging;
 using ICD.Connect.Devices;
