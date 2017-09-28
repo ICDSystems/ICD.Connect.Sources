@@ -1,6 +1,6 @@
 ﻿using System;
 using ICD.Common.Properties;
-using ICD.Connect.Settings.Attributes.Factories;
+using ICD.Connect.Settings.Attributes;
 using ICD.Connect.Sources.Barco;
 
 namespace ICD.Connect.Sources.BarcoPro
@@ -24,7 +24,7 @@ namespace ICD.Connect.Sources.BarcoPro
 		/// </summary>
 		/// <param name="xml"></param>
 		/// <returns></returns>
-		[PublicAPI, XmlDeviceSettingsFactoryMethod(FACTORY_NAME)]
+		[PublicAPI, XmlFactoryMethod(FACTORY_NAME)]
 		public static BarcoClickshareProDeviceSettings FromXml(string xml)
 		{
 			BarcoClickshareProDeviceSettings output = new BarcoClickshareProDeviceSettings();
