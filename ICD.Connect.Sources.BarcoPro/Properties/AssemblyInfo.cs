@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 
-[assembly: AssemblyTitle("ICD.SimplSharp.BarcoClicksharePro")]
+[assembly: AssemblyTitle("ICD.Connect.Sources.BarcoPro")]
 [assembly: AssemblyCompany("ICD Systems")]
-[assembly: AssemblyProduct("ICD.SimplSharp.BarcoClicksharePro")]
-[assembly: AssemblyCopyright("Copyright © ICD Systems 2016")]
+[assembly: AssemblyProduct("ICD.Connect.Sources.BarcoPro")]
+[assembly: AssemblyCopyright("Copyright © ICD Systems 2017")]
 [assembly: AssemblyVersion("2.0.0.*")]
 
