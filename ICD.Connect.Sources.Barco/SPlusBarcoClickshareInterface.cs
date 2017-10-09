@@ -2,11 +2,11 @@
 using System;
 using Crestron.SimplSharp;
 using ICD.Common.Utils.EventArguments;
+using ICD.Common.Properties;
 using ICD.Connect.Protocol.Network.WebPorts;
 
 namespace ICD.Connect.Sources.Barco
 {
-
 	public delegate void DelBoolStatus(ushort value);
 
 	public delegate void DelStringStatus(SimplSharpString value);
@@ -16,44 +16,52 @@ namespace ICD.Connect.Sources.Barco
 		SimplSharpString lastPaired, SimplSharpString macAddress, SimplSharpString serialNumber, SimplSharpString status,
 		SimplSharpString version);
 
-	public class SPlusBarcoClickshareInterface
+	[PublicAPI("S+")]
+	public sealed class SPlusBarcoClickshareInterface
 	{
-
 		#region Fields
+
 		private BarcoClickshareDevice m_Clickshare;
 
 		private HttpPort m_Port;
 
 		#endregion
 
-
 		#region Properties
+
+		[PublicAPI("S+")]
 		public SimplSharpString Host { get; set; }
 
+		[PublicAPI("S+")]
 		public SimplSharpString User { get; set; }
 
+		[PublicAPI("S+")]
 		public SimplSharpString Pass { get; set; }
+
 		#endregion
-
-
 
 		#region SPlus Delegates
 
+		[PublicAPI("S+")]
 		public DelBoolStatus SPlusSharingStatusChanged { get; set; }
 
+		[PublicAPI("S+")]
 		public DelBoolStatus SPlusOnlineStatusChanged { get; set; }
 
+		[PublicAPI("S+")]
 		public DelStringStatus SPlusVersionChanged { get; set; }
 
+		[PublicAPI("S+")]
 		public DelButtonStatus SPlusButtonStatusChanged { get; set; }
 
+		[PublicAPI("S+")]
 		public DelBoolStatus SPlusButtonsClearStatus { get; set; }
 
 		#endregion
 
-
 		#region SPlus Methods
 
+		[PublicAPI("S+")]
 		public void SPlusApplySettings()
 		{
 			if (Host == null || Host == new SimplSharpString())
@@ -78,21 +86,25 @@ namespace ICD.Connect.Sources.Barco
 			m_Clickshare.SetPort(m_Port);
 		}
 
+		[PublicAPI("S+")]
 		public void SPlusDestroyDevice()
 		{
 			Unregister();
 		}
 
+		[PublicAPI("S+")]
 		public void SPlusSetHost(SimplSharpString host)
 		{
 			Host = host;
 		}
 
+		[PublicAPI("S+")]
 		public void SPlusSetUser(SimplSharpString user)
 		{
 			User = user;
 		}
 
+		[PublicAPI("S+")]
 		public void SPlusSetPass(SimplSharpString pass)
 		{
 			Pass = pass;
