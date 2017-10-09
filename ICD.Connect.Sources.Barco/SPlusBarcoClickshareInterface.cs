@@ -2,7 +2,7 @@
 using System;
 using Crestron.SimplSharp;
 using ICD.Common.Utils.EventArguments;
-using ICD.Connect.Protocol.Network.WebPorts.Https;
+using ICD.Connect.Protocol.Network.WebPorts;
 
 namespace ICD.Connect.Sources.Barco
 {
@@ -22,7 +22,7 @@ namespace ICD.Connect.Sources.Barco
 		#region Fields
 		private BarcoClickshareDevice m_Clickshare;
 
-		private HttpsPort m_Port;
+		private HttpPort m_Port;
 
 		#endregion
 
@@ -61,7 +61,7 @@ namespace ICD.Connect.Sources.Barco
 
 			Unregister();
 
-			m_Port = new HttpsPort
+			m_Port = new HttpPort
 			{
 				Address = Host.ToString(),
 				Username = User.ToString(),
