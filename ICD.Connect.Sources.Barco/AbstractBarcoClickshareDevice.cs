@@ -268,7 +268,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 			catch (Exception e)
 			{
-				Log(eSeverity.Error, "{0} error communicating with {1} - {2}", GetType().Name, m_Port.Address, e.Message);
+				Log(eSeverity.Error, "Error communicating with {0} - {1}", m_Port.Address, e.Message);
 				IncrementUpdateInterval();
 			}
 		}
@@ -429,7 +429,7 @@ namespace ICD.Connect.Sources.Barco
 		private void Log(eSeverity severity, string message, params object[] args)
 		{
 			message = string.Format(message, args);
-			message = string.Format("{0} - {1}", GetType().Name, message);
+			message = string.Format("{0} - {1}", this, message);
 
 			ServiceProvider.GetService<ILoggerService>().AddEntry(severity, message);
 		}
