@@ -120,9 +120,11 @@ namespace ICD.Connect.Sources.TvTuner
 			IIrPort port = null;
 
 			if (settings.Port != null)
+			{
 				port = factory.GetPortById((int)settings.Port) as IIrPort;
-			if (port == null)
-				Logger.AddEntry(eSeverity.Error, "Port {0} is not an IR Port", settings.Port);
+				if (port == null)
+					Logger.AddEntry(eSeverity.Error, "Port {0} is not an IR Port", settings.Port);
+			}
 
 			SetIrPort(port);
 		}
