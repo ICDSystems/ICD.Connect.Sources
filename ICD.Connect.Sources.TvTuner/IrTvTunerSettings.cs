@@ -2,6 +2,7 @@
 using ICD.Common.Properties;
 using ICD.Common.Utils.Xml;
 using ICD.Connect.Devices;
+using ICD.Connect.Protocol.Ports.IrPort;
 using ICD.Connect.Settings.Attributes;
 
 namespace ICD.Connect.Sources.TvTuner
@@ -11,7 +12,7 @@ namespace ICD.Connect.Sources.TvTuner
 		private const string FACTORY_NAME = "IrTvTuner";
 		private const string PORT_ELEMENT = "Port";
 
-		[SettingsProperty(SettingsProperty.ePropertyType.PortId)]
+		[SettingsProperty(SettingsProperty.ePropertyType.Id, typeof(IIrPort))]
 		public int? Port { get; set; }
 
 		/// <summary>
