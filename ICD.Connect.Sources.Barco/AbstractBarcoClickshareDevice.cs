@@ -251,6 +251,7 @@ namespace ICD.Connect.Sources.Barco
 			try
 			{
 				bool oldSharing = Sharing;
+
 				ParsePortData(m_Port.Get(Version + KEY_DEVICE_SHARING), ParseSharingState);
 
 				// If the sharing state changed or we've updated enough times, check the version and buttons table.
@@ -284,11 +285,21 @@ namespace ICD.Connect.Sources.Barco
 			if (string.IsNullOrEmpty(response))
 				return;
 
-			JObject json;
-
 			try
 			{
-				json = JObject.Parse(response);
+				JObject json = JObject.Parse(response);
+
+				int status = (int)json.SelectToken("status");
+
+				if (status != STATUS_SUCCESS)
+				{
+					string message = (string)json.SelectToken("message");
+					ParseError(status, message);
+					return;
+				}
+
+				JObject data = (JObject)json.SelectToken("data");
+				dataCallback(data);
 			}
 			catch (Exception)
 			{
@@ -297,17 +308,6 @@ namespace ICD.Connect.Sources.Barco
 				return;
 			}
 
-			int status = (int)json.SelectToken("status");
-
-			if (status != STATUS_SUCCESS)
-			{
-				string message = (string)json.SelectToken("message");
-				ParseError(status, message);
-				return;
-			}
-
-			JObject data = (JObject)json.SelectToken("data");
-			dataCallback(data);
 			ResetUpdateInterval();
 		}
 
