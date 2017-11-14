@@ -251,18 +251,14 @@ namespace ICD.Connect.Sources.Barco
 			try
 			{
 				bool oldSharing = Sharing;
-
-				ParsePortData(m_Port.Get(DEFAULT_VERSION + KEY_DEVICE_SHARING), ParseSharingState);
+				PollSharingState();
 
 				// If the sharing state changed or we've updated enough times, check the version and buttons table.
 				if (Sharing != oldSharing || m_UpdateCount == 0)
 				{
-					if (Version == DEFAULT_VERSION)
-						ParsePortData(m_Port.Get(REQUEST_VERSION), ParseVersion);
-					if (string.IsNullOrEmpty(SoftwareVersion))
-						ParsePortData(m_Port.Get(DEFAULT_VERSION + KEY_SOFTWARE_VERSION), ParseSoftwareVersion);
-
-					ParsePortData(m_Port.Get(DEFAULT_VERSION + KEY_BUTTONS_TABLE), ParseButtonsTable);
+					PollVersion();
+					PollSoftwareVersion();
+					PollButtonsTable();
 				}
 
 				m_UpdateCount = (m_UpdateCount + 1) % INFO_UPDATE_OCCURANCE;
@@ -272,6 +268,52 @@ namespace ICD.Connect.Sources.Barco
 				Log(eSeverity.Error, "Error communicating with {0} - {1}", m_Port.Address, e.Message);
 				IncrementUpdateInterval();
 			}
+		}
+
+		private void PollSharingState()
+		{
+			string response;
+
+			if (m_Port.Get(DEFAULT_VERSION + KEY_DEVICE_SHARING, out response))
+				ParsePortData(response, ParseSharingState);
+			else
+				IncrementUpdateInterval();
+		}
+
+		private void PollVersion()
+		{
+			if (Version != DEFAULT_VERSION)
+				return;
+
+			string response;
+
+			if (m_Port.Get(REQUEST_VERSION, out response))
+				ParsePortData(response, ParseVersion);
+			else
+				IncrementUpdateInterval();
+		}
+
+		private void PollSoftwareVersion()
+		{
+			if (!string.IsNullOrEmpty(SoftwareVersion))
+				return;
+
+			string response;
+
+			if (m_Port.Get(DEFAULT_VERSION + KEY_SOFTWARE_VERSION, out response))
+				ParsePortData(response, ParseSoftwareVersion);
+			else
+				IncrementUpdateInterval();
+		}
+
+		private void PollButtonsTable()
+		{
+			string response;
+
+			if (m_Port.Get(DEFAULT_VERSION + KEY_BUTTONS_TABLE, out response))
+				ParsePortData(response, ParseButtonsTable);
+			else
+				IncrementUpdateInterval();
 		}
 
 		/// <summary>
