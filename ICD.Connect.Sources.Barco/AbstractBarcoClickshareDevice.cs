@@ -252,7 +252,7 @@ namespace ICD.Connect.Sources.Barco
 			{
 				bool oldSharing = Sharing;
 
-				ParsePortData(m_Port.Get(Version + KEY_DEVICE_SHARING), ParseSharingState);
+				ParsePortData(m_Port.Get(DEFAULT_VERSION + KEY_DEVICE_SHARING), ParseSharingState);
 
 				// If the sharing state changed or we've updated enough times, check the version and buttons table.
 				if (Sharing != oldSharing || m_UpdateCount == 0)
@@ -260,9 +260,9 @@ namespace ICD.Connect.Sources.Barco
 					if (Version == DEFAULT_VERSION)
 						ParsePortData(m_Port.Get(REQUEST_VERSION), ParseVersion);
 					if (string.IsNullOrEmpty(SoftwareVersion))
-						ParsePortData(m_Port.Get(Version + KEY_SOFTWARE_VERSION), ParseSoftwareVersion);
+						ParsePortData(m_Port.Get(DEFAULT_VERSION + KEY_SOFTWARE_VERSION), ParseSoftwareVersion);
 
-					ParsePortData(m_Port.Get(Version + KEY_BUTTONS_TABLE), ParseButtonsTable);
+					ParsePortData(m_Port.Get(DEFAULT_VERSION + KEY_BUTTONS_TABLE), ParseButtonsTable);
 				}
 
 				m_UpdateCount = (m_UpdateCount + 1) % INFO_UPDATE_OCCURANCE;
