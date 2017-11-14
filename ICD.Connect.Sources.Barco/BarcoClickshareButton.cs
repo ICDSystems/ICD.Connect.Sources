@@ -1,6 +1,7 @@
 ﻿using System;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
+using ICD.Common.Utils.Json;
 using Newtonsoft.Json.Linq;
 
 namespace ICD.Connect.Sources.Barco
@@ -134,8 +135,10 @@ namespace ICD.Connect.Sources.Barco
 			string serialNumber = (string)json.SelectToken("SerialNumber");
 			string statusString = (string)json.SelectToken("Status");
 
-			DateTime? lastConnected = lastConnectedToken == null ? null : (DateTime?)lastConnectedToken;
-			DateTime? lastPaired = lastPairedToken == null ? null : (DateTime?)lastPairedToken;
+			DateTime temp;
+
+			DateTime? lastConnected = JsonUtils.TryParseDateTime(lastConnectedToken, out temp) ? temp : (DateTime?)null;
+			DateTime? lastPaired = JsonUtils.TryParseDateTime(lastPairedToken, out temp) ? temp : (DateTime?)null;
 
 			eStatus status = EnumUtils.Parse<eStatus>(statusString, true);
 
