@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
 using Newtonsoft.Json.Linq;
@@ -11,9 +10,6 @@ namespace ICD.Connect.Sources.Barco
 	/// </summary>
 	public struct BarcoClickshareButton
 	{
-		// 2016-02-26T19:24:59
-		private const string DATE_FORMAT = @"yyyy-MM-dd\THH:mm:ss";
-
 		public enum eStatus
 		{
 			[UsedImplicitly] Ok,
@@ -132,19 +128,14 @@ namespace ICD.Connect.Sources.Barco
 			int connectionCount = (int)json.SelectToken("ConnectionCount");
 			string version = (string)json.SelectToken("FirmwareVersion");
 			string ip = (string)json.SelectToken("IpAddress");
-			string lastConnectedString = (string)json.SelectToken("LastConnected");
-			string lastPairedString = (string)json.SelectToken("LastPaired");
+			JToken lastConnectedToken = json.SelectToken("LastConnected");
+			JToken lastPairedToken = json.SelectToken("LastPaired");
 			string macAddress = (string)json.SelectToken("MacAddress");
 			string serialNumber = (string)json.SelectToken("SerialNumber");
 			string statusString = (string)json.SelectToken("Status");
 
-			CultureInfo provider = CultureInfo.CurrentCulture;
-			DateTime? lastConnected = lastConnectedString == null
-				                          ? (DateTime?)null
-				                          : DateTime.ParseExact(lastConnectedString, DATE_FORMAT, provider);
-			DateTime? lastPaired = lastPairedString == null
-				                       ? (DateTime?)null
-				                       : DateTime.ParseExact(lastPairedString, DATE_FORMAT, provider);
+			DateTime? lastConnected = lastConnectedToken == null ? null : (DateTime?)lastConnectedToken;
+			DateTime? lastPaired = lastPairedToken == null ? null : (DateTime?)lastPairedToken;
 
 			eStatus status = EnumUtils.Parse<eStatus>(statusString, true);
 
