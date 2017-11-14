@@ -301,9 +301,9 @@ namespace ICD.Connect.Sources.Barco
 				JObject data = (JObject)json.SelectToken("data");
 				dataCallback(data);
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				Log(eSeverity.Error, "Failed to parse json: {0}", response);
+				Log(eSeverity.Error, e, "Failed to parse json - {0}", response);
 				IncrementUpdateInterval();
 				return;
 			}
@@ -432,6 +432,21 @@ namespace ICD.Connect.Sources.Barco
 			message = string.Format("{0} - {1}", this, message);
 
 			ServiceProvider.GetService<ILoggerService>().AddEntry(severity, message);
+		}
+
+		/// <summary>
+		/// Logs to logging core.
+		/// </summary>
+		/// <param name="severity"></param>
+		/// <param name="exception"></param>
+		/// <param name="message"></param>
+		/// <param name="args"></param>
+		private void Log(eSeverity severity, Exception exception, string message, params object[] args)
+		{
+			message = string.Format(message, args);
+			message = string.Format("{0} - {1}", this, message);
+
+			ServiceProvider.GetService<ILoggerService>().AddEntry(severity, exception, message);
 		}
 
 		/// <summary>
