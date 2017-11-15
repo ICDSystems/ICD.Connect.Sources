@@ -4,6 +4,7 @@ using ICD.Common.Utils.Xml;
 using ICD.Connect.Devices;
 using ICD.Connect.Protocol.Ports.IrPort;
 using ICD.Connect.Settings.Attributes;
+using ICD.Connect.Settings.Attributes.SettingsProperties;
 
 namespace ICD.Connect.Sources.TvTuner
 {
@@ -12,7 +13,7 @@ namespace ICD.Connect.Sources.TvTuner
 		private const string FACTORY_NAME = "IrTvTuner";
 		private const string PORT_ELEMENT = "Port";
 
-		[SettingsProperty(SettingsProperty.ePropertyType.Id, typeof(IIrPort))]
+		[OriginatorIdSettingsProperty(typeof(IIrPort))]
 		public int? Port { get; set; }
 
 		/// <summary>
@@ -33,8 +34,7 @@ namespace ICD.Connect.Sources.TvTuner
 		{
 			base.WriteElements(writer);
 
-			if (Port != null)
-				writer.WriteElementString(PORT_ELEMENT, IcdXmlConvert.ToString((int)Port));
+			writer.WriteElementString(PORT_ELEMENT, IcdXmlConvert.ToString(Port));
 		}
 
 		/// <summary>

@@ -1,7 +1,7 @@
 ﻿using ICD.Common.Utils.Xml;
 using ICD.Connect.Devices;
 using ICD.Connect.Protocol.Network.WebPorts;
-using ICD.Connect.Settings.Attributes;
+using ICD.Connect.Settings.Attributes.SettingsProperties;
 
 namespace ICD.Connect.Sources.Barco
 {
@@ -12,7 +12,7 @@ namespace ICD.Connect.Sources.Barco
 	{
 		private const string PORT_ELEMENT = "Port";
 
-		[SettingsProperty(SettingsProperty.ePropertyType.Id, typeof(IWebPort))]
+		[OriginatorIdSettingsProperty(typeof(IWebPort))]
 		public int? Port { get; set; }
 
 		/// <summary>
@@ -23,8 +23,7 @@ namespace ICD.Connect.Sources.Barco
 		{
 			base.WriteElements(writer);
 
-			if (Port != null)
-				writer.WriteElementString(PORT_ELEMENT, IcdXmlConvert.ToString((int)Port));
+			writer.WriteElementString(PORT_ELEMENT, IcdXmlConvert.ToString(Port));
 		}
 
 		/// <summary>
