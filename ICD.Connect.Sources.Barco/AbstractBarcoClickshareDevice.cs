@@ -8,6 +8,7 @@ using ICD.Common.Services.Logging;
 using ICD.Common.Utils;
 using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Timers;
+using ICD.Connect.API.Nodes;
 using ICD.Connect.Devices;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.WebPorts;
@@ -109,6 +110,8 @@ namespace ICD.Connect.Sources.Barco
 
 				m_Version = value;
 
+				Logger.AddEntry(eSeverity.Informational, "{0} version set to {1}", this, m_Version);
+
 				OnVersionChanged.Raise(this, new StringEventArgs(m_Version));
 			}
 		}
@@ -127,6 +130,8 @@ namespace ICD.Connect.Sources.Barco
 
 				m_SoftwareVersion = value;
 
+				Logger.AddEntry(eSeverity.Informational, "{0} software version set to {1}", this, m_SoftwareVersion);
+
 				OnSoftwareVersionChanged.Raise(this, new StringEventArgs(m_SoftwareVersion));
 			}
 		}
@@ -144,6 +149,8 @@ namespace ICD.Connect.Sources.Barco
 					return;
 
 				m_Sharing = value;
+
+				Logger.AddEntry(eSeverity.Informational, "{0} sharing state set to {1}", this, m_Sharing);
 
 				OnSharingStatusChanged.Raise(this, new BoolEventArgs(m_Sharing));
 			}
@@ -581,6 +588,23 @@ namespace ICD.Connect.Sources.Barco
 				Log(eSeverity.Error, "No Web Port with id {0}", settings.Port);
 
 			SetPort(port);
+		}
+
+		#endregion
+
+		#region Console
+
+		/// <summary>
+		/// Calls the delegate for each console status item.
+		/// </summary>
+		/// <param name="addRow"></param>
+		public override void BuildConsoleStatus(AddStatusRowDelegate addRow)
+		{
+			base.BuildConsoleStatus(addRow);
+
+			addRow("Version", Version);
+			addRow("Software Version", SoftwareVersion);
+			addRow("Sharing", Sharing);
 		}
 
 		#endregion
