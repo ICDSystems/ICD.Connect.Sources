@@ -20,7 +20,9 @@ namespace ICD.Connect.Sources.BarcoPro
 		/// </summary>
 		protected override void DisposeFinal(bool disposing)
 		{
+#if SIMPLSHARP
 			m_Thread.Abort();
+#endif
 
 			base.DisposeFinal(disposing);
 		}
