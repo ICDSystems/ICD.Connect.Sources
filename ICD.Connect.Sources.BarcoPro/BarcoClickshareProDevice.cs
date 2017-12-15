@@ -15,6 +15,16 @@ namespace ICD.Connect.Sources.BarcoPro
 	{
 		private Thread m_Thread;
 
+		/// <summary>
+		/// Release resources.
+		/// </summary>
+		protected override void DisposeFinal(bool disposing)
+		{
+			m_Thread.Abort();
+
+			base.DisposeFinal(disposing);
+		}
+
 		protected override void PollDevice()
 		{
 			// Don't create multiple threads to poll at the same time.
