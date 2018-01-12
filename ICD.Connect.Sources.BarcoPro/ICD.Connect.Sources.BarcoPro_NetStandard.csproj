@@ -33,6 +33,7 @@
     <None Remove="ICD.Connect.Sources.BarcoPro_SimplSharp.suo" />
     <None Remove="ICD.Connect.Sources.projectinfo" />
     <None Remove="ICD.SimplSharp.projectinfo" />
+    <None Remove="Properties\ControlSystem.cfg" />
   </ItemGroup>
 
   <ItemGroup>
