@@ -1,14 +1,13 @@
 ﻿using System;
 using ICD.Common.Properties;
 using ICD.Common.Utils.Xml;
-using ICD.Connect.Devices;
 using ICD.Connect.Protocol.Ports.IrPort;
 using ICD.Connect.Settings.Attributes;
 using ICD.Connect.Settings.Attributes.SettingsProperties;
 
 namespace ICD.Connect.Sources.TvTuner
 {
-	public sealed class IrTvTunerSettings : AbstractDeviceSettings
+	public sealed class IrTvTunerSettings : AbstractTvTunerSettings
 	{
 		private const string FACTORY_NAME = "IrTvTuner";
 		private const string PORT_ELEMENT = "Port";
@@ -24,7 +23,7 @@ namespace ICD.Connect.Sources.TvTuner
 		/// <summary>
 		/// Gets the type of the originator for this settings instance.
 		/// </summary>
-		public override Type OriginatorType { get { return typeof(IrTvTuner); } }
+		public override Type OriginatorType { get { return typeof(IrTvTunerDevice); } }
 
 		/// <summary>
 		/// Writes property elements to xml.

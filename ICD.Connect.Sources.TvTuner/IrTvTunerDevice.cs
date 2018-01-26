@@ -1,7 +1,6 @@
 ﻿using ICD.Common.Utils.EventArguments;
 using ICD.Common.Properties;
 using ICD.Common.Utils.Services.Logging;
-using ICD.Connect.Devices;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports.IrPort;
 using ICD.Connect.Routing.Connections;
@@ -13,14 +12,14 @@ namespace ICD.Connect.Sources.TvTuner
 	/// <summary>
 	/// Controls a generic TvTuner via an IR Port.
 	/// </summary>
-	public sealed class IrTvTuner : AbstractDevice<IrTvTunerSettings>, ITvTuner
+	public sealed class IrTvTunerDevice : AbstractTvTunerDevice<IrTvTunerSettings>
 	{
 		private IIrPort m_Port;
 
 		/// <summary>
 		/// Constructor.
 		/// </summary>
-		public IrTvTuner()
+		public IrTvTunerDevice()
 		{
 			// Assume the tv tuner has a single source output
 			MockRouteSourceControl sourceControl = new MockRouteSourceControl(this, 0);
@@ -52,7 +51,7 @@ namespace ICD.Connect.Sources.TvTuner
 		/// Goes to the given channel number.
 		/// </summary>
 		/// <param name="number"></param>
-		public void SetChannel(string number)
+		public override void SetChannel(string number)
 		{
 			foreach (char character in number)
 				SendNumber(character);
@@ -61,7 +60,7 @@ namespace ICD.Connect.Sources.TvTuner
 		/// <summary>
 		/// Goes to the next channel.
 		/// </summary>
-		public void ChannelUp()
+		public override void ChannelUp()
 		{
 			SendNumber('+');
 		}
@@ -69,7 +68,7 @@ namespace ICD.Connect.Sources.TvTuner
 		/// <summary>
 		/// Goes to the previous channel.
 		/// </summary>
-		public void ChannelDown()
+		public override void ChannelDown()
 		{
 			SendNumber('-');
 		}
@@ -78,7 +77,7 @@ namespace ICD.Connect.Sources.TvTuner
 		/// Sends a single number to the tuner for manual channel selection.
 		/// </summary>
 		/// <param name="number"></param>
-		public void SendNumber(char number)
+		public override void SendNumber(char number)
 		{
 			m_Port.PressAndRelease(number.ToString());
 		}
