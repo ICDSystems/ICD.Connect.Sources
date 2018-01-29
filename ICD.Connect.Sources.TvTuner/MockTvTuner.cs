@@ -1,7 +1,22 @@
-﻿namespace ICD.Connect.Sources.TvTuner
+﻿using ICD.Connect.Routing.Connections;
+using ICD.Connect.Routing.Mock.Source;
+
+namespace ICD.Connect.Sources.TvTuner
 {
 	public sealed class MockTvTunerDevice : AbstractTvTunerDevice<MockTvTunerSettings>
 	{
+		/// <summary>
+		/// Constructor.
+		/// </summary>
+		public MockTvTunerDevice()
+		{
+			// Assume the tv tuner has a single source output
+			MockRouteSourceControl sourceControl = new MockRouteSourceControl(this, 0);
+			sourceControl.SetActiveTransmissionState(1, eConnectionType.Audio | eConnectionType.Video, true);
+
+			Controls.Add(sourceControl);
+		}
+
 		/// <summary>
 		/// Gets the current online status of the device.
 		/// </summary>
