@@ -24,9 +24,9 @@ namespace ICD.Connect.Sources.TvTuner
 		/// <param name="xml"></param>
 		/// <returns></returns>
 		[PublicAPI, XmlFactoryMethod(FACTORY_NAME)]
-		public static IrTvTunerSettings FromXml(string xml)
+		public static MockTvTunerSettings FromXml(string xml)
 		{
-			IrTvTunerSettings output = new IrTvTunerSettings();
+			MockTvTunerSettings output = new MockTvTunerSettings();
 			ParseXml(output, xml);
 			return output;
 		}
