@@ -2,7 +2,7 @@
 using ICD.Common.Properties;
 using ICD.Connect.Settings.Attributes;
 
-namespace ICD.Connect.Sources.TvTuner
+namespace ICD.Connect.Sources.TvTuner.Devices
 {
 	public sealed class MockTvTunerSettings : AbstractTvTunerSettings
 	{

@@ -1,13 +1,14 @@
-﻿using ICD.Common.Utils.EventArguments;
-using ICD.Common.Properties;
+﻿using ICD.Common.Properties;
+using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports.IrPort;
 using ICD.Connect.Routing.Connections;
 using ICD.Connect.Routing.Mock.Source;
 using ICD.Connect.Settings.Core;
+using ICD.Connect.Sources.TvTuner.Controls;
 
-namespace ICD.Connect.Sources.TvTuner
+namespace ICD.Connect.Sources.TvTuner.Devices
 {
 	/// <summary>
 	/// Controls a generic TvTuner via an IR Port.
@@ -26,6 +27,7 @@ namespace ICD.Connect.Sources.TvTuner
 			sourceControl.SetActiveTransmissionState(1, eConnectionType.Audio | eConnectionType.Video, true);
 
 			Controls.Add(sourceControl);
+			Controls.Add(new TvTunerControl(this, 1));
 		}
 
 		#region Methods

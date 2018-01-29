@@ -1,7 +1,7 @@
 ﻿using ICD.Common.Properties;
 using ICD.Connect.Devices;
 
-namespace ICD.Connect.Sources.TvTuner
+namespace ICD.Connect.Sources.TvTuner.Devices
 {
 	/// <summary>
 	/// A TV Tuner device provides functionality for changing channel.

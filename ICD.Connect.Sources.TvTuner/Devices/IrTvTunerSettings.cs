@@ -5,7 +5,7 @@ using ICD.Connect.Protocol.Ports.IrPort;
 using ICD.Connect.Settings.Attributes;
 using ICD.Connect.Settings.Attributes.SettingsProperties;
 
-namespace ICD.Connect.Sources.TvTuner
+namespace ICD.Connect.Sources.TvTuner.Devices
 {
 	public sealed class IrTvTunerSettings : AbstractTvTunerSettings
 	{

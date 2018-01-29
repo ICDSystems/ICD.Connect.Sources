@@ -1,7 +1,8 @@
 ﻿using ICD.Connect.Routing.Connections;
 using ICD.Connect.Routing.Mock.Source;
+using ICD.Connect.Sources.TvTuner.Controls;
 
-namespace ICD.Connect.Sources.TvTuner
+namespace ICD.Connect.Sources.TvTuner.Devices
 {
 	public sealed class MockTvTunerDevice : AbstractTvTunerDevice<MockTvTunerSettings>
 	{
@@ -15,6 +16,7 @@ namespace ICD.Connect.Sources.TvTuner
 			sourceControl.SetActiveTransmissionState(1, eConnectionType.Audio | eConnectionType.Video, true);
 
 			Controls.Add(sourceControl);
+			Controls.Add(new TvTunerControl(this, 1));
 		}
 
 		/// <summary>
