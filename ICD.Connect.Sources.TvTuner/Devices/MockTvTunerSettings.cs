@@ -27,7 +27,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		public static MockTvTunerSettings FromXml(string xml)
 		{
 			MockTvTunerSettings output = new MockTvTunerSettings();
-			ParseXml(output, xml);
+			output.ParseXml(xml);
 			return output;
 		}
 	}

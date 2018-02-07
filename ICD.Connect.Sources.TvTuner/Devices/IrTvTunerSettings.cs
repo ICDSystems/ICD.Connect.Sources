@@ -51,7 +51,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 				Port = port
 			};
 
-			ParseXml(output, xml);
+			output.ParseXml(xml);
 			return output;
 		}
 	}
