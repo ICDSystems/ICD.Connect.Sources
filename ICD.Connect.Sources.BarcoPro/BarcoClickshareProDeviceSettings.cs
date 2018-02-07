@@ -28,7 +28,7 @@ namespace ICD.Connect.Sources.BarcoPro
 		public static BarcoClickshareProDeviceSettings FromXml(string xml)
 		{
 			BarcoClickshareProDeviceSettings output = new BarcoClickshareProDeviceSettings();
-			ParseXml(output, xml);
+			output.ParseXml(xml);
 			return output;
 		}
 	}
