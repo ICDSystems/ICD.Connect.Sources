@@ -1,5 +1,4 @@
 ﻿using System;
-using ICD.Common.Properties;
 using ICD.Common.Utils.Xml;
 using ICD.Connect.Protocol.Ports.IrPort;
 using ICD.Connect.Settings.Attributes;
@@ -7,6 +6,7 @@ using ICD.Connect.Settings.Attributes.SettingsProperties;
 
 namespace ICD.Connect.Sources.TvTuner.Devices
 {
+	[KrangSettings(FACTORY_NAME)]
 	public sealed class IrTvTunerSettings : AbstractTvTunerSettings
 	{
 		private const string FACTORY_NAME = "IrTvTuner";
@@ -37,22 +37,14 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		}
 
 		/// <summary>
-		/// Loads the settings from XML.
+		/// Updates the settings from xml.
 		/// </summary>
 		/// <param name="xml"></param>
-		/// <returns></returns>
-		[PublicAPI, XmlFactoryMethod(FACTORY_NAME)]
-		public static IrTvTunerSettings FromXml(string xml)
+		public override void ParseXml(string xml)
 		{
-			int? port = XmlUtils.TryReadChildElementContentAsInt(xml, PORT_ELEMENT);
+			base.ParseXml(xml);
 
-			IrTvTunerSettings output = new IrTvTunerSettings
-			{
-				Port = port
-			};
-
-			output.ParseXml(xml);
-			return output;
+			Port = XmlUtils.TryReadChildElementContentAsInt(xml, PORT_ELEMENT);
 		}
 	}
 }

@@ -1,9 +1,9 @@
 ﻿using System;
-using ICD.Common.Properties;
 using ICD.Connect.Settings.Attributes;
 
 namespace ICD.Connect.Sources.TvTuner.Devices
 {
+	[KrangSettings(FACTORY_NAME)]
 	public sealed class MockTvTunerSettings : AbstractTvTunerSettings
 	{
 		private const string FACTORY_NAME = "MockTvTuner";
@@ -17,18 +17,5 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		/// Gets the type of the originator for this settings instance.
 		/// </summary>
 		public override Type OriginatorType { get { return typeof(MockTvTunerDevice); } }
-
-		/// <summary>
-		/// Loads the settings from XML.
-		/// </summary>
-		/// <param name="xml"></param>
-		/// <returns></returns>
-		[PublicAPI, XmlFactoryMethod(FACTORY_NAME)]
-		public static MockTvTunerSettings FromXml(string xml)
-		{
-			MockTvTunerSettings output = new MockTvTunerSettings();
-			output.ParseXml(xml);
-			return output;
-		}
 	}
 }
