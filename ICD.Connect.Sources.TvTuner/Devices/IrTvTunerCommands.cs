@@ -6,36 +6,36 @@ namespace ICD.Connect.Sources.TvTuner.Devices
     {
 		#region Defaults
 
-		public const string COMMAND_CLEAR = "clear";
-		public const string COMMAND_ENTER = "enter";
-		public const string COMMAND_CHANNEL_UP = "+";
-		public const string COMMAND_CHANNEL_DOWN = "-";
+		private const string COMMAND_CLEAR = "clear";
+		private const string COMMAND_ENTER = "enter";
+		private const string COMMAND_CHANNEL_UP = "+";
+		private const string COMMAND_CHANNEL_DOWN = "-";
 
-		public const string COMMAND_REPEAT = "repeat";
-		public const string COMMAND_REWIND = "rewind";
-		public const string COMMAND_FAST_FORWARD = "fastforward";
-		public const string COMMAND_STOP = "stop";
-		public const string COMMAND_PLAY = "play";
-		public const string COMMAND_PAUSE = "pause";
-		public const string COMMAND_RECORD = "record";
+		private const string COMMAND_REPEAT = "repeat";
+		private const string COMMAND_REWIND = "rewind";
+		private const string COMMAND_FAST_FORWARD = "fastforward";
+		private const string COMMAND_STOP = "stop";
+		private const string COMMAND_PLAY = "play";
+		private const string COMMAND_PAUSE = "pause";
+		private const string COMMAND_RECORD = "record";
 
-		public const string COMMAND_PAGE_UP = "pageup";
-		public const string COMMAND_PAGE_DOWN = "pagedown";
-		public const string COMMAND_TOP_MENU = "topmenu";
-		public const string COMMAND_POPUP_MENU = "popupmenu";
-		public const string COMMAND_RETURN = "return";
-		public const string COMMAND_INFO = "info";
-		public const string COMMAND_EJECT = "eject";
-		public const string COMMAND_POWER = "power";
-		public const string COMMAND_RED = "red";
-		public const string COMMAND_GREEN = "green";
-		public const string COMMAND_YELLOW = "yellow";
-		public const string COMMAND_BLUE = "blue";
-		public const string COMMAND_UP = "up";
-		public const string COMMAND_DOWN = "down";
-		public const string COMMAND_LEFT = "left";
-		public const string COMMAND_RIGHT = "right";
-		public const string COMMAND_SELECT = "select";
+		private const string COMMAND_PAGE_UP = "pageup";
+		private const string COMMAND_PAGE_DOWN = "pagedown";
+		private const string COMMAND_TOP_MENU = "topmenu";
+		private const string COMMAND_POPUP_MENU = "popupmenu";
+		private const string COMMAND_RETURN = "return";
+		private const string COMMAND_INFO = "info";
+		private const string COMMAND_EJECT = "eject";
+		private const string COMMAND_POWER = "power";
+		private const string COMMAND_RED = "red";
+		private const string COMMAND_GREEN = "green";
+		private const string COMMAND_YELLOW = "yellow";
+		private const string COMMAND_BLUE = "blue";
+		private const string COMMAND_UP = "up";
+		private const string COMMAND_DOWN = "down";
+		private const string COMMAND_LEFT = "left";
+		private const string COMMAND_RIGHT = "right";
+		private const string COMMAND_SELECT = "select";
 
 		#endregion
 

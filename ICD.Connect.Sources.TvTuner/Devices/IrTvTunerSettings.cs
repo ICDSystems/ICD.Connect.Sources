@@ -19,36 +19,36 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		private const string ELEMENT_PLAYBACK = "Playback";
 		private const string ELEMENT_MENUS = "Menus";
 
-		public const string ELEMENT_CLEAR = "Clear";
-		public const string ELEMENT_ENTER = "Enter";
-		public const string ELEMENT_CHANNEL_UP = "ChannelUp";
-		public const string ELEMENT_CHANNEL_DOWN = "ChannelDown";
+		private const string ELEMENT_CLEAR = "Clear";
+		private const string ELEMENT_ENTER = "Enter";
+		private const string ELEMENT_CHANNEL_UP = "ChannelUp";
+		private const string ELEMENT_CHANNEL_DOWN = "ChannelDown";
 
-		public const string ELEMENT_REPEAT = "Repeat";
-		public const string ELEMENT_REWIND = "Rewind";
-		public const string ELEMENT_FAST_FORWARD = "FastForward";
-		public const string ELEMENT_STOP = "Stop";
-		public const string ELEMENT_PLAY = "Play";
-		public const string ELEMENT_PAUSE = "Pause";
-		public const string ELEMENT_RECORD = "Record";
+		private const string ELEMENT_REPEAT = "Repeat";
+		private const string ELEMENT_REWIND = "Rewind";
+		private const string ELEMENT_FAST_FORWARD = "FastForward";
+		private const string ELEMENT_STOP = "Stop";
+		private const string ELEMENT_PLAY = "Play";
+		private const string ELEMENT_PAUSE = "Pause";
+		private const string ELEMENT_RECORD = "Record";
 
-		public const string ELEMENT_PAGE_UP = "PageUp";
-		public const string ELEMENT_PAGE_DOWN = "PageDown";
-		public const string ELEMENT_TOP_MENU = "TopMenu";
-		public const string ELEMENT_POPUP_MENU = "PopupMenu";
-		public const string ELEMENT_RETURN = "Return";
-		public const string ELEMENT_INFO = "Info";
-		public const string ELEMENT_EJECT = "Eject";
-		public const string ELEMENT_POWER = "Power";
-		public const string ELEMENT_RED = "Red";
-		public const string ELEMENT_GREEN = "Green";
-		public const string ELEMENT_YELLOW = "Yellow";
-		public const string ELEMENT_BLUE = "Blue";
-		public const string ELEMENT_UP = "Up";
-		public const string ELEMENT_DOWN = "Down";
-		public const string ELEMENT_LEFT = "Left";
-		public const string ELEMENT_RIGHT = "Right";
-		public const string ELEMENT_SELECT = "Select";
+		private const string ELEMENT_PAGE_UP = "PageUp";
+		private const string ELEMENT_PAGE_DOWN = "PageDown";
+		private const string ELEMENT_TOP_MENU = "TopMenu";
+		private const string ELEMENT_POPUP_MENU = "PopupMenu";
+		private const string ELEMENT_RETURN = "Return";
+		private const string ELEMENT_INFO = "Info";
+		private const string ELEMENT_EJECT = "Eject";
+		private const string ELEMENT_POWER = "Power";
+		private const string ELEMENT_RED = "Red";
+		private const string ELEMENT_GREEN = "Green";
+		private const string ELEMENT_YELLOW = "Yellow";
+		private const string ELEMENT_BLUE = "Blue";
+		private const string ELEMENT_UP = "Up";
+		private const string ELEMENT_DOWN = "Down";
+		private const string ELEMENT_LEFT = "Left";
+		private const string ELEMENT_RIGHT = "Right";
+		private const string ELEMENT_SELECT = "Select";
 
 		#endregion
 
