@@ -15,6 +15,8 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 	/// </summary>
 	public sealed class IrTvTunerDevice : AbstractTvTunerDevice<IrTvTunerSettings>
 	{
+		private readonly IrTvTunerCommands m_Commands;
+		
 		private IIrPort m_Port;
 
 		/// <summary>
@@ -22,6 +24,8 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		/// </summary>
 		public IrTvTunerDevice()
 		{
+			m_Commands = new IrTvTunerCommands();
+
 			// Assume the tv tuner has a single source output
 			MockRouteSourceControl sourceControl = new MockRouteSourceControl(this, 0);
 			sourceControl.SetActiveTransmissionState(1, eConnectionType.Audio | eConnectionType.Video, true);
@@ -49,6 +53,10 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			UpdateCachedOnlineStatus();
 		}
 
+		#endregion
+
+		#region Channels
+
 		/// <summary>
 		/// Goes to the given channel number.
 		/// </summary>
@@ -56,23 +64,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		public override void SetChannel(string number)
 		{
 			foreach (char character in number)
-				SendNumber(character);
-		}
-
-		/// <summary>
-		/// Goes to the next channel.
-		/// </summary>
-		public override void ChannelUp()
-		{
-			SendNumber('+');
-		}
-
-		/// <summary>
-		/// Goes to the previous channel.
-		/// </summary>
-		public override void ChannelDown()
-		{
-			SendNumber('-');
+				PressAndRelease(character);
 		}
 
 		/// <summary>
@@ -81,7 +73,259 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		/// <param name="number"></param>
 		public override void SendNumber(char number)
 		{
-			m_Port.PressAndRelease(number.ToString());
+			PressAndRelease(number);
+		}
+
+		/// <summary>
+		/// Sends the clear command.
+		/// </summary>
+		public override void Clear()
+		{
+			PressAndRelease(m_Commands.CommandClear);
+		}
+
+		/// <summary>
+		/// Sends the enter command.
+		/// </summary>
+		public override void Enter()
+		{
+			PressAndRelease(m_Commands.CommandEnter);
+		}
+
+		/// <summary>
+		/// Goes to the next channel.
+		/// </summary>
+		public override void ChannelUp()
+		{
+			PressAndRelease(m_Commands.CommandChannelUp);
+		}
+
+		/// <summary>
+		/// Goes to the previous channel.
+		/// </summary>
+		public override void ChannelDown()
+		{
+			PressAndRelease(m_Commands.CommandChannelDown);
+		}
+
+		#endregion
+
+		#region Playback
+
+		/// <summary>
+		/// Sends the repeat command.
+		/// </summary>
+		public override void Repeat()
+		{
+			PressAndRelease(m_Commands.CommandRepeat);
+		}
+
+		/// <summary>
+		/// Sends the rewind command.
+		/// </summary>
+		public override void Rewind()
+		{
+			PressAndRelease(m_Commands.CommandRewind);
+		}
+
+		/// <summary>
+		/// Sends the fast-forward command.
+		/// </summary>
+		public override void FastForward()
+		{
+			PressAndRelease(m_Commands.CommandFastForward);
+		}
+
+		/// <summary>
+		/// Sends the stop command.
+		/// </summary>
+		public override void Stop()
+		{
+			PressAndRelease(m_Commands.CommandStop);
+		}
+
+		/// <summary>
+		/// Sends the play command.
+		/// </summary>
+		public override void Play()
+		{
+			PressAndRelease(m_Commands.CommandPlay);
+		}
+
+		/// <summary>
+		/// Sends the pause command.
+		/// </summary>
+		public override void Pause()
+		{
+			PressAndRelease(m_Commands.CommandPause);
+		}
+
+		/// <summary>
+		/// Sends the record command.
+		/// </summary>
+		public override void Record()
+		{
+			PressAndRelease(m_Commands.CommandRecord);
+		}
+
+		#endregion
+
+		#region Menus
+
+		/// <summary>
+		/// Goes to the above page.
+		/// </summary>
+		public override void PageUp()
+		{
+			PressAndRelease(m_Commands.CommandPageUp);
+		}
+
+		/// <summary>
+		/// Goes to the below page.
+		/// </summary>
+		public override void PageDown()
+		{
+			PressAndRelease(m_Commands.CommandPageDown);
+		}
+
+		/// <summary>
+		/// Sends the top-menu command.
+		/// </summary>
+		public override void TopMenu()
+		{
+			PressAndRelease(m_Commands.CommandTopMenu);
+		}
+
+		/// <summary>
+		/// Sends the popup-menu command.
+		/// </summary>
+		public override void PopupMenu()
+		{
+			PressAndRelease(m_Commands.CommandPopupMenu);
+		}
+
+		/// <summary>
+		/// Sends the return command.
+		/// </summary>
+		public override void Return()
+		{
+			PressAndRelease(m_Commands.CommandReturn);
+		}
+
+		/// <summary>
+		/// Sends the info command.
+		/// </summary>
+		public override void Info()
+		{
+			PressAndRelease(m_Commands.CommandInfo);
+		}
+
+		/// <summary>
+		/// Sends the eject command.
+		/// </summary>
+		public override void Eject()
+		{
+			PressAndRelease(m_Commands.CommandEject);
+		}
+
+		/// <summary>
+		/// Sends the power command.
+		/// </summary>
+		public override void Power()
+		{
+			PressAndRelease(m_Commands.CommandPower);
+		}
+
+		/// <summary>
+		/// Sends the red command.
+		/// </summary>
+		public override void Red()
+		{
+			PressAndRelease(m_Commands.CommandRed);
+		}
+
+		/// <summary>
+		/// Sends the green command.
+		/// </summary>
+		public override void Green()
+		{
+			PressAndRelease(m_Commands.CommandGreen);
+		}
+
+		/// <summary>
+		/// Sends the yellow command.
+		/// </summary>
+		public override void Yellow()
+		{
+			PressAndRelease(m_Commands.CommandYellow);
+		}
+
+		/// <summary>
+		/// Sends the blue command.
+		/// </summary>
+		public override void Blue()
+		{
+			PressAndRelease(m_Commands.CommandBlue);
+		}
+
+		/// <summary>
+		/// Sends the up command.
+		/// </summary>
+		public override void Up()
+		{
+			PressAndRelease(m_Commands.CommandUp);
+		}
+
+		/// <summary>
+		/// Sends the down command.
+		/// </summary>
+		public override void Down()
+		{
+			PressAndRelease(m_Commands.CommandDown);
+		}
+
+		/// <summary>
+		/// Sends the left command.
+		/// </summary>
+		public override void Left()
+		{
+			PressAndRelease(m_Commands.CommandLeft);
+		}
+
+		/// <summary>
+		/// Sends the right command.
+		/// </summary>
+		public override void Right()
+		{
+			PressAndRelease(m_Commands.CommandRight);
+		}
+
+		/// <summary>
+		/// Sends the select command.
+		/// </summary>
+		public override void Select()
+		{
+			PressAndRelease(m_Commands.CommandSelect);
+		}
+
+		#endregion
+
+		#region Private Methods
+
+		private void PressAndRelease(char command)
+		{
+			PressAndRelease(command.ToString());
+		}
+
+		private void PressAndRelease(string command)
+		{
+			if (m_Port == null)
+			{
+				Logger.AddEntry(eSeverity.Error, "{0} unable to send command - port is null.", this);
+				return;
+			}
+
+			m_Port.PressAndRelease(command);
 		}
 
 		#endregion
@@ -97,6 +341,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			base.CopySettingsFinal(settings);
 
 			settings.Port = m_Port == null ? (int?)null : m_Port.Id;
+			settings.Commands.Update(m_Commands);
 		}
 
 		/// <summary>
@@ -107,6 +352,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			base.ClearSettingsFinal();
 
 			SetIrPort(null);
+			m_Commands.Clear();
 		}
 
 		/// <summary>
@@ -117,6 +363,8 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		protected override void ApplySettingsFinal(IrTvTunerSettings settings, IDeviceFactory factory)
 		{
 			base.ApplySettingsFinal(settings, factory);
+
+			m_Commands.Update(settings.Commands);
 
 			IIrPort port = null;
 
@@ -132,7 +380,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 
 		#endregion
 
-		#region Private Methods
+		#region Port Callbacks
 
 		/// <summary>
 		/// Subscribe to the port events.
