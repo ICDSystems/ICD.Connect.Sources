@@ -73,6 +73,7 @@
     <Compile Include="Controls\TvTunerControl.cs" />
     <Compile Include="Devices\AbstractTvTunerDevice.cs" />
     <Compile Include="Devices\AbstractTvTunerSettings.cs" />
+    <Compile Include="Devices\IrTvTunerCommands.cs" />
     <Compile Include="Devices\IrTvTunerDevice.cs" />
     <Compile Include="Devices\IrTvTunerSettings.cs" />
     <Compile Include="Devices\ITvTuner.cs" />
