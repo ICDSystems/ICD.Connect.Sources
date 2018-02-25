@@ -182,14 +182,18 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			Port = XmlUtils.TryReadChildElementContentAsInt(xml, PORT_ELEMENT);
 
 			string irCommands;
-			string channels;
-			string playback;
-			string menus;
+			string channels = null;
+			string playback = null;
+			string menus = null;
 
 			XmlUtils.TryGetChildElementAsString(xml, ELEMENT_IR_COMMANDS, out irCommands);
-			XmlUtils.TryGetChildElementAsString(irCommands, ELEMENT_CHANNELS, out channels);
-			XmlUtils.TryGetChildElementAsString(irCommands, ELEMENT_PLAYBACK, out playback);
-			XmlUtils.TryGetChildElementAsString(irCommands, ELEMENT_MENUS, out menus);
+
+			if (irCommands != null)
+			{
+				XmlUtils.TryGetChildElementAsString(irCommands, ELEMENT_CHANNELS, out channels);
+				XmlUtils.TryGetChildElementAsString(irCommands, ELEMENT_PLAYBACK, out playback);
+				XmlUtils.TryGetChildElementAsString(irCommands, ELEMENT_MENUS, out menus);
+			}
 
 			CommandClear = channels == null ? null : XmlUtils.TryReadChildElementContentAsString(channels, ELEMENT_CLEAR);
 			CommandEnter = channels == null ? null : XmlUtils.TryReadChildElementContentAsString(channels, ELEMENT_ENTER);
