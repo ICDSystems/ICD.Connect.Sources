@@ -4,5 +4,5 @@
 [assembly: AssemblyCompany("ICD Systems")]
 [assembly: AssemblyProduct("ICD.Connect.Sources.BarcoPro")]
 [assembly: AssemblyCopyright("Copyright © ICD Systems 2017")]
-[assembly: AssemblyVersion("2.0.0.*")]
+[assembly: AssemblyVersion("2.0.0.0")]
 
