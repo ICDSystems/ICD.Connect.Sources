@@ -21,7 +21,8 @@ namespace ICD.Connect.Sources.BarcoPro
 		protected override void DisposeFinal(bool disposing)
 		{
 #if SIMPLSHARP
-			m_Thread.Abort();
+			if (m_Thread != null)
+				m_Thread.Abort();
 #endif
 
 			base.DisposeFinal(disposing);
@@ -40,7 +41,7 @@ namespace ICD.Connect.Sources.BarcoPro
 					ThreadCallback();
 					return null;
 				};
-			
+
 			m_Thread = new Thread(callback, null, Thread.eThreadStartOptions.Running)
 			{
 				Priority = Thread.eThreadPriority.LowestPriority
