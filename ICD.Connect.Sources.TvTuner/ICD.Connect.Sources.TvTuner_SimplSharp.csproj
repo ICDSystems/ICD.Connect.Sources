@@ -80,6 +80,7 @@
     <Compile Include="Devices\ITvTunerSettings.cs" />
     <Compile Include="Devices\MockTvTuner.cs" />
     <Compile Include="Devices\MockTvTunerSettings.cs" />
+    <Compile Include="Devices\TvTunerConsole.cs" />
     <Compile Include="Proxies\IProxyTvTuner.cs" />
     <Compile Include="Proxies\ProxyTvTuner.cs" />
     <Compile Include="KrangPlugin.cs" />
