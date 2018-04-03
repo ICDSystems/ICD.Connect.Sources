@@ -4,6 +4,7 @@
     <OutputType>Library</OutputType>
     <TargetFramework>netstandard2.0</TargetFramework>
 	<RootNamespace>ICD.Connect.Sources.BarcoPro</RootNamespace>
+	<AssemblyName>ICD.Connect.Sources.BarcoPro</AssemblyName>
 	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	<Deterministic>true</Deterministic>
   </PropertyGroup>
