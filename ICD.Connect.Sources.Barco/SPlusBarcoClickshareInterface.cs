@@ -1,4 +1,5 @@
-﻿#if SIMPLSHARP
+﻿using ICD.Connect.Devices.EventArguments;
+#if SIMPLSHARP
 using System;
 using Crestron.SimplSharp;
 using ICD.Common.Utils.EventArguments;
@@ -142,12 +143,12 @@ namespace ICD.Connect.Sources.Barco
 			}
 		}
 
-		private void ClickshareOnIsOnlineStateChanged(object sender, BoolEventArgs boolEventArgs)
+		private void ClickshareOnIsOnlineStateChanged(object sender, DeviceBaseOnlineStateApiEventArgs args)
 		{
 			var delegateToFire = SPlusOnlineStatusChanged;
 
 			if (delegateToFire != null)
-				delegateToFire(boolEventArgs.Data ? (ushort)1 : (ushort)0);
+				delegateToFire(args.Data ? (ushort)1 : (ushort)0);
 		}
 
 		private void ClickshareOnSharingStatusChanged(object sender, BoolEventArgs boolEventArgs)
@@ -177,7 +178,7 @@ namespace ICD.Connect.Sources.Barco
 				m_Clickshare.Dispose();
 
 				ClickshareOnSharingStatusChanged(this, new BoolEventArgs(false));
-				ClickshareOnIsOnlineStateChanged(this, new BoolEventArgs(false));
+				ClickshareOnIsOnlineStateChanged(this, new DeviceBaseOnlineStateApiEventArgs(false));
 				ClickshareOnVersionChanged(this, new StringEventArgs(""));
 				ClearButtonFeedback();
 
