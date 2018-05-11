@@ -5,7 +5,7 @@ using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports.IrPort;
 using ICD.Connect.Routing.Connections;
 using ICD.Connect.Routing.Mock.Source;
-using ICD.Connect.Settings.Core;
+using ICD.Connect.Settings;
 using ICD.Connect.Sources.TvTuner.Controls;
 
 namespace ICD.Connect.Sources.TvTuner.Devices
