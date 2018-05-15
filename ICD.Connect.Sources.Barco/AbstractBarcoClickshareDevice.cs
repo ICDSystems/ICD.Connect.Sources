@@ -12,6 +12,7 @@ using ICD.Connect.API.Nodes;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
+using ICD.Connect.Protocol.Network.Settings;
 using ICD.Connect.Protocol.Network.WebPorts;
 using ICD.Connect.Settings;
 using Newtonsoft.Json.Linq;
@@ -111,7 +112,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_Version = value;
 
-				Logger.AddEntry(eSeverity.Informational, "{0} version set to {1}", this, m_Version);
+				Log(eSeverity.Informational, "Version set to {0}", m_Version);
 
 				OnVersionChanged.Raise(this, new StringEventArgs(m_Version));
 			}
@@ -131,7 +132,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_SoftwareVersion = value;
 
-				Logger.AddEntry(eSeverity.Informational, "{0} software version set to {1}", this, m_SoftwareVersion);
+				Log(eSeverity.Informational, "Software version set to {0}", m_SoftwareVersion);
 
 				OnSoftwareVersionChanged.Raise(this, new StringEventArgs(m_SoftwareVersion));
 			}
@@ -151,7 +152,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_Sharing = value;
 
-				Logger.AddEntry(eSeverity.Informational, "{0} sharing state set to {1}", this, m_Sharing);
+				Log(eSeverity.Informational, "Sharing state set to {0}", m_Sharing);
 
 				OnSharingStatusChanged.Raise(this, new BoolEventArgs(m_Sharing));
 			}
@@ -273,7 +274,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 			catch (Exception e)
 			{
-				Log(eSeverity.Error, "Error communicating with {0} - {1}", m_Port.Address, e.Message);
+				Log(eSeverity.Error, "Error communicating with {0} - {1}", m_Port.UriProperties.GetAddressFromUri(), e.Message);
 				IncrementUpdateInterval();
 			}
 		}
@@ -468,35 +469,6 @@ namespace ICD.Connect.Sources.Barco
 				m_SharingUpdateInterval = FAILURE_UPDATE_INTERVAL_LIMIT;
 
 			m_SharingTimer.Reset(m_SharingUpdateInterval, m_SharingUpdateInterval);
-		}
-
-		/// <summary>
-		/// Logs to logging core.
-		/// </summary>
-		/// <param name="severity"></param>
-		/// <param name="message"></param>
-		/// <param name="args"></param>
-		private void Log(eSeverity severity, string message, params object[] args)
-		{
-			message = string.Format(message, args);
-			message = string.Format("{0} - {1}", this, message);
-
-			ServiceProvider.GetService<ILoggerService>().AddEntry(severity, message);
-		}
-
-		/// <summary>
-		/// Logs to logging core.
-		/// </summary>
-		/// <param name="severity"></param>
-		/// <param name="exception"></param>
-		/// <param name="message"></param>
-		/// <param name="args"></param>
-		private void Log(eSeverity severity, Exception exception, string message, params object[] args)
-		{
-			message = string.Format(message, args);
-			message = string.Format("{0} - {1}", this, message);
-
-			ServiceProvider.GetService<ILoggerService>().AddEntry(severity, exception, message);
 		}
 
 		/// <summary>
