@@ -5,7 +5,6 @@ using ICD.Common.Utils.EventArguments;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
 using ICD.Common.Utils.Extensions;
-using ICD.Common.Utils.Services;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Common.Utils.Timers;
 using ICD.Connect.API.Nodes;
@@ -89,6 +88,8 @@ namespace ICD.Connect.Sources.Barco
 		private readonly Dictionary<int, BarcoClickshareButton> m_Buttons;
 		private readonly SafeCriticalSection m_ButtonsSection;
 
+		private readonly UriProperties m_UriProperties;
+
 		private IWebPort m_Port;
 		private bool m_Sharing;
 		private string m_Version;
@@ -167,6 +168,8 @@ namespace ICD.Connect.Sources.Barco
 		/// </summary>
 		protected AbstractBarcoClickshareDevice()
 		{
+			m_UriProperties = new UriProperties();
+
 			m_Version = DEFAULT_VERSION;
 			m_SharingUpdateInterval = SHARING_UPDATE_INTERVAL;
 
@@ -531,6 +534,8 @@ namespace ICD.Connect.Sources.Barco
 			base.CopySettingsFinal(settings);
 
 			settings.Port = m_Port == null ? (int?)null : m_Port.Id;
+
+			settings.Copy(m_UriProperties);
 		}
 
 		/// <summary>
@@ -541,6 +546,8 @@ namespace ICD.Connect.Sources.Barco
 			base.ClearSettingsFinal();
 
 			SetPort(null);
+
+			m_UriProperties.Clear();
 		}
 
 		/// <summary>
@@ -551,6 +558,8 @@ namespace ICD.Connect.Sources.Barco
 		protected override void ApplySettingsFinal(T settings, IDeviceFactory factory)
 		{
 			base.ApplySettingsFinal(settings, factory);
+
+			m_UriProperties.Copy(settings);
 
 			IWebPort port = null;
 
