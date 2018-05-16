@@ -1,12 +1,13 @@
 ﻿using ICD.Common.Utils.Xml;
 using ICD.Connect.Protocol.Ports.IrPort;
+using ICD.Connect.Protocol.Settings;
 using ICD.Connect.Settings.Attributes;
 using ICD.Connect.Settings.Attributes.SettingsProperties;
 
 namespace ICD.Connect.Sources.TvTuner.Devices
 {
 	[KrangSettings("IrTvTuner", typeof(IrTvTunerDevice))]
-	public sealed class IrTvTunerSettings : AbstractTvTunerSettings
+	public sealed class IrTvTunerSettings : AbstractTvTunerSettings, IIrDriverSettings
 	{
 		private const string PORT_ELEMENT = "Port";
 
@@ -51,6 +52,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		#endregion
 
 		private readonly IrTvTunerCommands m_Commands;
+		private readonly IrDriverProperties m_IrDriverProperties;
 
 		#region Properties
 
@@ -93,12 +95,44 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 
 		#endregion
 
+		#region IR Driver
+
+		/// <summary>
+		/// Gets/sets the configurable path to the IR driver.
+		/// </summary>
+		public string IrDriverPath
+		{
+			get { return m_IrDriverProperties.IrDriverPath; }
+			set { m_IrDriverProperties.IrDriverPath = value; }
+		}
+
+		/// <summary>
+		/// Gets/sets the configurable pulse time for the IR driver.
+		/// </summary>
+		public ushort IrPulseTime
+		{
+			get { return m_IrDriverProperties.IrPulseTime; }
+			set { m_IrDriverProperties.IrPulseTime = value; }
+		}
+
+		/// <summary>
+		/// Gets/sets the configurable between time for the IR driver.
+		/// </summary>
+		public ushort IrBetweenTime
+		{
+			get { return m_IrDriverProperties.IrBetweenTime; }
+			set { m_IrDriverProperties.IrBetweenTime = value; }
+		}
+
+		#endregion
+
 		/// <summary>
 		/// Constructor.
 		/// </summary>
 		public IrTvTunerSettings()
 		{
 			m_Commands = new IrTvTunerCommands();
+			m_IrDriverProperties = new IrDriverProperties();
 		}
 
 		/// <summary>
@@ -157,6 +191,8 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 				writer.WriteEndElement();
 			}
 			writer.WriteEndElement();
+
+			m_IrDriverProperties.WriteElements(writer);
 		}
 
 		/// <summary>
@@ -213,6 +249,8 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			CommandLeft = menus == null ? null : XmlUtils.TryReadChildElementContentAsString(menus, ELEMENT_LEFT);
 			CommandRight = menus == null ? null : XmlUtils.TryReadChildElementContentAsString(menus, ELEMENT_RIGHT);
 			CommandSelect = menus == null ? null : XmlUtils.TryReadChildElementContentAsString(menus, ELEMENT_SELECT);
+
+			m_IrDriverProperties.ParseXml(xml);
 		}
 	}
 }
