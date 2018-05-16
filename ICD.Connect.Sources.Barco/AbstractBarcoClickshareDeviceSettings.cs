@@ -1,6 +1,6 @@
 ﻿using ICD.Common.Utils.Xml;
 using ICD.Connect.Devices;
-using ICD.Connect.Protocol.Network.WebPorts;
+using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Settings.Attributes.SettingsProperties;
 
 namespace ICD.Connect.Sources.Barco

@@ -1,11 +1,11 @@
 ﻿using ICD.Connect.Devices.EventArguments;
+using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
 #if SIMPLSHARP
 using System;
 using Crestron.SimplSharp;
 using ICD.Common.Utils.EventArguments;
 using ICD.Common.Properties;
-using ICD.Connect.Protocol.Network.WebPorts;
 
 namespace ICD.Connect.Sources.Barco
 {

@@ -12,8 +12,8 @@ using ICD.Connect.API.Nodes;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
+using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
-using ICD.Connect.Protocol.Network.WebPorts;
 using ICD.Connect.Settings;
 using Newtonsoft.Json.Linq;
 
