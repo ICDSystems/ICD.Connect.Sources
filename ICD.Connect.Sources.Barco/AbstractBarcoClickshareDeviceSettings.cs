@@ -42,7 +42,7 @@ namespace ICD.Connect.Sources.Barco
 		/// <summary>
 		/// Gets/sets the configurable URI port.
 		/// </summary>
-		public ushort UriPort { get { return m_UriProperties.UriPort; } set { m_UriProperties.UriPort = value; } }
+		public ushort? UriPort { get { return m_UriProperties.UriPort; } set { m_UriProperties.UriPort = value; } }
 
 		/// <summary>
 		/// Gets/sets the configurable URI scheme.
@@ -103,7 +103,7 @@ namespace ICD.Connect.Sources.Barco
 
 			m_UriProperties.ParseXml(xml);
 
-			UriPort = UriPort == 0 ? (ushort)4001 : UriPort;
+			UriPort = UriPort ?? 4001;
 		}
 	}
 }
