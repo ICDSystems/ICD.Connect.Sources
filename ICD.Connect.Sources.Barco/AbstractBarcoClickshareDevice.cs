@@ -212,6 +212,8 @@ namespace ICD.Connect.Sources.Barco
 			if (port == m_Port)
 				return;
 
+			ConfigurePort(port);
+
 			Unsubscribe(m_Port);
 			m_Port = port;
 			Subscribe(m_Port);
@@ -220,6 +222,17 @@ namespace ICD.Connect.Sources.Barco
 				m_Port.Accept = PORT_ACCEPT;
 
 			UpdateCachedOnlineStatus();
+		}
+
+		/// <summary>
+		/// Configures the given port for communication with the device.
+		/// </summary>
+		/// <param name="port"></param>
+		private void ConfigurePort(IWebPort port)
+		{
+			// URI
+			if (port != null)
+				port.ApplyDeviceConfiguration(m_UriProperties);
 		}
 
 		/// <summary>
