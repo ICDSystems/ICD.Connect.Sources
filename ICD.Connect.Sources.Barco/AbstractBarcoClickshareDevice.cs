@@ -474,20 +474,6 @@ namespace ICD.Connect.Sources.Barco
 		/// Logs to logging core.
 		/// </summary>
 		/// <param name="severity"></param>
-		/// <param name="message"></param>
-		/// <param name="args"></param>
-		private void Log(eSeverity severity, string message, params object[] args)
-		{
-			message = string.Format(message, args);
-			message = string.Format("{0} - {1}", this, message);
-
-			ServiceProvider.GetService<ILoggerService>().AddEntry(severity, message);
-		}
-
-		/// <summary>
-		/// Logs to logging core.
-		/// </summary>
-		/// <param name="severity"></param>
 		/// <param name="exception"></param>
 		/// <param name="message"></param>
 		/// <param name="args"></param>
