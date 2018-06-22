@@ -188,6 +188,7 @@ namespace ICD.Connect.Sources.Barco
 		protected override void DisposeFinal(bool disposing)
 		{
 			OnVersionChanged = null;
+			OnSoftwareVersionChanged = null;
 			OnSharingStatusChanged = null;
 			OnButtonsChanged = null;
 
