@@ -64,7 +64,7 @@ namespace ICD.Connect.Sources.Barco
 			if (output != 1)
 			{
 				string message = string.Format("{0} has no {1} output at address {2}", this, type, output);
-				throw new IndexOutOfRangeException(message);
+				throw new ArgumentOutOfRangeException("output", message);
 			}
 
 			switch (type)
