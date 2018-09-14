@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [5.1.0] - 2018-09-14
+### Changed
+ - Routing performance improvements
+
 ## [5.0.0] - 2018-04-23
 ### Added
  - Adding API attributes to TV tuner
