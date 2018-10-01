@@ -37,7 +37,7 @@ namespace ICD.Connect.Sources.BarcoPro
 #if SIMPLSHARP
 			m_Thread = new Thread(ThreadCallback, null) {Priority = Thread.eThreadPriority.LowestPriority};
 #else
-			m_Thread = new Thread(ThreadCallback);
+			m_Thread = new Thread(() => ThreadCallback());
 			m_Thread.Start();
 #endif
 		}
