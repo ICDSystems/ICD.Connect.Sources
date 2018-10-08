@@ -82,6 +82,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SPlusBarcoClickshareInterface.cs" />
     <None Include="Properties\ControlSystem.cfg" />
+    <None Include="R5900018-03-ClickShareAPIguide.pdf" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ICD.Common.Utils\ICD.Common.Utils\ICD.Common.Utils_SimplSharp.csproj">
