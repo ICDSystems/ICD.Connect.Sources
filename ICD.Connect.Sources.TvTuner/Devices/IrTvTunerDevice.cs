@@ -1,4 +1,5 @@
-﻿using ICD.Common.Properties;
+﻿using System.Collections.Generic;
+using ICD.Common.Properties;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
@@ -370,9 +371,14 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 
 			if (settings.Port != null)
 			{
-				port = factory.GetPortById((int)settings.Port) as IIrPort;
-				if (port == null)
-					Logger.AddEntry(eSeverity.Error, "Port {0} is not an IR Port", settings.Port);
+				try
+				{
+					port = factory.GetPortById((int)settings.Port) as IIrPort;
+				}
+				catch (KeyNotFoundException)
+				{
+					Log(eSeverity.Error, "Port {0} is not an IR Port", settings.Port);
+				}
 			}
 
 			SetIrPort(port);
