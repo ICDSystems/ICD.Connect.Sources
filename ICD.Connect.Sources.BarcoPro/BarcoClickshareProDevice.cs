@@ -35,21 +35,17 @@ namespace ICD.Connect.Sources.BarcoPro
 				return;
 
 #if SIMPLSHARP
-			ThreadCallbackFunction callback =
-				o =>
-				{
-					ThreadCallback();
-					return null;
-				};
-
-			m_Thread = new Thread(callback, null, Thread.eThreadStartOptions.Running)
-			{
-				Priority = Thread.eThreadPriority.LowestPriority
-			};
+			m_Thread = new Thread(ThreadCallback, null) {Priority = Thread.eThreadPriority.LowestPriority};
 #else
-			m_Thread = new Thread(ThreadCallback);
+			m_Thread = new Thread(() => ThreadCallback());
 			m_Thread.Start();
 #endif
+		}
+
+		private object ThreadCallback(object unused)
+		{
+			ThreadCallback();
+			return null;
 		}
 
 		private void ThreadCallback()
