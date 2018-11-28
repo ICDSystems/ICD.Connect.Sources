@@ -291,7 +291,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 			catch (Exception e)
 			{
-				Log(eSeverity.Error, "Error communicating with {0} - {1}", m_Port.UriProperties.GetAddressFromUri(), e.Message);
+				Log(eSeverity.Error, "Error communicating with {0} - {1}", m_Port.Uri, e.Message);
 				IncrementUpdateInterval();
 			}
 		}

@@ -1,6 +1,6 @@
-﻿using ICD.Connect.Devices.EventArguments;
+﻿using ICD.Common.Utils;
+using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Network.Ports.Web;
-using ICD.Connect.Protocol.Network.Settings;
 #if SIMPLSHARP
 using System;
 using Crestron.SimplSharp;
@@ -71,11 +71,14 @@ namespace ICD.Connect.Sources.Barco
 
 			Unregister();
 
-			m_Port = new HttpPort();
-
-			m_Port.UriProperties.SetUriFromAddress(Host.ToString());
-			m_Port.UriProperties.UriUsername = User.ToString();
-			m_Port.UriProperties.UriPassword = Pass.ToString();
+			m_Port = new HttpPort
+			{
+				Uri = new IcdUriBuilder(Host.ToString())
+				{
+					UserName = User.ToString(),
+					Password = Pass.ToString()
+				}.Uri
+			};
 
 			m_Clickshare = new BarcoClickshareDevice();
 
