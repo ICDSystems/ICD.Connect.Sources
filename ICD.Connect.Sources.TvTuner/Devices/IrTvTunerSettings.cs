@@ -124,6 +124,14 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			set { m_IrDriverProperties.IrBetweenTime = value; }
 		}
 
+		/// <summary>
+		/// Clears the configured values.
+		/// </summary>
+		void IIrDriverProperties.Clear()
+		{
+			m_IrDriverProperties.Clear();
+		}
+
 		#endregion
 
 		/// <summary>
