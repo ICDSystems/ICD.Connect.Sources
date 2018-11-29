@@ -111,7 +111,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_Version = value;
 
-				Logger.AddEntry(eSeverity.Informational, "{0} version set to {1}", this, m_Version);
+				Log(eSeverity.Informational, "{0} version set to {1}", this, m_Version);
 
 				OnVersionChanged.Raise(this, new StringEventArgs(m_Version));
 			}
@@ -131,7 +131,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_SoftwareVersion = value;
 
-				Logger.AddEntry(eSeverity.Informational, "{0} software version set to {1}", this, m_SoftwareVersion);
+				Log(eSeverity.Informational, "{0} software version set to {1}", this, m_SoftwareVersion);
 
 				OnSoftwareVersionChanged.Raise(this, new StringEventArgs(m_SoftwareVersion));
 			}
@@ -151,7 +151,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_Sharing = value;
 
-				Logger.AddEntry(eSeverity.Informational, "{0} sharing state set to {1}", this, m_Sharing);
+				Log(eSeverity.Informational, "{0} sharing state set to {1}", this, m_Sharing);
 
 				OnSharingStatusChanged.Raise(this, new BoolEventArgs(m_Sharing));
 			}
