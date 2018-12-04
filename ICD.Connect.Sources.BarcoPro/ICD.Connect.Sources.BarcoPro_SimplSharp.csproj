@@ -113,6 +113,10 @@
       <Project>{5B84EB3C-1C3A-4C4D-98C2-69F67CF51D5A}</Project>
       <Name>ICD.Connect.Settings_SimplSharp</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ICD.Connect.Telemetry\ICD.Connect.Telemetry\ICD.Connect.Telemetry_SimplSharp.csproj">
+      <Project>{9512C0A5-F966-4AC6-9668-62C6F343B0CD}</Project>
+      <Name>ICD.Connect.Telemetry_SimplSharp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ICD.Connect.Sources.Barco\ICD.Connect.Sources.Barco_SimplSharp.csproj">
       <Project>{48E2061F-98B2-416B-8941-A8A470D6F2DA}</Project>
       <Name>ICD.Connect.Sources.Barco_SimplSharp</Name>
