@@ -6,7 +6,7 @@ using ICD.Connect.Sources.TvTuner.Devices;
 
 namespace ICD.Connect.Sources.TvTuner.Proxies
 {
-	public sealed class ProxyTvTuner : AbstractProxyDevice, IProxyTvTuner
+	public sealed class ProxyTvTuner : AbstractProxyDevice<ProxyTvTunerSettings>, IProxyTvTuner
 	{
 		/// <summary>
 		/// Goes to the given channel number.
