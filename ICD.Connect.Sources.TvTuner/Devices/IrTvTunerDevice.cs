@@ -373,7 +373,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			SetIrPort(null);
 
 			m_Commands.Clear();
-			m_IrDriverProperties.Clear();
+			m_IrDriverProperties.ClearIrProperties();
 		}
 
 		/// <summary>
