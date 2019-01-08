@@ -1,4 +1,5 @@
-﻿using ICD.Common.Utils.Xml;
+﻿using System;
+using ICD.Common.Utils.Xml;
 using ICD.Connect.Devices;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
@@ -79,11 +80,9 @@ namespace ICD.Connect.Sources.Barco
 		/// </summary>
 		protected AbstractBarcoClickshareDeviceSettings()
 		{
-			m_UriProperties = new UriProperties
-			{
-				UriScheme = "https",
-				UriPort = 4001,
-			};
+			m_UriProperties = new UriProperties();
+
+			UpdateUriDefaults();
 		}
 
 		/// <summary>
@@ -111,7 +110,12 @@ namespace ICD.Connect.Sources.Barco
 
 			m_UriProperties.ParseXml(xml);
 
-			UriPort = UriPort ?? 4001;
+			UpdateUriDefaults();
+		}
+
+		private void UpdateUriDefaults()
+		{
+			m_UriProperties.ApplyDefaultValues(null, null, null, 4001, Uri.UriSchemeHttps, null, null, null);
 		}
 	}
 }
