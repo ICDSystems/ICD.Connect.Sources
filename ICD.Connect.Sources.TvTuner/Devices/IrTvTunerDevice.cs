@@ -4,9 +4,10 @@ using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports.IrPort;
+using ICD.Connect.Protocol.Settings;
 using ICD.Connect.Routing.Connections;
 using ICD.Connect.Routing.Mock.Source;
-using ICD.Connect.Settings.Core;
+using ICD.Connect.Settings;
 using ICD.Connect.Sources.TvTuner.Controls;
 
 namespace ICD.Connect.Sources.TvTuner.Devices
@@ -17,6 +18,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 	public sealed class IrTvTunerDevice : AbstractTvTunerDevice<IrTvTunerSettings>
 	{
 		private readonly IrTvTunerCommands m_Commands;
+		private readonly IrDriverProperties m_IrDriverProperties;
 		
 		private IIrPort m_Port;
 
@@ -26,6 +28,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		public IrTvTunerDevice()
 		{
 			m_Commands = new IrTvTunerCommands();
+			m_IrDriverProperties = new IrDriverProperties();
 
 			// Assume the tv tuner has a single source output
 			MockRouteSourceControl sourceControl = new MockRouteSourceControl(this, 0);
@@ -47,11 +50,24 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			if (port == m_Port)
 				return;
 
+			ConfigurePort(port);
+
 			Unsubscribe(m_Port);
 			m_Port = port;
 			Subscribe(m_Port);
 
 			UpdateCachedOnlineStatus();
+		}
+
+		/// <summary>
+		/// Configures the given port for communication with the device.
+		/// </summary>
+		/// <param name="port"></param>
+		private void ConfigurePort(IIrPort port)
+		{
+			// IR
+			if (port != null)
+				port.ApplyDeviceConfiguration(m_IrDriverProperties);
 		}
 
 		#endregion
@@ -322,7 +338,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		{
 			if (m_Port == null)
 			{
-				Logger.AddEntry(eSeverity.Error, "{0} unable to send command - port is null.", this);
+				Log(eSeverity.Error, "Unable to send command - port is null.");
 				return;
 			}
 
@@ -343,6 +359,8 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 
 			settings.Port = m_Port == null ? (int?)null : m_Port.Id;
 			settings.Commands.Update(m_Commands);
+
+			settings.Copy(m_IrDriverProperties);
 		}
 
 		/// <summary>
@@ -353,7 +371,9 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			base.ClearSettingsFinal();
 
 			SetIrPort(null);
+
 			m_Commands.Clear();
+			m_IrDriverProperties.ClearIrProperties();
 		}
 
 		/// <summary>
@@ -366,6 +386,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			base.ApplySettingsFinal(settings, factory);
 
 			m_Commands.Update(settings.Commands);
+			m_IrDriverProperties.Copy(settings);
 
 			IIrPort port = null;
 
