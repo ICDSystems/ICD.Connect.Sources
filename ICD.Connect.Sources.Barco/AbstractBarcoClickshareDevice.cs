@@ -5,15 +5,15 @@ using ICD.Common.Utils.EventArguments;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
 using ICD.Common.Utils.Extensions;
-using ICD.Common.Utils.Services;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Common.Utils.Timers;
 using ICD.Connect.API.Nodes;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
-using ICD.Connect.Protocol.Network.WebPorts;
-using ICD.Connect.Settings.Core;
+using ICD.Connect.Protocol.Network.Ports.Web;
+using ICD.Connect.Protocol.Network.Settings;
+using ICD.Connect.Settings;
 using Newtonsoft.Json.Linq;
 
 namespace ICD.Connect.Sources.Barco
@@ -88,6 +88,8 @@ namespace ICD.Connect.Sources.Barco
 		private readonly Dictionary<int, BarcoClickshareButton> m_Buttons;
 		private readonly SafeCriticalSection m_ButtonsSection;
 
+		private readonly UriProperties m_UriProperties;
+
 		private IWebPort m_Port;
 		private bool m_Sharing;
 		private string m_Version;
@@ -111,7 +113,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_Version = value;
 
-				Logger.AddEntry(eSeverity.Informational, "{0} version set to {1}", this, m_Version);
+				Log(eSeverity.Informational, "Version set to {0}", m_Version);
 
 				OnVersionChanged.Raise(this, new StringEventArgs(m_Version));
 			}
@@ -131,7 +133,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_SoftwareVersion = value;
 
-				Logger.AddEntry(eSeverity.Informational, "{0} software version set to {1}", this, m_SoftwareVersion);
+				Log(eSeverity.Informational, "Software version set to {0}", m_SoftwareVersion);
 
 				OnSoftwareVersionChanged.Raise(this, new StringEventArgs(m_SoftwareVersion));
 			}
@@ -151,7 +153,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_Sharing = value;
 
-				Logger.AddEntry(eSeverity.Informational, "{0} sharing state set to {1}", this, m_Sharing);
+				Log(eSeverity.Informational, "Sharing state set to {0}", m_Sharing);
 
 				OnSharingStatusChanged.Raise(this, new BoolEventArgs(m_Sharing));
 			}
@@ -166,6 +168,8 @@ namespace ICD.Connect.Sources.Barco
 		/// </summary>
 		protected AbstractBarcoClickshareDevice()
 		{
+			m_UriProperties = new UriProperties();
+
 			m_Version = DEFAULT_VERSION;
 			m_SharingUpdateInterval = SHARING_UPDATE_INTERVAL;
 
@@ -209,6 +213,8 @@ namespace ICD.Connect.Sources.Barco
 			if (port == m_Port)
 				return;
 
+			ConfigurePort(port);
+
 			Unsubscribe(m_Port);
 			m_Port = port;
 			Subscribe(m_Port);
@@ -217,6 +223,17 @@ namespace ICD.Connect.Sources.Barco
 				m_Port.Accept = PORT_ACCEPT;
 
 			UpdateCachedOnlineStatus();
+		}
+
+		/// <summary>
+		/// Configures the given port for communication with the device.
+		/// </summary>
+		/// <param name="port"></param>
+		private void ConfigurePort(IWebPort port)
+		{
+			// URI
+			if (port != null)
+				port.ApplyDeviceConfiguration(m_UriProperties);
 		}
 
 		/// <summary>
@@ -274,7 +291,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 			catch (Exception e)
 			{
-				Log(eSeverity.Error, "Error communicating with {0} - {1}", m_Port.Address, e.Message);
+				Log(eSeverity.Error, "Error communicating with {0} - {1}", m_Port.Uri, e.Message);
 				IncrementUpdateInterval();
 			}
 		}
@@ -472,21 +489,6 @@ namespace ICD.Connect.Sources.Barco
 		}
 
 		/// <summary>
-		/// Logs to logging core.
-		/// </summary>
-		/// <param name="severity"></param>
-		/// <param name="exception"></param>
-		/// <param name="message"></param>
-		/// <param name="args"></param>
-		private void Log(eSeverity severity, Exception exception, string message, params object[] args)
-		{
-			message = string.Format(message, args);
-			message = string.Format("{0} - {1}", this, message);
-
-			ServiceProvider.GetService<ILoggerService>().AddEntry(severity, exception, message);
-		}
-
-		/// <summary>
 		/// Gets the current online status of the device.
 		/// </summary>
 		/// <returns></returns>
@@ -546,6 +548,8 @@ namespace ICD.Connect.Sources.Barco
 			base.CopySettingsFinal(settings);
 
 			settings.Port = m_Port == null ? (int?)null : m_Port.Id;
+
+			settings.Copy(m_UriProperties);
 		}
 
 		/// <summary>
@@ -556,6 +560,8 @@ namespace ICD.Connect.Sources.Barco
 			base.ClearSettingsFinal();
 
 			SetPort(null);
+
+			m_UriProperties.Clear();
 		}
 
 		/// <summary>
@@ -566,6 +572,8 @@ namespace ICD.Connect.Sources.Barco
 		protected override void ApplySettingsFinal(T settings, IDeviceFactory factory)
 		{
 			base.ApplySettingsFinal(settings, factory);
+
+			m_UriProperties.Copy(settings);
 
 			IWebPort port = null;
 

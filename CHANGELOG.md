@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [6.0.0] - 2019-01-10
+### Added
+ - Added port configuration features to source devices
+
 ## [5.1.1] - 2018-10-30
 ### Changed
  - Fixing loading issue where devices do not fail gracefully when a port is not available
