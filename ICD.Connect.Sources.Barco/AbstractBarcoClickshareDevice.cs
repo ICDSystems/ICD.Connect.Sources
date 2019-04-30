@@ -39,6 +39,7 @@ namespace ICD.Connect.Sources.Barco
 		private const long SHARING_UPDATE_INTERVAL = 1000 * 5;
 		private const long FAILURE_UPDATE_INTERVAL_INCREMENT = 1000 * 10;
 		private const long FAILURE_UPDATE_INTERVAL_LIMIT = 1000 * 60;
+		private const int MAX_PORT_FAILURES_FOR_OFFLINE = 4;
 
 		// The number of times to check "sharing" before checking version/buttons
 		private const int INFO_UPDATE_OCCURANCE = 10;
@@ -94,6 +95,7 @@ namespace ICD.Connect.Sources.Barco
 		private string m_SoftwareVersion;
 		private long m_SharingUpdateInterval;
 		private int m_UpdateCount;
+		private int m_ConsecutivePortFailures;
 
 		#region Properties
 
@@ -457,6 +459,9 @@ namespace ICD.Connect.Sources.Barco
 		{
 			m_SharingUpdateInterval = SHARING_UPDATE_INTERVAL;
 			m_SharingTimer.Reset(m_SharingUpdateInterval, m_SharingUpdateInterval);
+
+			m_ConsecutivePortFailures = 0;
+			UpdateCachedOnlineStatus();
 		}
 
 		/// <summary>
@@ -469,6 +474,9 @@ namespace ICD.Connect.Sources.Barco
 				m_SharingUpdateInterval = FAILURE_UPDATE_INTERVAL_LIMIT;
 
 			m_SharingTimer.Reset(m_SharingUpdateInterval, m_SharingUpdateInterval);
+
+			m_ConsecutivePortFailures++;
+			UpdateCachedOnlineStatus();
 		}
 
 		/// <summary>
@@ -492,7 +500,7 @@ namespace ICD.Connect.Sources.Barco
 		/// <returns></returns>
 		protected override bool GetIsOnlineStatus()
 		{
-			return m_Port != null && m_Port.IsOnline;
+			return m_Port != null && m_ConsecutivePortFailures < MAX_PORT_FAILURES_FOR_OFFLINE;
 		}
 
 		#endregion
