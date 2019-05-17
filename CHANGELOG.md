@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
  - Added port configuration features to source devices
 
+## [5.1.2] - 2019-05-16
+### Changed
+ - Failing gracefully when a Crestron Thread fails to instantiate
+ - When the barco fails an http request, do not immediately mark it offline
+
 ## [5.1.1] - 2018-10-30
 ### Changed
  - Fixing loading issue where devices do not fail gracefully when a port is not available

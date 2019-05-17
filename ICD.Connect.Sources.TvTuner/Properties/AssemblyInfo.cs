@@ -5,4 +5,3 @@ using System.Reflection;
 [assembly: AssemblyProduct("ICD.Connect.Sources.TvTuner")]
 [assembly: AssemblyCopyright("Copyright © ICD Systems 2019")]
 [assembly: AssemblyVersion("6.0.0.0")]
-

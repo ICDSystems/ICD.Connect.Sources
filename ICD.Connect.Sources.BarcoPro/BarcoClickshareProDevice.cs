@@ -1,4 +1,6 @@
-﻿using ICD.Connect.Sources.Barco;
+﻿using System;
+using ICD.Common.Utils.Services.Logging;
+using ICD.Connect.Sources.Barco;
 #if SIMPLSHARP
 using Crestron.SimplSharpPro.CrestronThread;
 #else
@@ -35,7 +37,14 @@ namespace ICD.Connect.Sources.BarcoPro
 				return;
 
 #if SIMPLSHARP
-			m_Thread = new Thread(ThreadCallback, null) {Priority = Thread.eThreadPriority.LowestPriority};
+			try
+			{
+				m_Thread = new Thread(ThreadCallback, null) { Priority = Thread.eThreadPriority.LowestPriority };
+			}
+			catch (Exception e)
+			{
+				Log(eSeverity.Error, "Failed to poll, Crestron Thread constructor threw a {0} - {1}", e.GetType(), e.Message);
+			}
 #else
 			m_Thread = new Thread(() => ThreadCallback());
 			m_Thread.Start();
