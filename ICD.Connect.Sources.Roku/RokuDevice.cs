@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using ICD.Common.Properties;
 using ICD.Common.Utils.Services.Logging;
+using ICD.Connect.API.Commands;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
@@ -36,6 +39,9 @@ namespace ICD.Connect.Sources.Roku
             ConfigurePort(port);
 
             Unsubscribe(m_Port);
+
+            if (port != null)
+                port.Accept = "application/xml";
 
             m_Port = port;
             Subscribe(m_Port);
@@ -144,6 +150,31 @@ namespace ICD.Connect.Sources.Roku
             settings.Copy(m_UriProperties);
         }
 
-        #endregion
+
+
+		#endregion
+
+		#region Methods
+
+		public void KeypressUp()
+		{
+			string unused;
+			m_Port.Post("/keypress/up",new byte[0], out unused);
+		}
+
+		#endregion
+
+		public override IEnumerable<IConsoleCommand> GetConsoleCommands()
+		{
+			foreach (IConsoleCommand command in base.GetConsoleCommands())
+				yield return command;
+
+			yield return new ConsoleCommand("KeypressUp", "", () => KeypressUp());
+		}
+
+		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
+		{
+			return base.GetConsoleCommands();
+		}
     }
 }
