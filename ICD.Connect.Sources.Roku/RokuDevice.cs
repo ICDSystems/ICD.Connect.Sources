@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using ICD.Common.Properties;
+using ICD.Common.Utils;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.API.Commands;
 using ICD.Connect.Devices;
@@ -154,14 +155,35 @@ namespace ICD.Connect.Sources.Roku
 
 		#endregion
 
-		#region Methods
-
-		public void KeypressUp()
+		#region Keypress Methods
+		public enum eRokuKeys
 		{
-			string unused;
-			m_Port.Post("/keypress/up",new byte[0], out unused);
+			Home,
+			Rev,
+			Fwd,
+			Play,
+			Select,
+			Left,
+			Right,
+			Down,
+			Up,
+			Back,
+			InstantReplay,
+			Info,
+			Backspace,
+			Search,
+			Enter
 		}
 
+		/// <summary>
+		/// Sends an HTTP POST command to press and release a specific key
+		/// </summary>
+		/// <param name="key"></param>
+		private void Keypress(eRokuKeys key)
+		{
+			string unused;
+			m_Port.Post(string.Format("/keypress/{0}", key.ToString()), new byte[0], out unused);
+		}
 		#endregion
 
 		public override IEnumerable<IConsoleCommand> GetConsoleCommands()
@@ -169,7 +191,10 @@ namespace ICD.Connect.Sources.Roku
 			foreach (IConsoleCommand command in base.GetConsoleCommands())
 				yield return command;
 
-			yield return new ConsoleCommand("KeypressUp", "", () => KeypressUp());
+			string keypressHelp =
+				string.Format("Keypress <{0}>", StringUtils.ArrayFormat(EnumUtils.GetValues<eRokuKeys>()));
+
+			yield return new GenericConsoleCommand<eRokuKeys>("Keypress", keypressHelp, k => Keypress(k));
 		}
 
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
