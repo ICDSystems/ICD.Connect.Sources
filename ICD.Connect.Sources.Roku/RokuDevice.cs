@@ -182,7 +182,25 @@ namespace ICD.Connect.Sources.Roku
 		private void Keypress(eRokuKeys key)
 		{
 			string unused;
-			m_Port.Post(string.Format("/keypress/{0}", key.ToString()), new byte[0], out unused);
+			m_Port.Post(string.Format("/keypress/{0}",key.ToString()), new byte[0], out unused);
+		}
+		/// <summary>
+		/// Sends an HTTP POST command to press and hold a specific key
+		/// </summary>
+		/// <param name="key"></param>
+		private void Keydown(eRokuKeys key)
+		{
+			string unused;
+			m_Port.Post(string.Format("/keydown/{0}", key.ToString()), new byte[0], out unused);
+		}
+		/// <summary>
+		/// Sends an HTTP POST command to release a specific key
+		/// </summary>
+		/// <param name="key"></param>
+		private void Keyup(eRokuKeys key)
+		{
+			string unused;
+			m_Port.Post(string.Format("/keyup/{0}", key.ToString()), new byte[0], out unused);
 		}
 		#endregion
 
@@ -191,10 +209,12 @@ namespace ICD.Connect.Sources.Roku
 			foreach (IConsoleCommand command in base.GetConsoleCommands())
 				yield return command;
 
-			string keypressHelp =
-				string.Format("Keypress <{0}>", StringUtils.ArrayFormat(EnumUtils.GetValues<eRokuKeys>()));
+			string keyHelp =
+				string.Format("Keys: <{0}>", StringUtils.ArrayFormat(EnumUtils.GetValues<eRokuKeys>()));
 
-			yield return new GenericConsoleCommand<eRokuKeys>("Keypress", keypressHelp, k => Keypress(k));
+			yield return new GenericConsoleCommand<eRokuKeys>("Keypress", "Press and release key. " + keyHelp, k => Keypress(k));
+			yield return new GenericConsoleCommand<eRokuKeys>("Keydown", "Press and hold key. " + keyHelp, k => Keydown(k));
+			yield return new GenericConsoleCommand<eRokuKeys>("Keyup", "Release key. " + keyHelp, k => Keyup(k));
 		}
 
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
