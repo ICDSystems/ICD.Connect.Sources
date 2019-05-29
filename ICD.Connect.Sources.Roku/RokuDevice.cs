@@ -152,7 +152,7 @@ namespace ICD.Connect.Sources.Roku
 
 
 		#endregion
-
+		
 		#region Keypress Methods
 		public enum eRokuKeys
 		{
@@ -209,6 +209,12 @@ namespace ICD.Connect.Sources.Roku
 			string unused;
 			m_Port.Post(string.Format("/launch/{0}", appID.ToString()), new byte[0], out unused);
 		}
+
+	    private void InstallApp(int channelID)
+	    {
+		    string unused;
+		    m_Port.Post(string.Format("/install/{0}", channelID.ToString()), new byte[0], out unused);
+	    }
 		#endregion
 		public override IEnumerable<IConsoleCommand> GetConsoleCommands()
 		{
@@ -222,9 +228,10 @@ namespace ICD.Connect.Sources.Roku
 			yield return new GenericConsoleCommand<eRokuKeys>("Keydown", "Press and hold key. " + keyHelp, k => Keydown(k));
 			yield return new GenericConsoleCommand<eRokuKeys>("Keyup", "Release key. " + keyHelp, k => Keyup(k));
 			yield return new GenericConsoleCommand<int>("Launch", "Launches the channel identified by appID",T =>LaunchApp(T));
+			yield return new GenericConsoleCommand<int>("Install", "Exits the current channel, and launches the Channel Store details screen of the channel identified by appID", T => InstallApp(T));
 		}
 
-		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
+	    private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
 		{
 			return base.GetConsoleCommands();
 		}
