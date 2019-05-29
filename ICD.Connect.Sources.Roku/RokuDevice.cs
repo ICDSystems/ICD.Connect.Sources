@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
 using ICD.Common.Utils.Services.Logging;
@@ -204,6 +202,14 @@ namespace ICD.Connect.Sources.Roku
 		}
 		#endregion
 
+		#region Post Methods
+
+		private void LaunchApp(int appID)
+		{
+			string unused;
+			m_Port.Post(string.Format("/launch/{0}", appID.ToString()), new byte[0], out unused);
+		}
+		#endregion
 		public override IEnumerable<IConsoleCommand> GetConsoleCommands()
 		{
 			foreach (IConsoleCommand command in base.GetConsoleCommands())
@@ -215,6 +221,7 @@ namespace ICD.Connect.Sources.Roku
 			yield return new GenericConsoleCommand<eRokuKeys>("Keypress", "Press and release key. " + keyHelp, k => Keypress(k));
 			yield return new GenericConsoleCommand<eRokuKeys>("Keydown", "Press and hold key. " + keyHelp, k => Keydown(k));
 			yield return new GenericConsoleCommand<eRokuKeys>("Keyup", "Release key. " + keyHelp, k => Keyup(k));
+			yield return new GenericConsoleCommand<int>("Launch", "Launches the channel identified by appID",T =>LaunchApp(T));
 		}
 
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
