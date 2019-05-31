@@ -10,13 +10,14 @@ using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
 using ICD.Connect.Settings;
 using System.Collections.Generic;
-using ICD.Common.Utils.Extensions;
 
 namespace ICD.Connect.Sources.Roku
 {
 	public sealed class RokuDevice : AbstractDevice<RokuDeviceSettings>
 	{
 		private readonly UriProperties m_UriProperties;
+		private readonly List<RokuApp> m_AppList;
+
 		private IWebPort m_Port;
 
 		/// <summary>
@@ -25,6 +26,7 @@ namespace ICD.Connect.Sources.Roku
 		public RokuDevice()
 		{
 			m_UriProperties = new UriProperties();
+			m_AppList = new List<RokuApp>();
 		}
 
 		/// <summary>
@@ -153,6 +155,27 @@ namespace ICD.Connect.Sources.Roku
 
 		#endregion
 
+		#region GET Methods
+
+		public void RefreshApps()
+		{
+			string xml;
+			m_Port.Get("/query/apps", out xml);
+			IEnumerable<RokuApp> apps = RokuApp.ReadAppsFromXml(xml);
+
+			m_AppList.Clear();
+			m_AppList.AddRange(apps);
+		}
+
+		private void Get(string path)
+		{
+			path = Uri.EscapeUriString(path);
+
+			string unused;
+			m_Port.Get(path, out unused);
+		}
+		#endregion
+
 		#region Keypress Methods
 
 		public enum eRokuKeys
@@ -246,18 +269,26 @@ namespace ICD.Connect.Sources.Roku
 			string multiSearchHelp =
 				string.Format("Search Parameters: <{0}>", StringUtils.ArrayFormat(EnumUtils.GetValues<eRokuSearchPar>()));
 
+			yield return new ConsoleCommand("RefreshApps", "Rebuilds the collections of channels installed on the Roku device", () => RefreshAndPrintApps());
+			yield return new ConsoleCommand("PrintApps", "Prints the collections of channels installed on the Roku device", () => PrintApps());
 			yield return new GenericConsoleCommand<eRokuKeys>("Keypress", "Press and release key. " + keyHelp, k => Keypress(k));
 			yield return new GenericConsoleCommand<eRokuKeys>("Keydown", "Press and hold key. " + keyHelp, k => Keydown(k));
 			yield return new GenericConsoleCommand<eRokuKeys>("Keyup", "Release key. " + keyHelp, k => Keyup(k));
-			yield return new GenericConsoleCommand<int>("Launch", "Launches the channel identified by appID", T => LaunchApp(T));
+			yield return new GenericConsoleCommand<int>("Launch", "Launches the channel identified by AppID", T => LaunchApp(T));
 			yield return new GenericConsoleCommand<int>("Install",
-				"Exits the current channel, and launches the Channel Store details screen of the channel identified by appID",
+				"Exits the current channel, and launches the Channel Store details screen of the channel identified by AppID",
 				T => InstallApp(T));
 			yield return new GenericConsoleCommand<eRokuSearchPar, string>("Search",
 				"Searches with the parameter and your term. " + searchHelp, (k, t) => RokuSearch(k, t));
 			yield return
 				new GenericConsoleCommand<eRokuSearchPar, string, eRokuSearchPar, string>(
 					"MultiSearch", "Searches with two parameters, and 1 term per parameter (keyword or title must be a parameter). " + multiSearchHelp, (k, t, h, q) => RokuSearch(k, t, h, q));
+		}
+
+		private string RefreshAndPrintApps()
+		{
+			RefreshApps();
+			return PrintApps();
 		}
 
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
@@ -284,6 +315,16 @@ namespace ICD.Connect.Sources.Roku
 			};
 
 			RokuSearch(query);
+		}
+
+		private string PrintApps()
+		{
+			TableBuilder builder = new TableBuilder("Name", "AppID", "Type", "SubType", "Version");
+
+			foreach (var App in m_AppList)
+				builder.AddRow(App.Name, App.AppID, App.Type, App.SubType, App.Version);
+
+			return builder.ToString();
 		}
 
 		#endregion
