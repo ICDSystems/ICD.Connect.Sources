@@ -20,7 +20,7 @@ namespace ICD.Connect.Sources.Roku
 
 		public static IEnumerable<RokuApp> ReadAppsFromXml(string xml)
 		{
-			return XmlUtils.ReadListFromXml(xml, "app", ReadAppFromXml);
+			return XmlUtils.ReadListFromXml<RokuApp>(xml, "app", ReadAppFromXml);
 		}
 
 		public static RokuApp ReadAppFromXml(string xml)
