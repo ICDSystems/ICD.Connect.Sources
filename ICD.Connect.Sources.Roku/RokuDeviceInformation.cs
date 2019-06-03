@@ -92,9 +92,9 @@ namespace ICD.Connect.Sources.Roku
 		public string TimeZoneTz { get; set; }
 		public string TimeZoneOffset { get; set; }
 		public string ClockFormat { get; set; }
-		public int Uptime { get; set; }
+		public int UpTime { get; set; }
 		public string PowerMode { get; set; }
-		public bool SupportsSuspended { get; set; }
+		public bool SupportsSuspend { get; set; }
 		public bool SupportsFindRemote { get; set; }
 		public bool SupportsAudioGuide { get; set; }
 		public bool SupportsRva { get; set; }
@@ -152,9 +152,9 @@ namespace ICD.Connect.Sources.Roku
 				TimeZoneTz = XmlUtils.TryReadChildElementContentAsString(xml, TIME_ZONE_TZ_ELEMENT),
 				TimeZoneOffset = XmlUtils.TryReadChildElementContentAsString(xml, TIME_ZONE_OFFSET_ELEMENT),
 				ClockFormat = XmlUtils.TryReadChildElementContentAsString(xml, CLOCK_FORMAT_ELEMENT),
-				Uptime = XmlUtils.TryReadChildElementContentAsInt(xml, UPTIME_ELEMENT) ?? 0,
+				UpTime = XmlUtils.TryReadChildElementContentAsInt(xml, UPTIME_ELEMENT) ?? 0,
 				PowerMode = XmlUtils.TryReadChildElementContentAsString(xml, POWER_MODE_ELEMENT),
-				SupportsSuspended = XmlUtils.TryReadChildElementContentAsBoolean(xml, SUPPORTS_SUSPEND_ELEMENT) ?? false,
+				SupportsSuspend = XmlUtils.TryReadChildElementContentAsBoolean(xml, SUPPORTS_SUSPEND_ELEMENT) ?? false,
 				SupportsFindRemote = XmlUtils.TryReadChildElementContentAsBoolean(xml, SUPPORTS_FIND_REMOTE_ELEMENT) ?? false,
 				SupportsAudioGuide = XmlUtils.TryReadChildElementContentAsBoolean(xml, SUPPORTS_AUDIO_GUIDE_ELEMENT) ?? false,
 				SupportsRva = XmlUtils.TryReadChildElementContentAsBoolean(xml, SUPPORTS_RVA_ELEMENT) ?? false,
