@@ -10,13 +10,17 @@ using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
 using ICD.Connect.Settings;
 using System.Collections.Generic;
+using ICD.Common.Utils.Timers;
 
 namespace ICD.Connect.Sources.Roku
 {
 	public sealed class RokuDevice : AbstractDevice<RokuDeviceSettings>
 	{
+		private const long APP_REFRESH_MILLISECONDS = 10 * 60 * 1000;
+
 		private readonly UriProperties m_UriProperties;
 		private readonly List<RokuApp> m_AppList;
+		private readonly SafeTimer m_AppTimer;
 
 		private IWebPort m_Port;
 
@@ -27,6 +31,14 @@ namespace ICD.Connect.Sources.Roku
 		{
 			m_UriProperties = new UriProperties();
 			m_AppList = new List<RokuApp>();
+			m_AppTimer = SafeTimer.Stopped(RefreshApps);
+		}
+
+		protected override void DisposeFinal(bool disposing)
+		{
+			base.DisposeFinal(disposing);
+
+			m_AppTimer.Dispose();
 		}
 
 		/// <summary>
@@ -39,6 +51,8 @@ namespace ICD.Connect.Sources.Roku
 			if (port == m_Port)
 				return;
 
+			m_AppTimer.Stop();
+
 			ConfigurePort(port);
 
 			Unsubscribe(m_Port);
@@ -50,6 +64,9 @@ namespace ICD.Connect.Sources.Roku
 			Subscribe(m_Port);
 
 			UpdateCachedOnlineStatus();
+
+			if (port != null)
+				m_AppTimer.Reset(0, APP_REFRESH_MILLISECONDS);
 		}
 
 
