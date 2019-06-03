@@ -23,6 +23,7 @@ namespace ICD.Connect.Sources.Roku
 		private readonly SafeTimer m_AppTimer;
 
 		private IWebPort m_Port;
+		private RokuApp m_ActiveApp;
 
 		/// <summary>
 		/// Constructor.
@@ -184,6 +185,16 @@ namespace ICD.Connect.Sources.Roku
 			m_AppList.AddRange(apps);
 		}
 
+		public void RefreshActiveApp()
+		{
+			string xml;
+			m_Port.Get("/query/active-app", out xml);
+			RokuApp activeApp = RokuApp.ReadActiveAppFromXml(xml);
+
+			m_ActiveApp = activeApp;
+			PrintActiveApp();
+		}
+
 		private void Get(string path)
 		{
 			path = Uri.EscapeUriString(path);
@@ -288,6 +299,7 @@ namespace ICD.Connect.Sources.Roku
 
 			yield return new ConsoleCommand("RefreshApps", "Rebuilds the collections of channels installed on the Roku device", () => RefreshAndPrintApps());
 			yield return new ConsoleCommand("PrintApps", "Prints the collections of channels installed on the Roku device", () => PrintApps());
+			yield return new ConsoleCommand("ActiveApp", "Prints the information of the active application", () => RefreshAndPrintActiveApp());
 			yield return new GenericConsoleCommand<eRokuKeys>("Keypress", "Press and release key. " + keyHelp, k => Keypress(k));
 			yield return new GenericConsoleCommand<eRokuKeys>("Keydown", "Press and hold key. " + keyHelp, k => Keydown(k));
 			yield return new GenericConsoleCommand<eRokuKeys>("Keyup", "Release key. " + keyHelp, k => Keyup(k));
@@ -306,6 +318,12 @@ namespace ICD.Connect.Sources.Roku
 		{
 			RefreshApps();
 			return PrintApps();
+		}
+
+		private string RefreshAndPrintActiveApp()
+		{
+			RefreshActiveApp();
+			return PrintActiveApp();
 		}
 
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
@@ -339,8 +357,18 @@ namespace ICD.Connect.Sources.Roku
 			TableBuilder builder = new TableBuilder("Name", "AppID", "Type", "SubType", "Version");
 
 			foreach (var App in m_AppList)
-				builder.AddRow(App.Name, App.AppID, App.Type, App.SubType, App.Version);
+				builder.AddRow(App.Name, App.AppId, App.Type, App.SubType, App.Version);
 
+			return builder.ToString();
+		}
+
+		private string PrintActiveApp()
+		{
+			TableBuilder builder = new TableBuilder("Name", "AppID", "Type", "SubType", "Version");
+
+			if (m_ActiveApp != null)
+				builder.AddRow(m_ActiveApp.Name, m_ActiveApp.AppId, m_ActiveApp.Type, m_ActiveApp.SubType, m_ActiveApp.Version);
+			
 			return builder.ToString();
 		}
 
