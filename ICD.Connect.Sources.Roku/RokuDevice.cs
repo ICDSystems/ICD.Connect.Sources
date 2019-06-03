@@ -24,6 +24,7 @@ namespace ICD.Connect.Sources.Roku
 
 		private IWebPort m_Port;
 		private RokuApp m_ActiveApp;
+		private RokuDeviceInformation m_DeviceInformation;
 
 		/// <summary>
 		/// Constructor.
@@ -195,6 +196,15 @@ namespace ICD.Connect.Sources.Roku
 			PrintActiveApp();
 		}
 
+		public void RefreshDeviceInformation()
+		{
+			string xml;
+			m_Port.Get("/query/device-info", out xml);
+			RokuDeviceInformation deviceInformation = RokuDeviceInformation.ReadDeviceInformationFromXml(xml);
+
+			m_DeviceInformation = deviceInformation;
+		}
+
 		private void Get(string path)
 		{
 			path = Uri.EscapeUriString(path);
@@ -300,6 +310,7 @@ namespace ICD.Connect.Sources.Roku
 			yield return new ConsoleCommand("RefreshApps", "Rebuilds the collections of channels installed on the Roku device", () => RefreshAndPrintApps());
 			yield return new ConsoleCommand("PrintApps", "Prints the collections of channels installed on the Roku device", () => PrintApps());
 			yield return new ConsoleCommand("ActiveApp", "Prints the information of the active application", () => RefreshAndPrintActiveApp());
+			yield return new ConsoleCommand("DeviceInfo", "Retrieves and displays information about the Roku Device", () => RefreshAndPrintDeviceInformation());
 			yield return new GenericConsoleCommand<eRokuKeys>("Keypress", "Press and release key. " + keyHelp, k => Keypress(k));
 			yield return new GenericConsoleCommand<eRokuKeys>("Keydown", "Press and hold key. " + keyHelp, k => Keydown(k));
 			yield return new GenericConsoleCommand<eRokuKeys>("Keyup", "Release key. " + keyHelp, k => Keyup(k));
@@ -324,6 +335,12 @@ namespace ICD.Connect.Sources.Roku
 		{
 			RefreshActiveApp();
 			return PrintActiveApp();
+		}
+
+		private string RefreshAndPrintDeviceInformation()
+		{
+			RefreshDeviceInformation();
+			return PrintDeviceInformation();
 		}
 
 		private IEnumerable<IConsoleCommand> GetBaseConsoleCommands()
@@ -370,6 +387,16 @@ namespace ICD.Connect.Sources.Roku
 				builder.AddRow(m_ActiveApp.Name, m_ActiveApp.AppId, m_ActiveApp.Type, m_ActiveApp.SubType, m_ActiveApp.Version);
 			
 			return builder.ToString();
+		}
+
+		private string PrintDeviceInformation()
+		{
+			TableBuilder builder = new TableBuilder("Type of Info", "details");
+			if (m_DeviceInformation != null)
+			{
+				builder.AddRow("UDN", m_DeviceInformation.Udn);
+				builder.AddRow("Serial Number", m_DeviceInformation.SerialNumber);
+			}
 		}
 
 		#endregion
