@@ -396,7 +396,61 @@ namespace ICD.Connect.Sources.Roku
 			{
 				builder.AddRow("UDN", m_DeviceInformation.Udn);
 				builder.AddRow("Serial Number", m_DeviceInformation.SerialNumber);
+				builder.AddRow("Device ID", m_DeviceInformation.DeviceId);
+				builder.AddRow("Advertising ID", m_DeviceInformation.AdvertisingId);
+				builder.AddRow("Vendor Name", m_DeviceInformation.VendorName);
+				builder.AddRow("Model Name", m_DeviceInformation.ModelName);
+				builder.AddRow("Model Number", m_DeviceInformation.ModelNumber);
+				builder.AddRow("Model Region", m_DeviceInformation.ModelRegion);
+				builder.AddRow("Is Tv", m_DeviceInformation.IsTv);
+				builder.AddRow("Is Stick", m_DeviceInformation.IsStick);
+				builder.AddRow("Supports Ethernet", m_DeviceInformation.SupportsEthernet);
+				builder.AddRow("Wifi MAC", m_DeviceInformation.WifiMac);
+				builder.AddRow("Wifi Driver", m_DeviceInformation.WifiDriver);
+				builder.AddRow("Software Version", m_DeviceInformation.SoftwareVersion);
+				builder.AddRow("Network Name", m_DeviceInformation.NetworkName);
+				builder.AddRow("Friendly Device Name", m_DeviceInformation.FriendlyDeviceName);
+				builder.AddRow("Friendly Model Name", m_DeviceInformation.FriendlyModelName);
+				builder.AddRow("Default Device Name", m_DeviceInformation.DefaultDeviceName);
+				builder.AddRow("User Device Name", m_DeviceInformation.UserDeviceName);
+				builder.AddRow("Build Number", m_DeviceInformation.BuildNumber);
+				builder.AddRow("Software Version", m_DeviceInformation.SoftwareVersion);
+				builder.AddRow("Software Build", m_DeviceInformation.SoftwareBuild);
+				builder.AddRow("Secure Device", m_DeviceInformation.SecureDevice);
+				builder.AddRow("Language", m_DeviceInformation.Language);
+				builder.AddRow("Country", m_DeviceInformation.Country);
+				builder.AddRow("Locale", m_DeviceInformation.Locale);
+				builder.AddRow("Time Zone", m_DeviceInformation.TimeZone);
+				builder.AddRow("Time zone Name",m_DeviceInformation.TimeZoneName);
+				builder.AddRow("Time Zone Tz", m_DeviceInformation.TimeZoneTz);
+				builder.AddRow("Time Zone Offset", m_DeviceInformation.TimeZoneOffset);
+				builder.AddRow("Clock Format", m_DeviceInformation.ClockFormat);
+				builder.AddRow("Up Time", m_DeviceInformation.UpTime);
+				builder.AddRow("Power Mode", m_DeviceInformation.PowerMode);
+				builder.AddRow("Supports Suspend", m_DeviceInformation.SupportsSuspend);
+				builder.AddRow("Supports Find Remote", m_DeviceInformation.SupportsFindRemote);
+				builder.AddRow("Supports Audio Guide", m_DeviceInformation.SupportsAudioGuide);
+				builder.AddRow("Supports RVA", m_DeviceInformation.SupportsRva);
+				builder.AddRow("Developer Enabled", m_DeviceInformation.DeveloperEnabled);
+				builder.AddRow("Keyed Developer ID", m_DeviceInformation.KeyedDelevoperId);
+				builder.AddRow("Search Enabled", m_DeviceInformation.SearchEnabled);
+				builder.AddRow("Search Channels Enabled", m_DeviceInformation.SearchChannelsEnabled);
+				builder.AddRow("Voice Search Enabled", m_DeviceInformation.VoiceSearchEnabled);
+				builder.AddRow("Notifications Enabled", m_DeviceInformation.NotificationsEnabled);
+				builder.AddRow("Notifications First Use", m_DeviceInformation.NotificationsFirstUse);
+				builder.AddRow("Supports Private Listening", m_DeviceInformation.SupportsPrivateListening);
+				builder.AddRow("Headphones Connected", m_DeviceInformation.HeadphonesConnected);
+				builder.AddRow("Supports ECS Textedit", m_DeviceInformation.SupportsEcsTextedit);
+				builder.AddRow("Supports ECS Microphone", m_DeviceInformation.SupportsEcsMicrophone);
+				builder.AddRow("Supports Wake On WLAN", m_DeviceInformation.SupportsWakeOnWlan);
+				builder.AddRow("Has Play On Roku", m_DeviceInformation.HasPlayOnRoku);
+				builder.AddRow("Has Mobile Screensaver", m_DeviceInformation.HasMobileScreensaver);
+				builder.AddRow("Support URL", m_DeviceInformation.SupportUrl);
+				builder.AddRow("Grandcentral Version", m_DeviceInformation.GrandcentralVersion);
+				builder.AddRow("Davinci Version", m_DeviceInformation.DavinciVersion);
 			}
+
+			return builder.ToString();
 		}
 
 		#endregion
