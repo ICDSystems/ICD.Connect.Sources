@@ -205,6 +205,15 @@ namespace ICD.Connect.Sources.Roku
 			m_DeviceInformation = deviceInformation;
 		}
 
+		public string GetAppIconUrl(int appId)
+		{
+			UriBuilder builder = new UriBuilder(m_Port.Uri);
+
+			builder.Path = string.Format("/query/icon/{0}", appId);
+
+			return builder.ToString();
+		}
+
 		private void Get(string path)
 		{
 			path = Uri.EscapeUriString(path);
