@@ -271,6 +271,14 @@ namespace ICD.Connect.Sources.Roku
 			Post(string.Format("/keyup/{0}", key.ToString()));
 		}
 
+		public void KeypressKeyboard(string message)
+		{
+			foreach (char messageChar in message)
+			{
+				Post(string.Format("/keypress/Lit_{0}", messageChar.ToString()));	
+			}
+		}
+
 		#endregion
 
 
@@ -323,6 +331,7 @@ namespace ICD.Connect.Sources.Roku
 			yield return new GenericConsoleCommand<eRokuKeys>("Keypress", "Press and release key. " + keyHelp, k => Keypress(k));
 			yield return new GenericConsoleCommand<eRokuKeys>("Keydown", "Press and hold key. " + keyHelp, k => Keydown(k));
 			yield return new GenericConsoleCommand<eRokuKeys>("Keyup", "Release key. " + keyHelp, k => Keyup(k));
+			yield return new GenericConsoleCommand<string>("Keyboard", "When there is an on-screen keyboard types a message", k => KeypressKeyboard(k));
 			yield return new GenericConsoleCommand<int>("Launch", "Launches the channel identified by AppID", T => LaunchApp(T));
 			yield return new GenericConsoleCommand<int>("Install",
 				"Exits the current channel, and launches the Channel Store details screen of the channel identified by AppID",
