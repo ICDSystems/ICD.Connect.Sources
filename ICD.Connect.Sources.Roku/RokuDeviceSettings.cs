@@ -111,6 +111,7 @@ namespace ICD.Connect.Sources.Roku
 
 		private void UpdateUriDefaults()
 		{
+			m_UriProperties.UriScheme = "http";
 			m_UriProperties.UriPort = m_UriProperties.UriPort ?? 8060;
 		}
 	}
