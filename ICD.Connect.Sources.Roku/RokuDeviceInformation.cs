@@ -2,7 +2,7 @@
 
 namespace ICD.Connect.Sources.Roku
 {
-	class RokuDeviceInformation
+	public sealed class RokuDeviceInformation
 	{
 		private const string UDN_ELEMENT = "udn";
 		private const string SERIAL_NUMBER_ELEMENT = "serial-number";

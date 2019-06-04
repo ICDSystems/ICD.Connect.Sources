@@ -18,6 +18,8 @@ namespace ICD.Connect.Sources.Roku
 	{
 		private const long APP_REFRESH_MILLISECONDS = 10 * 60 * 1000;
 
+		#region Private Fields
+
 		private readonly UriProperties m_UriProperties;
 		private readonly List<RokuApp> m_AppList;
 		private readonly SafeTimer m_AppTimer;
@@ -25,6 +27,8 @@ namespace ICD.Connect.Sources.Roku
 		private IWebPort m_Port;
 		private RokuApp m_ActiveApp;
 		private RokuDeviceInformation m_DeviceInformation;
+
+		#endregion
 
 		/// <summary>
 		/// Constructor.
@@ -42,6 +46,13 @@ namespace ICD.Connect.Sources.Roku
 
 			m_AppTimer.Dispose();
 		}
+
+		protected override bool GetIsOnlineStatus()
+		{
+			return m_Port != null && m_Port.IsOnline;
+		}
+
+		#region Port Callbacks
 
 		/// <summary>
 		/// Sets the port for communication with the service.
@@ -83,11 +94,6 @@ namespace ICD.Connect.Sources.Roku
 				port.ApplyDeviceConfiguration(m_UriProperties);
 		}
 
-		protected override bool GetIsOnlineStatus()
-		{
-			return m_Port != null && m_Port.IsOnline;
-		}
-
 		/// <summary>
 		/// Subscribe to the port events.
 		/// </summary>
@@ -116,6 +122,8 @@ namespace ICD.Connect.Sources.Roku
 		{
 			UpdateCachedOnlineStatus();
 		}
+
+		#endregion
 
 		#region Settings
 
@@ -179,7 +187,7 @@ namespace ICD.Connect.Sources.Roku
 		public void RefreshApps()
 		{
 			string xml;
-			m_Port.Get("/query/apps", out xml);
+			Get("/query/apps", out xml);
 			IEnumerable<RokuApp> apps = RokuApp.ReadAppsFromXml(xml);
 
 			m_AppList.Clear();
@@ -189,7 +197,7 @@ namespace ICD.Connect.Sources.Roku
 		public void RefreshActiveApp()
 		{
 			string xml;
-			m_Port.Get("/query/active-app", out xml);
+			Get("/query/active-app", out xml);
 			RokuApp activeApp = RokuApp.ReadActiveAppFromXml(xml);
 
 			m_ActiveApp = activeApp;
@@ -199,7 +207,7 @@ namespace ICD.Connect.Sources.Roku
 		public void RefreshDeviceInformation()
 		{
 			string xml;
-			m_Port.Get("/query/device-info", out xml);
+			Get("/query/device-info", out xml);
 			RokuDeviceInformation deviceInformation = RokuDeviceInformation.ReadDeviceInformationFromXml(xml);
 
 			m_DeviceInformation = deviceInformation;
@@ -207,21 +215,23 @@ namespace ICD.Connect.Sources.Roku
 
 		public string GetAppIconUrl(int appId)
 		{
-			IcdUriBuilder builder = new IcdUriBuilder(m_Port.Uri);
-
-			builder.Path = string.Format("/query/icon/{0}", appId);
+			IcdUriBuilder builder = new IcdUriBuilder(m_Port.Uri)
+			{
+				Path = string.Format("/query/icon/{0}", appId)
+			};
 
 			return builder.ToString();
 		}
 
-		private void Get(string path)
+		private void Get(string path, out string result)
 		{
 			path = Uri.EscapeUriString(path);
-
-			string unused;
-			m_Port.Get(path, out unused);
+			m_Port.Get(path, out result);
 		}
+
 		#endregion
+
+		#region POST Methods
 
 		#region Keypress Methods
 
@@ -307,6 +317,8 @@ namespace ICD.Connect.Sources.Roku
 
 		#endregion
 
+		#endregion
+
 		#region Console
 
 		public override IEnumerable<IConsoleCommand> GetConsoleCommands()
@@ -316,8 +328,7 @@ namespace ICD.Connect.Sources.Roku
 
 			string keyHelp =
 				string.Format("Keys: <{0}>", StringUtils.ArrayFormat(EnumUtils.GetValues<eRokuKeys>()));
-			string searchHelp =
-				("search Parameters: <[Keyword, Title]>");
+			const string searchHelp = ("search Parameters: <[Keyword, Title]>");
 			string multiSearchHelp =
 				string.Format("Search Parameters: <{0}>", StringUtils.ArrayFormat(EnumUtils.GetValues<eRokuSearchPar>()));
 
@@ -388,8 +399,8 @@ namespace ICD.Connect.Sources.Roku
 		{
 			TableBuilder builder = new TableBuilder("Name", "AppID", "Type", "SubType", "Version");
 
-			foreach (var App in m_AppList)
-				builder.AddRow(App.Name, App.AppId, App.Type, App.SubType, App.Version);
+			foreach (RokuApp app in m_AppList)
+				builder.AddRow(app.Name, app.AppId, app.Type, app.SubType, app.Version);
 
 			return builder.ToString();
 		}

@@ -1,46 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using ICD.Common.Utils;
 using ICD.Common.Utils.Collections;
 
 namespace ICD.Connect.Sources.Roku
 {
-	public sealed class UriQueryBuilder
-	{
-		private readonly Dictionary<string, string> m_Parameters;
-
-		public UriQueryBuilder()
-		{
-			m_Parameters = new Dictionary<string, string>();
-		}
-
-		public UriQueryBuilder Append(string key, string value)
-		{
-			m_Parameters.Add(key, value);
-			return this;
-		}
-
-		public override string ToString()
-		{
-			StringBuilder builder = new StringBuilder("?");
-
-			bool first = true;
-
-			foreach (KeyValuePair<string, string> kvp in m_Parameters)
-			{
-				if (!first)
-					builder.Append('&');
-				first = false;
-
-				builder.Append(kvp.Key);
-				builder.Append('=');
-				builder.Append(kvp.Value);
-			}
-
-			return builder.ToString();
-		}
-	}
-
 	public enum eRokuSearchPar
 	{
 		Keyword,
@@ -55,16 +19,7 @@ namespace ICD.Connect.Sources.Roku
 		Launch
 	}
 
-	public enum eRokuSearchType
-	{
-		Movie,
-		TvShow,
-		Person,
-		Channel,
-		Game
-	}
-
-	public class RokuSearchQueryBuilder
+	public sealed class RokuSearchQueryBuilder
 	{
 		private static readonly Dictionary<eRokuSearchPar, string> s_SearchPars =
 			new Dictionary<eRokuSearchPar, string>

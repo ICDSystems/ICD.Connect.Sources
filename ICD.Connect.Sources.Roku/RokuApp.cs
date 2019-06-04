@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using ICD.Common.Properties;
 using ICD.Common.Utils.Xml;
 
@@ -14,6 +12,7 @@ namespace ICD.Connect.Sources.Roku
 		private const string VERSION_ATTRIBUTE = "version";
 		private const string NAME_ELEMENT = "app";
 
+		#region Properties
 
 		public int AppId { get; set; }
 		public string SubType { get; set; }
@@ -21,9 +20,13 @@ namespace ICD.Connect.Sources.Roku
 		public string Version { get; set; }
 		public string Name { get; set; }
 
+		#endregion
+
+		#region Factory Methods
+
 		public static IEnumerable<RokuApp> ReadAppsFromXml(string xml)
 		{
-			return XmlUtils.ReadListFromXml<RokuApp>(xml, "app", ReadAppFromXml);
+			return XmlUtils.ReadListFromXml<RokuApp>(xml, NAME_ELEMENT, ReadAppFromXml);
 		}
 
 		[CanBeNull]
@@ -37,10 +40,6 @@ namespace ICD.Connect.Sources.Roku
 			}
 
 			return null;
-
-			/*IEnumerable<RokuApp> activeApps = XmlUtils.ReadListFromXml<RokuApp>(xml, "app", ReadActiveAppFromXml);
-			activeApps = activeApps.Concat(XmlUtils.ReadListFromXml<RokuApp>(xml, "screensaver", ReadActiveAppFromXml));
-			return activeApps;*/
 		}
 
 		[NotNull]
@@ -55,5 +54,7 @@ namespace ICD.Connect.Sources.Roku
 				Name = XmlUtils.ReadElementContent(xml)
 			};
 		}
+
+		#endregion
 	}
 }
