@@ -20,6 +20,7 @@ namespace ICD.Connect.Sources.Roku
 
 		#region Private Fields
 
+		private readonly SafeCriticalSection m_Section;
 		private readonly UriProperties m_UriProperties;
 		private readonly List<RokuApp> m_AppList;
 		private readonly SafeTimer m_AppTimer;
@@ -32,9 +33,9 @@ namespace ICD.Connect.Sources.Roku
 
 		#region Properties
 
-		public RokuApp ActiveApp { get { return m_ActiveApp; } }
+		public RokuApp ActiveApp { get { return m_Section.Execute(() => m_ActiveApp); } }
 
-		public RokuDeviceInformation DeviceInformation { get { return m_DeviceInformation; } }
+		public RokuDeviceInformation DeviceInformation { get { return m_Section.Execute(() => m_DeviceInformation); } }
 
 		#endregion
 
@@ -43,6 +44,7 @@ namespace ICD.Connect.Sources.Roku
 		/// </summary>
 		public RokuDevice()
 		{
+			m_Section = new SafeCriticalSection();
 			m_UriProperties = new UriProperties();
 			m_AppList = new List<RokuApp>();
 			m_AppTimer = SafeTimer.Stopped(RefreshApps);
@@ -62,7 +64,7 @@ namespace ICD.Connect.Sources.Roku
 
 		public IEnumerable<RokuApp> GetRokuApps()
 		{
-			return m_AppList.ToArray();
+			return m_Section.Execute(() => m_AppList.ToArray());
 		}
 
 		#region Port Callbacks
@@ -201,31 +203,57 @@ namespace ICD.Connect.Sources.Roku
 
 		public void RefreshApps()
 		{
-			string xml;
-			Get("/query/apps", out xml);
-			IEnumerable<RokuApp> apps = RokuApp.ReadAppsFromXml(xml);
+			m_Section.Enter();
 
-			m_AppList.Clear();
-			m_AppList.AddRange(apps);
+			try
+			{
+				string xml;
+				Get("/query/apps", out xml);
+				IEnumerable<RokuApp> apps = RokuApp.ReadAppsFromXml(xml);
+
+				m_AppList.Clear();
+				m_AppList.AddRange(apps);
+			}
+			finally
+			{
+				m_Section.Leave();
+			}
 		}
 
 		public void RefreshActiveApp()
 		{
-			string xml;
-			Get("/query/active-app", out xml);
-			RokuApp activeApp = RokuApp.ReadActiveAppFromXml(xml);
+			m_Section.Enter();
 
-			m_ActiveApp = activeApp;
-			PrintActiveApp();
+			try
+			{
+				string xml;
+				Get("/query/active-app", out xml);
+				RokuApp activeApp = RokuApp.ReadActiveAppFromXml(xml);
+
+				m_ActiveApp = activeApp;
+			}
+			finally
+			{
+				m_Section.Leave();
+			}
 		}
 
 		public void RefreshDeviceInformation()
 		{
-			string xml;
-			Get("/query/device-info", out xml);
-			RokuDeviceInformation deviceInformation = RokuDeviceInformation.ReadDeviceInformationFromXml(xml);
+			m_Section.Enter();
 
-			m_DeviceInformation = deviceInformation;
+			try
+			{
+				string xml;
+				Get("/query/device-info", out xml);
+				RokuDeviceInformation deviceInformation = RokuDeviceInformation.ReadDeviceInformationFromXml(xml);
+
+				m_DeviceInformation = deviceInformation;
+			}
+			finally
+			{
+				m_Section.Leave();
+			}
 		}
 
 		public string GetAppIconUrl(int appId)
@@ -412,88 +440,113 @@ namespace ICD.Connect.Sources.Roku
 
 		private string PrintApps()
 		{
-			TableBuilder builder = new TableBuilder("Name", "AppID", "Type", "SubType", "Version");
+			m_Section.Enter();
 
-			foreach (RokuApp app in m_AppList)
-				builder.AddRow(app.Name, app.AppId, app.Type, app.SubType, app.Version);
+			try
+			{
+				TableBuilder builder = new TableBuilder("Name", "AppID", "Type", "SubType", "Version");
 
-			return builder.ToString();
+				foreach (RokuApp app in m_AppList)
+					builder.AddRow(app.Name, app.AppId, app.Type, app.SubType, app.Version);
+
+				return builder.ToString();
+			}
+			finally
+			{
+				m_Section.Leave();	
+			}
 		}
 
 		private string PrintActiveApp()
 		{
-			TableBuilder builder = new TableBuilder("Name", "AppID", "Type", "SubType", "Version");
+			m_Section.Enter();
 
-			if (m_ActiveApp != null)
-				builder.AddRow(m_ActiveApp.Name, m_ActiveApp.AppId, m_ActiveApp.Type, m_ActiveApp.SubType, m_ActiveApp.Version);
-			
-			return builder.ToString();
+			try
+			{
+				TableBuilder builder = new TableBuilder("Name", "AppID", "Type", "SubType", "Version");
+
+				if (m_ActiveApp != null)
+					builder.AddRow(m_ActiveApp.Name, m_ActiveApp.AppId, m_ActiveApp.Type, m_ActiveApp.SubType, m_ActiveApp.Version);
+
+				return builder.ToString();
+			}
+			finally
+			{
+				m_Section.Leave();
+			}
 		}
 
 		private string PrintDeviceInformation()
 		{
-			TableBuilder builder = new TableBuilder("Type of Info", "details");
-			if (m_DeviceInformation != null)
+			m_Section.Enter();
+
+			try
 			{
-				builder.AddRow("UDN", m_DeviceInformation.Udn);
-				builder.AddRow("Serial Number", m_DeviceInformation.SerialNumber);
-				builder.AddRow("Device ID", m_DeviceInformation.DeviceId);
-				builder.AddRow("Advertising ID", m_DeviceInformation.AdvertisingId);
-				builder.AddRow("Vendor Name", m_DeviceInformation.VendorName);
-				builder.AddRow("Model Name", m_DeviceInformation.ModelName);
-				builder.AddRow("Model Number", m_DeviceInformation.ModelNumber);
-				builder.AddRow("Model Region", m_DeviceInformation.ModelRegion);
-				builder.AddRow("Is Tv", m_DeviceInformation.IsTv);
-				builder.AddRow("Is Stick", m_DeviceInformation.IsStick);
-				builder.AddRow("Supports Ethernet", m_DeviceInformation.SupportsEthernet);
-				builder.AddRow("Wifi MAC", m_DeviceInformation.WifiMac);
-				builder.AddRow("Wifi Driver", m_DeviceInformation.WifiDriver);
-				builder.AddRow("Software Version", m_DeviceInformation.SoftwareVersion);
-				builder.AddRow("Network Name", m_DeviceInformation.NetworkName);
-				builder.AddRow("Friendly Device Name", m_DeviceInformation.FriendlyDeviceName);
-				builder.AddRow("Friendly Model Name", m_DeviceInformation.FriendlyModelName);
-				builder.AddRow("Default Device Name", m_DeviceInformation.DefaultDeviceName);
-				builder.AddRow("User Device Name", m_DeviceInformation.UserDeviceName);
-				builder.AddRow("Build Number", m_DeviceInformation.BuildNumber);
-				builder.AddRow("Software Version", m_DeviceInformation.SoftwareVersion);
-				builder.AddRow("Software Build", m_DeviceInformation.SoftwareBuild);
-				builder.AddRow("Secure Device", m_DeviceInformation.SecureDevice);
-				builder.AddRow("Language", m_DeviceInformation.Language);
-				builder.AddRow("Country", m_DeviceInformation.Country);
-				builder.AddRow("Locale", m_DeviceInformation.Locale);
-				builder.AddRow("Time Zone", m_DeviceInformation.TimeZone);
-				builder.AddRow("Time zone Name",m_DeviceInformation.TimeZoneName);
-				builder.AddRow("Time Zone Tz", m_DeviceInformation.TimeZoneTz);
-				builder.AddRow("Time Zone Offset", m_DeviceInformation.TimeZoneOffset);
-				builder.AddRow("Clock Format", m_DeviceInformation.ClockFormat);
-				builder.AddRow("Up Time", m_DeviceInformation.UpTime);
-				builder.AddRow("Power Mode", m_DeviceInformation.PowerMode);
-				builder.AddRow("Supports Suspend", m_DeviceInformation.SupportsSuspend);
-				builder.AddRow("Supports Find Remote", m_DeviceInformation.SupportsFindRemote);
-				builder.AddRow("Supports Audio Guide", m_DeviceInformation.SupportsAudioGuide);
-				builder.AddRow("Supports RVA", m_DeviceInformation.SupportsRva);
-				builder.AddRow("Developer Enabled", m_DeviceInformation.DeveloperEnabled);
-				builder.AddRow("Keyed Developer ID", m_DeviceInformation.KeyedDelevoperId);
-				builder.AddRow("Search Enabled", m_DeviceInformation.SearchEnabled);
-				builder.AddRow("Search Channels Enabled", m_DeviceInformation.SearchChannelsEnabled);
-				builder.AddRow("Voice Search Enabled", m_DeviceInformation.VoiceSearchEnabled);
-				builder.AddRow("Notifications Enabled", m_DeviceInformation.NotificationsEnabled);
-				builder.AddRow("Notifications First Use", m_DeviceInformation.NotificationsFirstUse);
-				builder.AddRow("Supports Private Listening", m_DeviceInformation.SupportsPrivateListening);
-				builder.AddRow("Headphones Connected", m_DeviceInformation.HeadphonesConnected);
-				builder.AddRow("Supports ECS Textedit", m_DeviceInformation.SupportsEcsTextedit);
-				builder.AddRow("Supports ECS Microphone", m_DeviceInformation.SupportsEcsMicrophone);
-				builder.AddRow("Supports Wake On WLAN", m_DeviceInformation.SupportsWakeOnWlan);
-				builder.AddRow("Has Play On Roku", m_DeviceInformation.HasPlayOnRoku);
-				builder.AddRow("Has Mobile Screensaver", m_DeviceInformation.HasMobileScreensaver);
-				builder.AddRow("Support URL", m_DeviceInformation.SupportUrl);
-				builder.AddRow("Grandcentral Version", m_DeviceInformation.GrandcentralVersion);
-				builder.AddRow("Davinci Version", m_DeviceInformation.DavinciVersion);
+				TableBuilder builder = new TableBuilder("Type of Info", "details");
+				if (m_DeviceInformation != null)
+				{
+					builder.AddRow("UDN", m_DeviceInformation.Udn);
+					builder.AddRow("Serial Number", m_DeviceInformation.SerialNumber);
+					builder.AddRow("Device ID", m_DeviceInformation.DeviceId);
+					builder.AddRow("Advertising ID", m_DeviceInformation.AdvertisingId);
+					builder.AddRow("Vendor Name", m_DeviceInformation.VendorName);
+					builder.AddRow("Model Name", m_DeviceInformation.ModelName);
+					builder.AddRow("Model Number", m_DeviceInformation.ModelNumber);
+					builder.AddRow("Model Region", m_DeviceInformation.ModelRegion);
+					builder.AddRow("Is Tv", m_DeviceInformation.IsTv);
+					builder.AddRow("Is Stick", m_DeviceInformation.IsStick);
+					builder.AddRow("Supports Ethernet", m_DeviceInformation.SupportsEthernet);
+					builder.AddRow("Wifi MAC", m_DeviceInformation.WifiMac);
+					builder.AddRow("Wifi Driver", m_DeviceInformation.WifiDriver);
+					builder.AddRow("Software Version", m_DeviceInformation.SoftwareVersion);
+					builder.AddRow("Network Name", m_DeviceInformation.NetworkName);
+					builder.AddRow("Friendly Device Name", m_DeviceInformation.FriendlyDeviceName);
+					builder.AddRow("Friendly Model Name", m_DeviceInformation.FriendlyModelName);
+					builder.AddRow("Default Device Name", m_DeviceInformation.DefaultDeviceName);
+					builder.AddRow("User Device Name", m_DeviceInformation.UserDeviceName);
+					builder.AddRow("Build Number", m_DeviceInformation.BuildNumber);
+					builder.AddRow("Software Version", m_DeviceInformation.SoftwareVersion);
+					builder.AddRow("Software Build", m_DeviceInformation.SoftwareBuild);
+					builder.AddRow("Secure Device", m_DeviceInformation.SecureDevice);
+					builder.AddRow("Language", m_DeviceInformation.Language);
+					builder.AddRow("Country", m_DeviceInformation.Country);
+					builder.AddRow("Locale", m_DeviceInformation.Locale);
+					builder.AddRow("Time Zone", m_DeviceInformation.TimeZone);
+					builder.AddRow("Time zone Name", m_DeviceInformation.TimeZoneName);
+					builder.AddRow("Time Zone Tz", m_DeviceInformation.TimeZoneTz);
+					builder.AddRow("Time Zone Offset", m_DeviceInformation.TimeZoneOffset);
+					builder.AddRow("Clock Format", m_DeviceInformation.ClockFormat);
+					builder.AddRow("Up Time", m_DeviceInformation.UpTime);
+					builder.AddRow("Power Mode", m_DeviceInformation.PowerMode);
+					builder.AddRow("Supports Suspend", m_DeviceInformation.SupportsSuspend);
+					builder.AddRow("Supports Find Remote", m_DeviceInformation.SupportsFindRemote);
+					builder.AddRow("Supports Audio Guide", m_DeviceInformation.SupportsAudioGuide);
+					builder.AddRow("Supports RVA", m_DeviceInformation.SupportsRva);
+					builder.AddRow("Developer Enabled", m_DeviceInformation.DeveloperEnabled);
+					builder.AddRow("Keyed Developer ID", m_DeviceInformation.KeyedDelevoperId);
+					builder.AddRow("Search Enabled", m_DeviceInformation.SearchEnabled);
+					builder.AddRow("Search Channels Enabled", m_DeviceInformation.SearchChannelsEnabled);
+					builder.AddRow("Voice Search Enabled", m_DeviceInformation.VoiceSearchEnabled);
+					builder.AddRow("Notifications Enabled", m_DeviceInformation.NotificationsEnabled);
+					builder.AddRow("Notifications First Use", m_DeviceInformation.NotificationsFirstUse);
+					builder.AddRow("Supports Private Listening", m_DeviceInformation.SupportsPrivateListening);
+					builder.AddRow("Headphones Connected", m_DeviceInformation.HeadphonesConnected);
+					builder.AddRow("Supports ECS Textedit", m_DeviceInformation.SupportsEcsTextedit);
+					builder.AddRow("Supports ECS Microphone", m_DeviceInformation.SupportsEcsMicrophone);
+					builder.AddRow("Supports Wake On WLAN", m_DeviceInformation.SupportsWakeOnWlan);
+					builder.AddRow("Has Play On Roku", m_DeviceInformation.HasPlayOnRoku);
+					builder.AddRow("Has Mobile Screensaver", m_DeviceInformation.HasMobileScreensaver);
+					builder.AddRow("Support URL", m_DeviceInformation.SupportUrl);
+					builder.AddRow("Grandcentral Version", m_DeviceInformation.GrandcentralVersion);
+					builder.AddRow("Davinci Version", m_DeviceInformation.DavinciVersion);
+				}
+				return builder.ToString();
 			}
-
-			return builder.ToString();
+			finally
+			{
+				m_Section.Leave();
+			}
 		}
-
 		#endregion
 	}
 }
