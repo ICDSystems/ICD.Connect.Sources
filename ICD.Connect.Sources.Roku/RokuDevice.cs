@@ -250,7 +250,7 @@ namespace ICD.Connect.Sources.Roku
 		/// <param name="key"></param>
 		public void Keypress(eRokuKeys key)
 		{
-			Post(string.Format("/keypress/{0}", key.ToString()));
+			Post(string.Format("/keypress/{0}", key));
 		}
 
 		/// <summary>
@@ -259,7 +259,7 @@ namespace ICD.Connect.Sources.Roku
 		/// <param name="key"></param>
 		public void Keydown(eRokuKeys key)
 		{
-			Post(string.Format("/keydown/{0}", key.ToString()));
+			Post(string.Format("/keydown/{0}", key));
 		}
 
 		/// <summary>
@@ -268,28 +268,25 @@ namespace ICD.Connect.Sources.Roku
 		/// <param name="key"></param>
 		public void Keyup(eRokuKeys key)
 		{
-			Post(string.Format("/keyup/{0}", key.ToString()));
+			Post(string.Format("/keyup/{0}", key));
 		}
 
 		public void KeypressKeyboard(string message)
 		{
-			foreach (char messageChar in message)
-			{
-				Post(string.Format("/keypress/Lit_{0}", messageChar.ToString()));	
-			}
+		    foreach (char messageChar in message)
+		        Post(string.Format("/keypress/Lit_{0}", messageChar));
 		}
 
 		#endregion
 
-
 		public void LaunchApp(int appId)
 		{
-			Post(string.Format("/launch/{0}", appId.ToString()));
+			Post(string.Format("/launch/{0}", appId));
 		}
 
 		public void InstallApp(int channelId)
 		{
-			Post(string.Format("/install/{0}", channelId.ToString()));
+			Post(string.Format("/install/{0}", channelId));
 		}
 
 		#region Search
