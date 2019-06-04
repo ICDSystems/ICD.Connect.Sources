@@ -65,7 +65,9 @@
     <Compile Include="KrangPlugin.cs" />
     <None Include="ObfuscationSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RokuApp.cs" />
     <Compile Include="RokuDevice.cs" />
+    <Compile Include="RokuDeviceInformation.cs" />
     <Compile Include="RokuDeviceSettings.cs" />
     <Compile Include="RokuSearchQueryBuilder.cs" />
     <None Include="Properties\ControlSystem.cfg" />

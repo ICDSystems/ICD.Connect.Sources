@@ -207,7 +207,7 @@ namespace ICD.Connect.Sources.Roku
 
 		public string GetAppIconUrl(int appId)
 		{
-			UriBuilder builder = new UriBuilder(m_Port.Uri);
+			IcdUriBuilder builder = new IcdUriBuilder(m_Port.Uri);
 
 			builder.Path = string.Format("/query/icon/{0}", appId);
 
