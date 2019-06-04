@@ -8,6 +8,7 @@ using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
+using ICD.Connect.Routing.Mock.Source;
 using ICD.Connect.Settings;
 using System.Collections.Generic;
 using ICD.Common.Utils.Timers;
@@ -48,6 +49,8 @@ namespace ICD.Connect.Sources.Roku
 			m_UriProperties = new UriProperties();
 			m_AppList = new List<RokuApp>();
 			m_AppTimer = SafeTimer.Stopped(RefreshApps);
+
+			Controls.Add(new MockRouteSourceControl(this, 0));
 		}
 
 		protected override void DisposeFinal(bool disposing)

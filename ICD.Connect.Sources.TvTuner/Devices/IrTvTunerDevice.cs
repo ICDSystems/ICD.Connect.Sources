@@ -30,11 +30,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			m_Commands = new IrTvTunerCommands();
 			m_IrDriverProperties = new IrDriverProperties();
 
-			// Assume the tv tuner has a single source output
-			MockRouteSourceControl sourceControl = new MockRouteSourceControl(this, 0);
-			sourceControl.SetActiveTransmissionState(1, eConnectionType.Audio | eConnectionType.Video, true);
-
-			Controls.Add(sourceControl);
+			Controls.Add(new MockRouteSourceControl(this, 0));
 			Controls.Add(new TvTunerControl(this, 1));
 		}
 
