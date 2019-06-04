@@ -30,6 +30,14 @@ namespace ICD.Connect.Sources.Roku
 
 		#endregion
 
+		#region Properties
+
+		public RokuApp ActiveApp { get { return m_ActiveApp; } }
+
+		public RokuDeviceInformation DeviceInformation { get { return m_DeviceInformation; } }
+
+		#endregion
+
 		/// <summary>
 		/// Constructor.
 		/// </summary>
@@ -50,6 +58,11 @@ namespace ICD.Connect.Sources.Roku
 		protected override bool GetIsOnlineStatus()
 		{
 			return m_Port != null && m_Port.IsOnline;
+		}
+
+		public IEnumerable<RokuApp> GetRokuApps()
+		{
+			return m_AppList.ToArray();
 		}
 
 		#region Port Callbacks
