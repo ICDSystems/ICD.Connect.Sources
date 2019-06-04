@@ -92,9 +92,11 @@ namespace ICD.Connect.Sources.Roku
 			UpdateCachedOnlineStatus();
 
 			if (port != null)
+			{
+				RefreshDeviceInformation();
 				m_AppTimer.Reset(0, APP_REFRESH_MILLISECONDS);
+			}
 		}
-
 
 		/// <summary>
 		/// Configures the given port for communication with the device.
