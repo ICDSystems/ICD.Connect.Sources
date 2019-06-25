@@ -5,7 +5,6 @@ using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports.IrPort;
 using ICD.Connect.Protocol.Settings;
-using ICD.Connect.Routing.Connections;
 using ICD.Connect.Routing.Mock.Source;
 using ICD.Connect.Settings;
 using ICD.Connect.Sources.TvTuner.Controls;
