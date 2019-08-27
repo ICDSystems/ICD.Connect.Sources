@@ -14,7 +14,8 @@ using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
 using ICD.Connect.Settings;
-using Newtonsoft.Json.Linq;
+using ICD.Connect.Sources.Barco.Responses;
+using Newtonsoft.Json;
 
 namespace ICD.Connect.Sources.Barco
 {
@@ -86,7 +87,7 @@ namespace ICD.Connect.Sources.Barco
 		private readonly SafeTimer m_SharingTimer;
 		private readonly SafeCriticalSection m_SharingTimerSection;
 
-		private readonly Dictionary<int, BarcoClickshareButton> m_Buttons;
+		private readonly Dictionary<int, Button> m_Buttons;
 		private readonly SafeCriticalSection m_ButtonsSection;
 
 		private readonly UriProperties m_UriProperties;
@@ -175,7 +176,7 @@ namespace ICD.Connect.Sources.Barco
 			m_Version = DEFAULT_VERSION;
 			m_SharingUpdateInterval = SHARING_UPDATE_INTERVAL;
 
-			m_Buttons = new Dictionary<int, BarcoClickshareButton>();
+			m_Buttons = new Dictionary<int, Button>();
 			m_ButtonsSection = new SafeCriticalSection();
 
 			m_SharingTimer = new SafeTimer(SharingTimerCallback, m_SharingUpdateInterval, m_SharingUpdateInterval);
@@ -242,7 +243,7 @@ namespace ICD.Connect.Sources.Barco
 		/// Gets the cached buttons.
 		/// </summary>
 		/// <returns></returns>
-		public IEnumerable<KeyValuePair<int, BarcoClickshareButton>> GetButtons()
+		public IEnumerable<KeyValuePair<int, Button>> GetButtons()
 		{
 			return m_ButtonsSection.Execute(() => m_Buttons.OrderBy(p => p.Key).ToArray());
 		}
@@ -300,12 +301,7 @@ namespace ICD.Connect.Sources.Barco
 
 		private void PollSharingState()
 		{
-			string response;
-
-			if (m_Port.Get(DEFAULT_VERSION + KEY_DEVICE_SHARING, out response))
-				ParsePortData(response, ParseSharingState);
-			else
-				IncrementUpdateInterval();
+			Poll<SharingStateResponse>(DEFAULT_VERSION + KEY_DEVICE_SHARING, ParseSharingState);
 		}
 
 		private void PollVersion()
@@ -313,12 +309,7 @@ namespace ICD.Connect.Sources.Barco
 			if (Version != DEFAULT_VERSION)
 				return;
 
-			string response;
-
-			if (m_Port.Get(REQUEST_VERSION, out response))
-				ParsePortData(response, ParseVersion);
-			else
-				IncrementUpdateInterval();
+			Poll<VersionResponse>(REQUEST_VERSION, ParseVersion);
 		}
 
 		private void PollSoftwareVersion()
@@ -326,54 +317,48 @@ namespace ICD.Connect.Sources.Barco
 			if (!string.IsNullOrEmpty(SoftwareVersion))
 				return;
 
-			string response;
-
-			if (m_Port.Get(DEFAULT_VERSION + KEY_SOFTWARE_VERSION, out response))
-				ParsePortData(response, ParseSoftwareVersion);
-			else
-				IncrementUpdateInterval();
+			Poll<SoftwareVersionResponse>(DEFAULT_VERSION + KEY_SOFTWARE_VERSION, ParseSoftwareVersion);
 		}
 
 		private void PollButtonsTable()
 		{
-			string response;
-
-			if (m_Port.Get(DEFAULT_VERSION + KEY_BUTTONS_TABLE, out response))
-				ParsePortData(response, ParseButtonsTable);
-			else
-				IncrementUpdateInterval();
+			Poll<ButtonsTableResponse>(DEFAULT_VERSION + KEY_BUTTONS_TABLE, ParseButtonsTable);
 		}
 
 		/// <summary>
 		/// Called when data is received from the physical device.
 		/// </summary>
-		/// <param name="response"></param>
-		/// <param name="dataCallback"></param>
-		private void ParsePortData(string response, Action<JObject> dataCallback)
+		/// <param name="relativeOrAbsoluteUri"></param>
+		/// <param name="responseCallback"></param>
+		private void Poll<TResponse>(string relativeOrAbsoluteUri, Action<TResponse> responseCallback)
+			where TResponse : IBarcoClickshareResponse
 		{
-			response = (response ?? string.Empty).Trim();
-			if (string.IsNullOrEmpty(response))
-				return;
+			if (responseCallback == null)
+				throw new ArgumentNullException("responseCallback");
 
 			try
 			{
-				JObject json = JObject.Parse(response);
-
-				int status = (int)json.SelectToken("status");
-
-				if (status != STATUS_SUCCESS)
+				string data;
+				if (m_Port.Get(relativeOrAbsoluteUri, out data))
 				{
-					string message = (string)json.SelectToken("message");
-					ParseError(status, message);
-					return;
-				}
+					data = (data ?? string.Empty).Trim();
+					if (string.IsNullOrEmpty(data))
+						return;
 
-				JObject data = (JObject)json.SelectToken("data");
-				dataCallback(data);
+					TResponse response = JsonConvert.DeserializeObject<TResponse>(data);
+
+					if (response.Status != STATUS_SUCCESS)
+					{
+						LogError(response.Status, response.Message);
+						return;
+					}
+
+					responseCallback(response);
+				}
 			}
 			catch (Exception e)
 			{
-				Log(eSeverity.Error, e, "Failed to parse json - {0}", response);
+				Log(eSeverity.Error, e, "Failed to parse json - {0}", e.Message);
 				IncrementUpdateInterval();
 				return;
 			}
@@ -384,45 +369,44 @@ namespace ICD.Connect.Sources.Barco
 		/// <summary>
 		/// Updates sharing status from JSON.
 		/// </summary>
-		/// <param name="data"></param>
-		private void ParseSharingState(JObject data)
+		/// <param name="response"></param>
+		private void ParseSharingState(SharingStateResponse response)
 		{
-			Sharing = (bool)data.SelectToken("value");
+			Sharing = response.Data.Value;
 		}
 
 		/// <summary>
 		/// Updates buttons from JSON.
 		/// </summary>
-		/// <param name="data"></param>
-		private void ParseButtonsTable(JObject data)
+		/// <param name="response"></param>
+		private void ParseButtonsTable(ButtonsTableResponse response)
 		{
-			JObject buttons = (JObject)data.SelectToken("value");
-			UpdateButtons(buttons);
+			UpdateButtons(response.Data.Value);
 		}
 
 		/// <summary>
 		/// Updates version from JSON.
 		/// </summary>
-		/// <param name="data"></param>
-		private void ParseVersion(JObject data)
+		/// <param name="response"></param>
+		private void ParseVersion(VersionResponse response)
 		{
-			Version = (string)data.SelectToken("value");
+			Version = response.Data.Value;
 		}
 
 		/// <summary>
 		/// Updates software version from JSON.
 		/// </summary>
-		/// <param name="data"></param>
-		private void ParseSoftwareVersion(JObject data)
+		/// <param name="response"></param>
+		private void ParseSoftwareVersion(SoftwareVersionResponse response)
 		{
-			SoftwareVersion = (string)data.SelectToken("value");
+			SoftwareVersion = response.Data.Value;
 		}
 
 		/// <summary>
 		/// Updates the buttons from json.
 		/// </summary>
 		/// <param name="buttons"></param>
-		private void UpdateButtons(JObject buttons)
+		private void UpdateButtons(ButtonsTable buttons)
 		{
 			bool changed;
 
@@ -430,14 +414,7 @@ namespace ICD.Connect.Sources.Barco
 
 			try
 			{
-				Dictionary<int, BarcoClickshareButton> newButtons = new Dictionary<int, BarcoClickshareButton>();
-
-				foreach (KeyValuePair<string, JToken> token in buttons)
-				{
-					int index = int.Parse(token.Key);
-					BarcoClickshareButton button = BarcoClickshareButton.FromJson(token.Value);
-					newButtons[index] = button;
-				}
+				Dictionary<int, Button> newButtons = buttons.GetButtons().ToDictionary();
 
 				changed = !newButtons.DictionaryEqual(m_Buttons);
 
@@ -461,7 +438,7 @@ namespace ICD.Connect.Sources.Barco
 		/// </summary>
 		/// <param name="status"></param>
 		/// <param name="message"></param>
-		private void ParseError(int status, string message)
+		private void LogError(int status, string message)
 		{
 			message = string.Format("Error Code {0} - {1}", status, message);
 			Log(eSeverity.Error, message);

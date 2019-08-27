@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+ - Barco ClickShare JSON deserialization improvements for better DateTime compatibility
+
 ## [6.1.0] - 2019-06-04
 ### Added
  - Roku Device API Implementation
