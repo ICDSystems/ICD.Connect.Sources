@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+ - TV Presets features moved from Misc project
+
 ## [6.1.1] - 2019-09-16
 ### Changed
  - Barco ClickShare JSON deserialization improvements for better DateTime compatibility
