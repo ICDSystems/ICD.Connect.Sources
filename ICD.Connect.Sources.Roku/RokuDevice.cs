@@ -184,7 +184,7 @@ namespace ICD.Connect.Sources.Roku
 
 			SetPort(null);
 
-			m_UriProperties.Clear();
+			m_UriProperties.ClearUriProperties();
 		}
 
 		/// <summary>
