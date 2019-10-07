@@ -4,5 +4,5 @@
 [assembly: AssemblyCompany("ICD Systems")]
 [assembly: AssemblyProduct("ICD.Connect.Sources.Roku")]
 [assembly: AssemblyCopyright("Copyright © ICD Systems 2019")]
-[assembly: AssemblyVersion("6.1.1.0")]
+[assembly: AssemblyVersion("6.2.0.0")]
 
