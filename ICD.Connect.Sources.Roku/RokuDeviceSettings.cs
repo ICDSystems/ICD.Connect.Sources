@@ -1,4 +1,5 @@
-﻿using ICD.Common.Utils.Xml;
+﻿using System;
+using ICD.Common.Utils.Xml;
 using ICD.Connect.Devices;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
@@ -8,11 +9,12 @@ using ICD.Connect.Settings.Attributes.SettingsProperties;
 namespace ICD.Connect.Sources.Roku
 {
 	[KrangSettings("Roku", typeof(RokuDevice))]
-	public sealed class RokuDeviceSettings : AbstractDeviceSettings, IUriSettings
+	public sealed class RokuDeviceSettings : AbstractDeviceSettings, IUriSettings, IWebProxySettings
 	{
 		private const string PORT_ELEMENT = "Port";
 
 		private readonly UriProperties m_UriProperties;
+		private readonly WebProxyProperties m_WebProxyProperties;
 
 		/// <summary>
 		/// The port id.
@@ -72,12 +74,60 @@ namespace ICD.Connect.Sources.Roku
 
 		#endregion
 
+		#region Proxy
+
+		/// <summary>
+		/// Gets/sets the configurable proxy username.
+		/// </summary>
+		public string ProxyUsername { get { return m_WebProxyProperties.ProxyUsername; } set { m_WebProxyProperties.ProxyUsername = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy password.
+		/// </summary>
+		public string ProxyPassword { get { return m_WebProxyProperties.ProxyPassword; } set { m_WebProxyProperties.ProxyPassword = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy host.
+		/// </summary>
+		public string ProxyHost { get { return m_WebProxyProperties.ProxyHost; } set { m_WebProxyProperties.ProxyHost = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy port.
+		/// </summary>
+		public ushort? ProxyPort { get { return m_WebProxyProperties.ProxyPort; } set { m_WebProxyProperties.ProxyPort = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy scheme.
+		/// </summary>
+		public string ProxyScheme { get { return m_WebProxyProperties.ProxyScheme; } set { m_WebProxyProperties.ProxyScheme = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy authentication method.
+		/// </summary>
+		public eProxyAuthenticationMethod? ProxyAuthenticationMethod
+		{
+			get { return m_WebProxyProperties.ProxyAuthenticationMethod; }
+			set { m_WebProxyProperties.ProxyAuthenticationMethod = value; }
+		}
+
+		/// <summary>
+		/// Clears the configured values.
+		/// </summary>
+		public void ClearProxyProperties()
+		{
+			m_WebProxyProperties.ClearProxyProperties();
+		}
+
+		#endregion
+
 		/// <summary>
 		/// Constructor.
 		/// </summary>
 		public RokuDeviceSettings()
 		{
 			m_UriProperties = new UriProperties();
+			m_WebProxyProperties = new WebProxyProperties();
+
 			UpdateUriDefaults();
 		}
 
@@ -92,6 +142,7 @@ namespace ICD.Connect.Sources.Roku
 			writer.WriteElementString(PORT_ELEMENT, IcdXmlConvert.ToString(Port));
 
 			m_UriProperties.WriteElements(writer);
+			m_WebProxyProperties.WriteElements(writer);
 		}
 
 		/// <summary>
@@ -105,14 +156,14 @@ namespace ICD.Connect.Sources.Roku
 			Port = XmlUtils.TryReadChildElementContentAsInt(xml, PORT_ELEMENT);
 
 			m_UriProperties.ParseXml(xml);
+			m_WebProxyProperties.ParseXml(xml);
 
 			UpdateUriDefaults();
 		}
 
 		private void UpdateUriDefaults()
 		{
-			m_UriProperties.UriScheme = "http";
-			m_UriProperties.UriPort = m_UriProperties.UriPort ?? 8060;
+			m_UriProperties.ApplyDefaultValues(null, null, null, 8060, Uri.UriSchemeHttp, null, null, null);
 		}
 	}
 }

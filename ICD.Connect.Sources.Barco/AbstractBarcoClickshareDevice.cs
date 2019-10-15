@@ -43,7 +43,7 @@ namespace ICD.Connect.Sources.Barco
 		private const int MAX_PORT_FAILURES_FOR_OFFLINE = 4;
 
 		// The number of times to check "sharing" before checking version/buttons
-		private const int INFO_UPDATE_OCCURANCE = 10;
+		private const int INFO_UPDATE_OCCURRENCE = 10;
 
 		private const int STATUS_SUCCESS = 200;
 		//private const int STATUS_BAD_FORMAT = 400;
@@ -91,6 +91,7 @@ namespace ICD.Connect.Sources.Barco
 		private readonly SafeCriticalSection m_ButtonsSection;
 
 		private readonly UriProperties m_UriProperties;
+		private readonly WebProxyProperties m_WebProxyProperties;
 
 		private IWebPort m_Port;
 		private bool m_Sharing;
@@ -172,6 +173,7 @@ namespace ICD.Connect.Sources.Barco
 		protected AbstractBarcoClickshareDevice()
 		{
 			m_UriProperties = new UriProperties();
+			m_WebProxyProperties = new WebProxyProperties();
 
 			m_Version = DEFAULT_VERSION;
 			m_SharingUpdateInterval = SHARING_UPDATE_INTERVAL;
@@ -236,7 +238,10 @@ namespace ICD.Connect.Sources.Barco
 		{
 			// URI
 			if (port != null)
+			{
 				port.ApplyDeviceConfiguration(m_UriProperties);
+				port.ApplyDeviceConfiguration(m_WebProxyProperties);
+			}
 		}
 
 		/// <summary>
@@ -290,7 +295,7 @@ namespace ICD.Connect.Sources.Barco
 					PollButtonsTable();
 				}
 
-				m_UpdateCount = (m_UpdateCount + 1) % INFO_UPDATE_OCCURANCE;
+				m_UpdateCount = (m_UpdateCount + 1) % INFO_UPDATE_OCCURRENCE;
 			}
 			catch (Exception e)
 			{
@@ -535,6 +540,7 @@ namespace ICD.Connect.Sources.Barco
 			settings.Port = m_Port == null ? (int?)null : m_Port.Id;
 
 			settings.Copy(m_UriProperties);
+			settings.Copy(m_WebProxyProperties);
 		}
 
 		/// <summary>
@@ -547,6 +553,7 @@ namespace ICD.Connect.Sources.Barco
 			SetPort(null);
 
 			m_UriProperties.ClearUriProperties();
+			m_WebProxyProperties.ClearProxyProperties();
 		}
 
 		/// <summary>
@@ -559,6 +566,7 @@ namespace ICD.Connect.Sources.Barco
 			base.ApplySettingsFinal(settings, factory);
 
 			m_UriProperties.Copy(settings);
+			m_WebProxyProperties.Copy(settings);
 
 			IWebPort port = null;
 

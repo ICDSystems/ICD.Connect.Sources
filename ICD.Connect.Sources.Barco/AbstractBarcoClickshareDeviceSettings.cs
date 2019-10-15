@@ -10,11 +10,12 @@ namespace ICD.Connect.Sources.Barco
 	/// <summary>
 	/// Settings for the BarcoClickshareDevice.
 	/// </summary>
-	public abstract class AbstractBarcoClickshareDeviceSettings : AbstractDeviceSettings, IUriSettings
+	public abstract class AbstractBarcoClickshareDeviceSettings : AbstractDeviceSettings, IUriSettings, IWebProxySettings
 	{
 		private const string PORT_ELEMENT = "Port";
 
 		private readonly UriProperties m_UriProperties;
+		private readonly WebProxyProperties m_WebProxyProperties;
 
 		#region Properties
 
@@ -75,12 +76,59 @@ namespace ICD.Connect.Sources.Barco
 
 		#endregion
 
+		#region Proxy
+
+		/// <summary>
+		/// Gets/sets the configurable proxy username.
+		/// </summary>
+		public string ProxyUsername { get { return m_WebProxyProperties.ProxyUsername; } set { m_WebProxyProperties.ProxyUsername = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy password.
+		/// </summary>
+		public string ProxyPassword { get { return m_WebProxyProperties.ProxyPassword; } set { m_WebProxyProperties.ProxyPassword = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy host.
+		/// </summary>
+		public string ProxyHost { get { return m_WebProxyProperties.ProxyHost; } set { m_WebProxyProperties.ProxyHost = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy port.
+		/// </summary>
+		public ushort? ProxyPort { get { return m_WebProxyProperties.ProxyPort; } set { m_WebProxyProperties.ProxyPort = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy scheme.
+		/// </summary>
+		public string ProxyScheme { get { return m_WebProxyProperties.ProxyScheme; } set { m_WebProxyProperties.ProxyScheme = value; } }
+
+		/// <summary>
+		/// Gets/sets the configurable proxy authentication method.
+		/// </summary>
+		public eProxyAuthenticationMethod? ProxyAuthenticationMethod
+		{
+			get { return m_WebProxyProperties.ProxyAuthenticationMethod; }
+			set { m_WebProxyProperties.ProxyAuthenticationMethod = value; }
+		}
+
+		/// <summary>
+		/// Clears the configured values.
+		/// </summary>
+		public void ClearProxyProperties()
+		{
+			m_WebProxyProperties.ClearProxyProperties();
+		}
+
+		#endregion
+
 		/// <summary>
 		/// Constructor.
 		/// </summary>
 		protected AbstractBarcoClickshareDeviceSettings()
 		{
 			m_UriProperties = new UriProperties();
+			m_WebProxyProperties = new WebProxyProperties();
 
 			UpdateUriDefaults();
 		}
@@ -96,6 +144,7 @@ namespace ICD.Connect.Sources.Barco
 			writer.WriteElementString(PORT_ELEMENT, IcdXmlConvert.ToString(Port));
 
 			m_UriProperties.WriteElements(writer);
+			m_WebProxyProperties.WriteElements(writer);
 		}
 
 		/// <summary>
@@ -109,6 +158,7 @@ namespace ICD.Connect.Sources.Barco
 			Port = XmlUtils.TryReadChildElementContentAsInt(xml, PORT_ELEMENT);
 
 			m_UriProperties.ParseXml(xml);
+			m_WebProxyProperties.ParseXml(xml);
 
 			UpdateUriDefaults();
 		}
