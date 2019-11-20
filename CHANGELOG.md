@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [6.3.0] - 2019-11-20
+### Added
+ - Added web proxy settings to Roku
+
 ## [6.2.0] - 2019-10-07
 ### Added
  - TV Presets features moved from Misc project
