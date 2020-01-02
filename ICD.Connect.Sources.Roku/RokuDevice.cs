@@ -210,8 +210,7 @@ namespace ICD.Connect.Sources.Roku
 
 			try
 			{
-				string xml;
-				Get("/query/apps", out xml);
+				string xml = Get("/query/apps");
 				IEnumerable<RokuApp> apps = RokuApp.ReadAppsFromXml(xml);
 
 				m_AppList.Clear();
@@ -229,8 +228,7 @@ namespace ICD.Connect.Sources.Roku
 
 			try
 			{
-				string xml;
-				Get("/query/active-app", out xml);
+				string xml = Get("/query/active-app");
 				RokuApp activeApp = RokuApp.ReadActiveAppFromXml(xml);
 
 				m_ActiveApp = activeApp;
@@ -247,8 +245,7 @@ namespace ICD.Connect.Sources.Roku
 
 			try
 			{
-				string xml;
-				Get("/query/device-info", out xml);
+				string xml = Get("/query/device-info");
 				RokuDeviceInformation deviceInformation = RokuDeviceInformation.ReadDeviceInformationFromXml(xml);
 
 				m_DeviceInformation = deviceInformation;
@@ -269,10 +266,10 @@ namespace ICD.Connect.Sources.Roku
 			return builder.ToString();
 		}
 
-		private void Get(string path, out string result)
+		private string Get(string path)
 		{
 			path = Uri.EscapeUriString(path);
-			m_Port.Get(path, out result);
+			return m_Port.Get(path).DataAsString;
 		}
 
 		#endregion
@@ -358,7 +355,7 @@ namespace ICD.Connect.Sources.Roku
 			path = Uri.EscapeUriString(path);
 
 			string unused;
-			m_Port.Post(path, new byte[0], out unused);
+			m_Port.Post(path, new byte[0]);
 		}
 
 		#endregion

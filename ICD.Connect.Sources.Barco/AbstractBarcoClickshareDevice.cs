@@ -343,10 +343,11 @@ namespace ICD.Connect.Sources.Barco
 
 			try
 			{
-				string data;
-				if (m_Port.Get(relativeOrAbsoluteUri, out data))
+				WebPortResponse portResponse = m_Port.Get(relativeOrAbsoluteUri);
+
+				if (portResponse.Success)
 				{
-					data = (data ?? string.Empty).Trim();
+					string data = (portResponse.DataAsString ?? string.Empty).Trim();
 					if (string.IsNullOrEmpty(data))
 						return;
 
