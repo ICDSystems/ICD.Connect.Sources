@@ -26,7 +26,6 @@ namespace ICD.Connect.Sources.Barco
 		public BarcoClickshareRouteSourceControl(TClickshare parent, int id)
 			: base(parent, id)
 		{
-			Subscribe(parent);
 		}
 
 		/// <summary>
@@ -38,8 +37,6 @@ namespace ICD.Connect.Sources.Barco
 			OnActiveTransmissionStateChanged = null;
 
 			base.DisposeFinal(disposing);
-
-			Unsubscribe(Parent);
 		}
 
 		#region Methods
@@ -118,8 +115,10 @@ namespace ICD.Connect.Sources.Barco
 		/// Subscribe to parent events.
 		/// </summary>
 		/// <param name="parent"></param>
-		private void Subscribe(TClickshare parent)
+		protected override void Subscribe(TClickshare parent)
 		{
+			base.Subscribe(parent);
+
 			parent.OnSharingStatusChanged += ParentOnSharingStatusChanged;
 		}
 
@@ -127,8 +126,10 @@ namespace ICD.Connect.Sources.Barco
 		/// Unsubscribe from parent events.
 		/// </summary>
 		/// <param name="parent"></param>
-		private void Unsubscribe(TClickshare parent)
+		protected override void Unsubscribe(TClickshare parent)
 		{
+			base.Unsubscribe(parent);
+
 			parent.OnSharingStatusChanged -= ParentOnSharingStatusChanged;
 		}
 
