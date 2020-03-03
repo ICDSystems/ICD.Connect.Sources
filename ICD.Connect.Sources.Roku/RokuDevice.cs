@@ -353,8 +353,6 @@ namespace ICD.Connect.Sources.Roku
 		private void Post(string path)
 		{
 			path = Uri.EscapeUriString(path);
-
-			string unused;
 			m_Port.Post(path, new byte[0]);
 		}
 
