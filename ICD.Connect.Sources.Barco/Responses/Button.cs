@@ -129,10 +129,10 @@ namespace ICD.Connect.Sources.Barco.Responses
 					instance.Ip = reader.GetValueAsString();
 					break;
 				case PROP_LAST_CONNECTED:
-					instance.LastConnected = reader.GetValueAsDateTime();
+					instance.LastConnected = reader.GetValueAsDateTime().ToUniversalTime();
 					break;
 				case PROP_LAST_PAIRED:
-					instance.LastPaired = reader.GetValueAsDateTime();
+					instance.LastPaired = reader.GetValueAsDateTime().ToUniversalTime();
 					break;
 				case PROP_MAC_ADDRESS:
 					instance.MacAddress = reader.GetValueAsString();

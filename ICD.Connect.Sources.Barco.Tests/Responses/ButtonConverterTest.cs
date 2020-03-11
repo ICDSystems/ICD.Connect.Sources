@@ -30,8 +30,8 @@ namespace ICD.Connect.Sources.Barco.Tests.Responses
 			Assert.AreEqual(button.ConnectionCount, 5);
 			Assert.AreEqual(button.Version, "02.09.05.0022");
 			Assert.AreEqual(button.Ip, string.Empty);
-			Assert.AreEqual(button.LastConnected, new DateTime(2019, 06, 18, 18, 34, 47));
-			Assert.AreEqual(button.LastPaired, new DateTime(2019, 06, 18, 17, 51, 16));
+			Assert.AreEqual(button.LastConnected, new DateTime(2019, 06, 18, 18, 34, 47).ToUniversalTime());
+			Assert.AreEqual(button.LastPaired, new DateTime(2019, 06, 18, 17, 51, 16).ToUniversalTime());
 			Assert.AreEqual(button.MacAddress, "00:23:A7:63:CC:10");
 			Assert.AreEqual(button.SerialNumber, "1871012116");
 			Assert.AreEqual(button.Status, Button.eStatus.Ok);
