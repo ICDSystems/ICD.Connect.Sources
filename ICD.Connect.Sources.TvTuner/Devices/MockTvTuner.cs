@@ -1,11 +1,17 @@
-﻿using ICD.Connect.Routing.Connections;
+﻿using ICD.Connect.Devices.Mock;
+using ICD.Connect.Routing.Connections;
 using ICD.Connect.Routing.Mock.Source;
+using ICD.Connect.Settings;
 using ICD.Connect.Sources.TvTuner.Controls;
 
 namespace ICD.Connect.Sources.TvTuner.Devices
 {
-	public sealed class MockTvTunerDevice : AbstractTvTunerDevice<MockTvTunerSettings>
+	public sealed class MockTvTunerDevice : AbstractTvTunerDevice<MockTvTunerSettings>, IMockDevice
 	{
+		private bool m_IsOnline;
+
+		public bool DefaultOffline { get; set; }
+
 		/// <summary>
 		/// Constructor.
 		/// </summary>
@@ -25,7 +31,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		/// <returns></returns>
 		protected override bool GetIsOnlineStatus()
 		{
-			return true;
+			return m_IsOnline;
 		}
 
 		/// <summary>
@@ -238,6 +244,46 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		/// </summary>
 		public override void Clear()
 		{
+		}
+
+		public void SetIsOnlineState(bool isOnline)
+		{
+			m_IsOnline = isOnline;
+
+			UpdateCachedOnlineStatus();
+		}
+
+		/// <summary>
+		/// Override to apply settings to the instance.
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="factory"></param>
+		protected override void ApplySettingsFinal(MockTvTunerSettings settings, IDeviceFactory factory)
+		{
+			base.ApplySettingsFinal(settings, factory);
+
+			MockDeviceHelper.ApplySettings(this, settings);
+		}
+
+		/// <summary>
+		/// Override to apply properties to the settings instance.
+		/// </summary>
+		/// <param name="settings"></param>
+		protected override void CopySettingsFinal(MockTvTunerSettings settings)
+		{
+			base.CopySettingsFinal(settings);
+
+			MockDeviceHelper.CopySettings(this, settings);
+		}
+
+		/// <summary>
+		/// Override to clear the instance settings.
+		/// </summary>
+		protected override void ClearSettingsFinal()
+		{
+			base.ClearSettingsFinal();
+
+			MockDeviceHelper.ClearSettings(this);
 		}
 	}
 }
