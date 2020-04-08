@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ICD.Common.Logging.LoggingContexts;
 using ICD.Common.Utils.EventArguments;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
@@ -117,7 +118,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_Version = value;
 
-				Log(eSeverity.Informational, "Version set to {0}", m_Version);
+				Logger.Set("Version", eSeverity.Informational, m_Version);
 
 				OnVersionChanged.Raise(this, new StringEventArgs(m_Version));
 			}
@@ -137,7 +138,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_SoftwareVersion = value;
 
-				Log(eSeverity.Informational, "Software version set to {0}", m_SoftwareVersion);
+				Logger.Set("Software Version", eSeverity.Informational, m_SoftwareVersion);
 
 				OnSoftwareVersionChanged.Raise(this, new StringEventArgs(m_SoftwareVersion));
 			}
@@ -157,7 +158,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_Sharing = value;
 
-				Log(eSeverity.Informational, "Sharing state set to {0}", m_Sharing);
+				Logger.Set("Sharing", eSeverity.Informational, m_Sharing);
 
 				OnSharingStatusChanged.Raise(this, new BoolEventArgs(m_Sharing));
 			}
@@ -299,7 +300,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 			catch (Exception e)
 			{
-				Log(eSeverity.Error, "Error communicating with {0} - {1}", m_Port.Uri, e.Message);
+				Logger.Log(eSeverity.Error, "Error communicating with {0} - {1}", m_Port.Uri, e.Message);
 				IncrementUpdateInterval();
 			}
 		}
@@ -364,7 +365,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 			catch (Exception e)
 			{
-				Log(eSeverity.Error, e, "Failed to parse json - {0}", e.Message);
+				Logger.Log(eSeverity.Error, e, "Failed to parse json - {0}", e.Message);
 				IncrementUpdateInterval();
 				return;
 			}
@@ -447,7 +448,7 @@ namespace ICD.Connect.Sources.Barco
 		private void LogError(int status, string message)
 		{
 			message = string.Format("Error Code {0} - {1}", status, message);
-			Log(eSeverity.Error, message);
+			Logger.Log(eSeverity.Error, message);
 
 			IncrementUpdateInterval();
 		}
@@ -579,7 +580,7 @@ namespace ICD.Connect.Sources.Barco
 				}
 				catch (KeyNotFoundException)
 				{
-					Log(eSeverity.Error, "No Web Port with id {0}", settings.Port);
+					Logger.Log(eSeverity.Error, "No Web Port with id {0}", settings.Port);
 				}	
 			}
 

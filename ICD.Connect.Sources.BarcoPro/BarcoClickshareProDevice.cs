@@ -43,7 +43,7 @@ namespace ICD.Connect.Sources.BarcoPro
 			}
 			catch (Exception e)
 			{
-				Log(eSeverity.Error, "Failed to poll, Crestron Thread constructor threw a {0} - {1}", e.GetType(), e.Message);
+				Logger.Log(eSeverity.Error, "Failed to poll, Crestron Thread constructor threw a {0} - {1}", e.GetType(), e.Message);
 			}
 #else
 			m_Thread = new Thread(() => ThreadCallback());

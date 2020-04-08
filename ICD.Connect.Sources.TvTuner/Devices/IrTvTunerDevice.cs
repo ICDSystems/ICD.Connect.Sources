@@ -333,7 +333,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		{
 			if (m_Port == null)
 			{
-				Log(eSeverity.Error, "Unable to send command - port is null.");
+				Logger.Log(eSeverity.Error, "Unable to send command - port is null.");
 				return;
 			}
 
@@ -393,7 +393,7 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 				}
 				catch (KeyNotFoundException)
 				{
-					Log(eSeverity.Error, "Port {0} is not an IR Port", settings.Port);
+					Logger.Log(eSeverity.Error, "Port {0} is not an IR Port", settings.Port);
 				}
 			}
 
