@@ -6,7 +6,7 @@ using ICD.Connect.Devices.Controls;
 namespace ICD.Connect.Sources.TvTuner.Controls
 {
 	public abstract class AbstractTvTunerControl<TDevice> : AbstractDeviceControl<TDevice>, ITvTunerControl
-		where TDevice : IDeviceBase
+		where TDevice : IDevice
 	{
 		/// <summary>
 		/// Constructor.
