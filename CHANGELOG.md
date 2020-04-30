@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
  - Added port configuration features to source devices
 
+## [5.2.0] - 2020-04-30
+### Changed
+ - Barco Clickshare - added polling for IP, Hostname, Serial, Model and added telemetry properties for them
+
 ## [5.1.2] - 2019-05-16
 ### Changed
  - Failing gracefully when a Crestron Thread fails to instantiate
