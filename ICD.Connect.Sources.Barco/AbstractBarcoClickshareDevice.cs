@@ -14,6 +14,7 @@ using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
 using ICD.Connect.Settings;
+using ICD.Connect.Telemetry.Attributes;
 using Newtonsoft.Json.Linq;
 
 namespace ICD.Connect.Sources.Barco
@@ -36,6 +37,8 @@ namespace ICD.Connect.Sources.Barco
 		//
 		// Finally, there's no point polling as frequently if a request fails, so we gradually
 		// increment the timer length after each failure.
+		#region Constants
+
 		private const long SHARING_UPDATE_INTERVAL = 1000 * 5;
 		private const long FAILURE_UPDATE_INTERVAL_INCREMENT = 1000 * 10;
 		private const long FAILURE_UPDATE_INTERVAL_LIMIT = 1000 * 60;
@@ -54,10 +57,25 @@ namespace ICD.Connect.Sources.Barco
 		private const string KEY_BUTTONS_TABLE = "/Buttons/ButtonTable";
 		private const string KEY_DEVICE_SHARING = "/DeviceInfo/Sharing";
 		private const string KEY_SOFTWARE_VERSION = "/Software/FirmwareVersion";
+		private const string KEY_DEVICE_MODEL = "/DeviceInfo/ModelName";
+		private const string KEY_DEVICE_SERIAL = "/DeviceInfo/SerialNumber";
+		private const string KEY_LAN = "/Network/Lan";
+		private const string KEY_WLAN = "/Network/Wlan";
+		private const string KEY_NETWORK_ADDRESSING = "Addressing";
+		private const string KEY_NETWORK_IP_ADDRESS = "IpAddress";
+		private const string KEY_NETWORK_SUBNET_MASK = "SubnetMask";
+		private const string KEY_NETWORK_DEFAULT_GATEWAY = "DefaultGateway";
+		private const string KEY_NETWORK_HOSTNAME = "Hostname";
+		private const string KEY_NETWORK_MAC_ADDRESS = "MacAddress";
+
 
 		private const string DEFAULT_VERSION = "v1.0";
 
 		private const string PORT_ACCEPT = "application/json";
+
+		#endregion
+
+		#region Events
 
 		/// <summary>
 		/// Raised when we receive a new API version.
@@ -69,6 +87,7 @@ namespace ICD.Connect.Sources.Barco
 		/// Raised when we receive a new software version.
 		/// </summary>
 		[PublicAPI]
+		[EventTelemetry(DeviceTelemetryNames.DEVICE_FIRMWARE_VERSION_CHANGED)]
 		public event EventHandler<StringEventArgs> OnSoftwareVersionChanged;
 
 		/// <summary>
@@ -77,11 +96,43 @@ namespace ICD.Connect.Sources.Barco
 		[PublicAPI]
 		public event EventHandler<BoolEventArgs> OnSharingStatusChanged;
 
+
+		[EventTelemetry(DeviceTelemetryNames.DEVICE_MODEL_CHANGED)]
+		public event EventHandler<StringEventArgs> OnModelChanged;
+
+
+		[EventTelemetry(DeviceTelemetryNames.DEVICE_SERIAL_NUMBER_CHANGED)]
+		public event EventHandler<StringEventArgs> OnSerialNumberChanged;
+
 		/// <summary>
 		/// Raised when the buttons collection changes.
 		/// </summary>
 		[PublicAPI]
 		public event EventHandler OnButtonsChanged;
+
+		[EventTelemetry(DeviceTelemetryNames.DEVICE_DHCP_STATUS_CHANGED)]
+		public event EventHandler<BoolEventArgs> OnLanDhcpEnabledChanged;
+
+		[EventTelemetry(DeviceTelemetryNames.DEVICE_IP_ADDRESS_CHANGED)]
+		public event EventHandler<StringEventArgs> OnLanIpAddressChanged;
+
+		[EventTelemetry(DeviceTelemetryNames.DEVICE_IP_SUBNET_CHANGED)]
+		public event EventHandler<StringEventArgs> OnLanSubnetMaskChanged;
+
+		[EventTelemetry(DeviceTelemetryNames.DEVICE_IP_GATEWAY_CHANGED)]
+		public event EventHandler<StringEventArgs> OnLanGatewayChanged;
+
+		[EventTelemetry(DeviceTelemetryNames.DEVICE_HOSTNAME_CHANGED)]
+		public event EventHandler<StringEventArgs> OnLanHostnameChanged;
+
+		[EventTelemetry(DeviceTelemetryNames.DEVICE_IP_ADDRESS_SECONDARY_CHANGED)]
+		public event EventHandler<StringEventArgs> OnWlanIpAddressChanged;
+
+		[EventTelemetry(DeviceTelemetryNames.DEVICE_MAC_ADDRESS_SECONDARY_CHANGED)]
+		public event EventHandler<StringEventArgs> OnWlanMacAddressChanged;
+		#endregion
+
+		#region Fields
 
 		private readonly SafeTimer m_SharingTimer;
 		private readonly SafeCriticalSection m_SharingTimerSection;
@@ -98,6 +149,20 @@ namespace ICD.Connect.Sources.Barco
 		private long m_SharingUpdateInterval;
 		private int m_UpdateCount;
 		private int m_ConsecutivePortFailures;
+		private string m_Model;
+		private string m_SerialNumber;
+
+		private bool m_LanDhcpEnabled;
+		private string m_LanIpAddress;
+		private string m_LanSubnetMask;
+		private string m_LanGateway;
+		private string m_LanHostname;
+
+		private string m_WlanIpAddress;
+		private string m_WlanMacAddress;
+
+
+		#endregion
 
 		#region Properties
 
@@ -125,6 +190,7 @@ namespace ICD.Connect.Sources.Barco
 		/// Gets the software version running on the clickshare.
 		/// </summary>
 		[PublicAPI]
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_FIRMWARE_VERSION, DeviceTelemetryNames.DEVICE_FIRMWARE_VERSION_CHANGED)]
 		public string SoftwareVersion
 		{
 			get { return m_SoftwareVersion; }
@@ -158,6 +224,150 @@ namespace ICD.Connect.Sources.Barco
 				Log(eSeverity.Informational, "Sharing state set to {0}", m_Sharing);
 
 				OnSharingStatusChanged.Raise(this, new BoolEventArgs(m_Sharing));
+			}
+		}
+
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_MODEL, DeviceTelemetryNames.DEVICE_MODEL_CHANGED)]
+		public string Model
+		{
+			get { return m_Model; }
+			private set
+			{
+				if (m_Model == value)
+					return;
+
+				m_Model = value;
+
+				OnModelChanged.Raise(this, new StringEventArgs(value));
+			}
+		}
+
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_SERIAL_NUMBER, DeviceTelemetryNames.DEVICE_SERIAL_NUMBER_CHANGED)]
+		public string SerialNumber
+		{
+			get { return m_SerialNumber;}
+			private set
+			{
+				if (m_SerialNumber == value)
+					return;
+
+				m_SerialNumber = value;
+
+				OnSerialNumberChanged.Raise(this, new StringEventArgs(value));
+			}
+		}
+
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_DHCP_STATUS, DeviceTelemetryNames.DEVICE_DHCP_STATUS_CHANGED)]
+		public bool LanDhcpEnabled
+		{
+			get { return m_LanDhcpEnabled; }
+			private set
+			{
+				if (m_LanDhcpEnabled == value)
+					return;
+
+				m_LanDhcpEnabled = value;
+
+				OnLanDhcpEnabledChanged.Raise(this, new BoolEventArgs(value));
+			}
+		}
+
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_ADDRESS, DeviceTelemetryNames.DEVICE_IP_ADDRESS_CHANGED)]
+		public string LanIpAddress
+		{
+			get
+			{
+				return m_LanIpAddress;
+			}
+			private set
+			{
+				if (m_LanIpAddress == value)
+					return;
+
+				m_LanIpAddress = value;
+
+				OnLanIpAddressChanged.Raise(this, new StringEventArgs(value));
+			}
+		}
+
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_SUBNET, DeviceTelemetryNames.DEVICE_IP_SUBNET_CHANGED)]
+		public string LanSubnetMask
+		{
+			get
+			{
+				return m_LanSubnetMask;
+			}
+			private set
+			{
+				if (m_LanSubnetMask == value)
+					return;
+
+				m_LanSubnetMask = value;
+
+				OnLanSubnetMaskChanged.Raise(this, new StringEventArgs(value));
+			}
+		}
+
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_GATEWAY, DeviceTelemetryNames.DEVICE_IP_GATEWAY_CHANGED)]
+		public string LanGateway
+		{
+			get { return m_LanGateway; }
+			private set
+			{
+				if (m_LanGateway == value)
+					return;
+
+				m_LanGateway = value;
+
+				OnLanGatewayChanged.Raise(this, new StringEventArgs(value));
+			}
+		}
+
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_HOSTNAME, DeviceTelemetryNames.DEVICE_HOSTNAME_CHANGED)]
+		public string LanHostname
+		{
+			get { return m_LanHostname; }
+			private set
+			{
+				if (m_LanHostname == value)
+					return;
+
+				m_LanHostname = value;
+
+				OnLanHostnameChanged.Raise(this, new StringEventArgs(value));
+			}
+		}
+
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_ADDRESS_SECONDARY, DeviceTelemetryNames.DEVICE_IP_ADDRESS_SECONDARY_CHANGED)]
+		public string WlanIpAddress
+		{
+			get
+			{
+				return m_WlanIpAddress;
+			}
+			private set
+			{
+				if (m_WlanIpAddress == value)
+					return;
+
+				m_WlanIpAddress = value;
+
+				OnWlanIpAddressChanged.Raise(this, new StringEventArgs(value));
+			}
+		}
+
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_MAC_ADDRESS_SECONDARY, DeviceTelemetryNames.DEVICE_MAC_ADDRESS_SECONDARY_CHANGED)]
+		public string WlanMacAddress
+		{
+			get { return m_WlanMacAddress; }
+			private set
+			{
+				if (m_WlanMacAddress == value)
+					return;
+
+				m_WlanMacAddress = value;
+
+				OnWlanMacAddressChanged.Raise(this, new StringEventArgs(value));
 			}
 		}
 
@@ -287,6 +497,10 @@ namespace ICD.Connect.Sources.Barco
 					PollVersion();
 					PollSoftwareVersion();
 					PollButtonsTable();
+					PollModel();
+					PollSerialNumber();
+					PollLan();
+					PollWlan();
 				}
 
 				m_UpdateCount = (m_UpdateCount + 1) % INFO_UPDATE_OCCURANCE;
@@ -340,6 +554,46 @@ namespace ICD.Connect.Sources.Barco
 
 			if (m_Port.Get(DEFAULT_VERSION + KEY_BUTTONS_TABLE, out response))
 				ParsePortData(response, ParseButtonsTable);
+			else
+				IncrementUpdateInterval();
+		}
+
+		private void PollModel()
+		{
+			string response;
+
+			if (m_Port.Get(DEFAULT_VERSION + KEY_DEVICE_MODEL, out response))
+				ParsePortData(response, ParseModel);
+			else
+				IncrementUpdateInterval();
+		}
+
+		private void PollSerialNumber()
+		{
+			string response;
+
+			if (m_Port.Get(DEFAULT_VERSION + KEY_DEVICE_SERIAL, out response))
+				ParsePortData(response, ParseSerialNumber);
+			else
+				IncrementUpdateInterval();
+		}
+
+		private void PollLan()
+		{
+			string response;
+
+			if (m_Port.Get(DEFAULT_VERSION + KEY_LAN, out response))
+				ParsePortData(response, ParseLan);
+			else
+				IncrementUpdateInterval();
+		}
+
+		private void PollWlan()
+		{
+			string response;
+
+			if (m_Port.Get(DEFAULT_VERSION + KEY_WLAN, out response))
+				ParsePortData(response, ParseWlan);
 			else
 				IncrementUpdateInterval();
 		}
@@ -406,7 +660,7 @@ namespace ICD.Connect.Sources.Barco
 		/// <param name="data"></param>
 		private void ParseVersion(JObject data)
 		{
-			Version = (string)data.SelectToken("value");
+			Version = data.SelectToken("value").ToString();
 		}
 
 		/// <summary>
@@ -415,7 +669,36 @@ namespace ICD.Connect.Sources.Barco
 		/// <param name="data"></param>
 		private void ParseSoftwareVersion(JObject data)
 		{
-			SoftwareVersion = (string)data.SelectToken("value");
+			SoftwareVersion = data.SelectToken("value").ToString();
+		}
+
+		private void ParseModel(JObject data)
+		{
+			Model = data.SelectToken("value").ToString();
+		}
+
+		private void ParseSerialNumber(JObject data)
+		{
+			SerialNumber = data.SelectToken("value").ToString();
+		}
+
+		private void ParseLan(JObject data)
+		{
+			JToken response = data.SelectToken("value");
+
+			LanDhcpEnabled = (response.SelectToken(KEY_NETWORK_ADDRESSING).ToString()).Equals("DHCP", StringComparison.OrdinalIgnoreCase);
+			LanIpAddress = response.SelectToken(KEY_NETWORK_IP_ADDRESS).ToString();
+			LanSubnetMask = response.SelectToken(KEY_NETWORK_SUBNET_MASK).ToString();
+			LanGateway = response.SelectToken(KEY_NETWORK_DEFAULT_GATEWAY).ToString();
+			LanHostname = response.SelectToken(KEY_NETWORK_HOSTNAME).ToString();
+		}
+
+		private void ParseWlan(JObject data)
+		{
+			JToken response = data.SelectToken("value");
+
+			WlanIpAddress = response.SelectToken(KEY_NETWORK_IP_ADDRESS).ToString();
+			WlanMacAddress = response.SelectToken(KEY_NETWORK_MAC_ADDRESS).ToString();
 		}
 
 		/// <summary>
