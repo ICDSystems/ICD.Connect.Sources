@@ -84,9 +84,13 @@
     <Compile Include="Responses\ButtonsTable.cs" />
     <Compile Include="Responses\ButtonsTableResponse.cs" />
     <Compile Include="Responses\IBarcoClickshareResponse.cs" />
+    <Compile Include="Responses\LanResponse.cs" />
+    <Compile Include="Responses\ModelResponse.cs" />
+    <Compile Include="Responses\SerialNumberResponse.cs" />
     <Compile Include="Responses\SharingStateResponse.cs" />
     <Compile Include="Responses\SoftwareVersionResponse.cs" />
     <Compile Include="Responses\VersionResponse.cs" />
+    <Compile Include="Responses\WlanResponse.cs" />
     <Compile Include="SPlusBarcoClickshareInterface.cs" />
     <None Include="Properties\ControlSystem.cfg" />
     <None Include="R5900018-03-ClickShareAPIguide.pdf" />
