@@ -186,7 +186,7 @@ namespace ICD.Connect.Sources.Barco
 		/// Gets the software version running on the clickshare.
 		/// </summary>
 		[PublicAPI]
-		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_FIRMWARE_VERSION, DeviceTelemetryNames.DEVICE_FIRMWARE_VERSION_CHANGED)]
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_FIRMWARE_VERSION, null, DeviceTelemetryNames.DEVICE_FIRMWARE_VERSION_CHANGED)]
 		public string SoftwareVersion
 		{
 			get { return m_SoftwareVersion; }
@@ -223,7 +223,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 		}
 
-		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_MODEL, DeviceTelemetryNames.DEVICE_MODEL_CHANGED)]
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_MODEL, null, DeviceTelemetryNames.DEVICE_MODEL_CHANGED)]
 		public string Model
 		{
 			get { return m_Model; }
@@ -238,7 +238,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 		}
 
-		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_SERIAL_NUMBER, DeviceTelemetryNames.DEVICE_SERIAL_NUMBER_CHANGED)]
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_SERIAL_NUMBER, null, DeviceTelemetryNames.DEVICE_SERIAL_NUMBER_CHANGED)]
 		public string SerialNumber
 		{
 			get { return m_SerialNumber;}
@@ -253,7 +253,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 		}
 
-		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_DHCP_STATUS, DeviceTelemetryNames.DEVICE_DHCP_STATUS_CHANGED)]
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_DHCP_STATUS, null, DeviceTelemetryNames.DEVICE_DHCP_STATUS_CHANGED)]
 		public bool LanDhcpEnabled
 		{
 			get { return m_LanDhcpEnabled; }
@@ -268,7 +268,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 		}
 
-		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_ADDRESS, DeviceTelemetryNames.DEVICE_IP_ADDRESS_CHANGED)]
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_ADDRESS, null, DeviceTelemetryNames.DEVICE_IP_ADDRESS_CHANGED)]
 		public string LanIpAddress
 		{
 			get
@@ -286,7 +286,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 		}
 
-		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_SUBNET, DeviceTelemetryNames.DEVICE_IP_SUBNET_CHANGED)]
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_SUBNET, null, DeviceTelemetryNames.DEVICE_IP_SUBNET_CHANGED)]
 		public string LanSubnetMask
 		{
 			get
@@ -304,7 +304,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 		}
 
-		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_GATEWAY, DeviceTelemetryNames.DEVICE_IP_GATEWAY_CHANGED)]
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_GATEWAY, null, DeviceTelemetryNames.DEVICE_IP_GATEWAY_CHANGED)]
 		public string LanGateway
 		{
 			get { return m_LanGateway; }
@@ -319,7 +319,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 		}
 
-		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_HOSTNAME, DeviceTelemetryNames.DEVICE_HOSTNAME_CHANGED)]
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_HOSTNAME, null, DeviceTelemetryNames.DEVICE_HOSTNAME_CHANGED)]
 		public string LanHostname
 		{
 			get { return m_LanHostname; }
@@ -334,7 +334,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 		}
 
-		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_ADDRESS_SECONDARY, DeviceTelemetryNames.DEVICE_IP_ADDRESS_SECONDARY_CHANGED)]
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_ADDRESS_SECONDARY, null, DeviceTelemetryNames.DEVICE_IP_ADDRESS_SECONDARY_CHANGED)]
 		public string WlanIpAddress
 		{
 			get
@@ -352,7 +352,7 @@ namespace ICD.Connect.Sources.Barco
 			}
 		}
 
-		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_MAC_ADDRESS_SECONDARY, DeviceTelemetryNames.DEVICE_MAC_ADDRESS_SECONDARY_CHANGED)]
+		[DynamicPropertyTelemetry(DeviceTelemetryNames.DEVICE_MAC_ADDRESS_SECONDARY, null, DeviceTelemetryNames.DEVICE_MAC_ADDRESS_SECONDARY_CHANGED)]
 		public string WlanMacAddress
 		{
 			get { return m_WlanMacAddress; }
