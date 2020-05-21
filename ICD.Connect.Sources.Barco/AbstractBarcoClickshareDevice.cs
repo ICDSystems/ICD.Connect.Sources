@@ -91,14 +91,6 @@ namespace ICD.Connect.Sources.Barco
 		[PublicAPI]
 		public event EventHandler<BoolEventArgs> OnSharingStatusChanged;
 
-
-		[EventTelemetry(DeviceTelemetryNames.DEVICE_MODEL_CHANGED)]
-		public event EventHandler<StringEventArgs> OnModelChanged;
-
-
-		[EventTelemetry(DeviceTelemetryNames.DEVICE_SERIAL_NUMBER_CHANGED)]
-		public event EventHandler<StringEventArgs> OnSerialNumberChanged;
-
 		/// <summary>
 		/// Raised when the buttons collection changes.
 		/// </summary>
@@ -145,8 +137,6 @@ namespace ICD.Connect.Sources.Barco
 		private long m_SharingUpdateInterval;
 		private int m_UpdateCount;
 		private int m_ConsecutivePortFailures;
-		private string m_Model;
-		private string m_SerialNumber;
 
 		private bool m_LanDhcpEnabled;
 		private string m_LanIpAddress;
@@ -156,7 +146,6 @@ namespace ICD.Connect.Sources.Barco
 
 		private string m_WlanIpAddress;
 		private string m_WlanMacAddress;
-
 
 		#endregion
 
@@ -220,36 +209,6 @@ namespace ICD.Connect.Sources.Barco
 				Logger.Set("Sharing", eSeverity.Informational, m_Sharing);
 
 				OnSharingStatusChanged.Raise(this, new BoolEventArgs(m_Sharing));
-			}
-		}
-
-		[PropertyTelemetry(DeviceTelemetryNames.DEVICE_MODEL, null, DeviceTelemetryNames.DEVICE_MODEL_CHANGED)]
-		public string Model
-		{
-			get { return m_Model; }
-			private set
-			{
-				if (m_Model == value)
-					return;
-
-				m_Model = value;
-
-				OnModelChanged.Raise(this, new StringEventArgs(value));
-			}
-		}
-
-		[PropertyTelemetry(DeviceTelemetryNames.DEVICE_SERIAL_NUMBER, null, DeviceTelemetryNames.DEVICE_SERIAL_NUMBER_CHANGED)]
-		public string SerialNumber
-		{
-			get { return m_SerialNumber;}
-			private set
-			{
-				if (m_SerialNumber == value)
-					return;
-
-				m_SerialNumber = value;
-
-				OnSerialNumberChanged.Raise(this, new StringEventArgs(value));
 			}
 		}
 
