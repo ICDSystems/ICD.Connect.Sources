@@ -117,6 +117,7 @@ namespace ICD.Connect.Sources.Barco
 
 		[EventTelemetry(DeviceTelemetryNames.DEVICE_MAC_ADDRESS_SECONDARY_CHANGED)]
 		public event EventHandler<StringEventArgs> OnWlanMacAddressChanged;
+
 		#endregion
 
 		#region Fields
@@ -165,7 +166,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_Version = value;
 
-				Logger.Set("Version", eSeverity.Informational, m_Version);
+				Logger.LogSetTo(eSeverity.Informational, "Version", m_Version);
 
 				OnVersionChanged.Raise(this, new StringEventArgs(m_Version));
 			}
@@ -186,7 +187,7 @@ namespace ICD.Connect.Sources.Barco
 
 				m_SoftwareVersion = value;
 
-				Logger.Set("Software Version", eSeverity.Informational, m_SoftwareVersion);
+				Logger.LogSetTo(eSeverity.Informational, "Software Version", m_SoftwareVersion);
 
 				OnSoftwareVersionChanged.Raise(this, new StringEventArgs(m_SoftwareVersion));
 			}
@@ -206,7 +207,10 @@ namespace ICD.Connect.Sources.Barco
 
 				m_Sharing = value;
 
-				Logger.Set("Sharing", eSeverity.Informational, m_Sharing);
+				Logger.LogSetTo(eSeverity.Informational, "Sharing", m_Sharing);
+				Activities.LogActivity(m_Sharing
+					                   ? new Activity(Activity.ePriority.High, "Sharing", "Sharing", eSeverity.Informational)
+					                   : new Activity(Activity.ePriority.Low, "Sharing", "Not Sharing", eSeverity.Informational));
 
 				OnSharingStatusChanged.Raise(this, new BoolEventArgs(m_Sharing));
 			}
