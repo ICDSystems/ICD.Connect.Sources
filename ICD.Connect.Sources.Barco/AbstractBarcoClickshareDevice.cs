@@ -10,6 +10,7 @@ using ICD.Common.Utils.Services.Logging;
 using ICD.Common.Utils.Timers;
 using ICD.Connect.API.Nodes;
 using ICD.Connect.Devices;
+using ICD.Connect.Devices.Controls;
 using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.Ports.Web;
@@ -350,8 +351,6 @@ namespace ICD.Connect.Sources.Barco
 
 			m_SharingTimer = new SafeTimer(SharingTimerCallback, m_SharingUpdateInterval, m_SharingUpdateInterval);
 			m_SharingTimerSection = new SafeCriticalSection();
-
-			Controls.Add(new BarcoClickshareRouteSourceControl<AbstractBarcoClickshareDevice<T>, T>(this, 0));
 		}
 
 		#endregion
@@ -810,6 +809,19 @@ namespace ICD.Connect.Sources.Barco
 			}
 
 			SetPort(port);
+		}
+
+		/// <summary>
+		/// Override to add controls to the device.
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="factory"></param>
+		/// <param name="addControl"></param>
+		protected override void AddControls(T settings, IDeviceFactory factory, Action<IDeviceControl> addControl)
+		{
+			base.AddControls(settings, factory, addControl);
+
+			addControl(new BarcoClickshareRouteSourceControl<AbstractBarcoClickshareDevice<T>, T>(this, 0));
 		}
 
 		#endregion

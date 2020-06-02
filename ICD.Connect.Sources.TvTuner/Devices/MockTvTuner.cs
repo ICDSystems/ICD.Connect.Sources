@@ -1,4 +1,6 @@
-﻿using ICD.Connect.Devices.Mock;
+﻿using System;
+using ICD.Connect.Devices.Controls;
+using ICD.Connect.Devices.Mock;
 using ICD.Connect.Routing.Connections;
 using ICD.Connect.Routing.Mock.Source;
 using ICD.Connect.Settings;
@@ -11,19 +13,6 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		private bool m_IsOnline;
 
 		public bool DefaultOffline { get; set; }
-
-		/// <summary>
-		/// Constructor.
-		/// </summary>
-		public MockTvTunerDevice()
-		{
-			// Assume the tv tuner has a single source output
-			MockRouteSourceControl sourceControl = new MockRouteSourceControl(this, 0);
-			sourceControl.SetActiveTransmissionState(1, eConnectionType.Audio | eConnectionType.Video, true);
-
-			Controls.Add(sourceControl);
-			Controls.Add(new TvTunerControl(this, 1));
-		}
 
 		/// <summary>
 		/// Gets the current online status of the device.
@@ -284,6 +273,24 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			base.ClearSettingsFinal();
 
 			MockDeviceHelper.ClearSettings(this);
+		}
+
+		/// <summary>
+		/// Override to add controls to the device.
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="factory"></param>
+		/// <param name="addControl"></param>
+		protected override void AddControls(MockTvTunerSettings settings, IDeviceFactory factory, Action<IDeviceControl> addControl)
+		{
+			base.AddControls(settings, factory, addControl);
+
+			// Assume the tv tuner has a single source output
+			MockRouteSourceControl sourceControl = new MockRouteSourceControl(this, 0);
+			sourceControl.SetActiveTransmissionState(1, eConnectionType.Audio | eConnectionType.Video, true);
+
+			addControl(sourceControl);
+			addControl(new TvTunerControl(this, 1));
 		}
 	}
 }

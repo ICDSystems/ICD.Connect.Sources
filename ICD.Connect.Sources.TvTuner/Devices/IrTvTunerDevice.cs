@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ICD.Common.Properties;
 using ICD.Common.Utils.Services.Logging;
+using ICD.Connect.Devices.Controls;
 using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Ports.IrPort;
@@ -28,9 +30,6 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 		{
 			m_Commands = new IrTvTunerCommands();
 			m_IrDriverProperties = new IrDriverProperties();
-
-			Controls.Add(new MockRouteSourceControl(this, 0));
-			Controls.Add(new TvTunerControl(this, 1));
 		}
 
 		#region Methods
@@ -398,6 +397,20 @@ namespace ICD.Connect.Sources.TvTuner.Devices
 			}
 
 			SetIrPort(port);
+		}
+
+		/// <summary>
+		/// Override to add controls to the device.
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="factory"></param>
+		/// <param name="addControl"></param>
+		protected override void AddControls(IrTvTunerSettings settings, IDeviceFactory factory, Action<IDeviceControl> addControl)
+		{
+			base.AddControls(settings, factory, addControl);
+
+			addControl(new MockRouteSourceControl(this, 0));
+			addControl(new TvTunerControl(this, 1));
 		}
 
 		#endregion

@@ -4,6 +4,7 @@ using ICD.Common.Utils;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.API.Commands;
 using ICD.Connect.Devices;
+using ICD.Connect.Devices.Controls;
 using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.Ports.Web;
@@ -49,8 +50,6 @@ namespace ICD.Connect.Sources.Roku
 			m_UriProperties = new UriProperties();
 			m_AppList = new List<RokuApp>();
 			m_AppTimer = SafeTimer.Stopped(RefreshApps);
-
-			Controls.Add(new MockRouteSourceControl(this, 0));
 		}
 
 		protected override void DisposeFinal(bool disposing)
@@ -198,6 +197,19 @@ namespace ICD.Connect.Sources.Roku
 			settings.Port = m_Port == null ? (int?) null : m_Port.Id;
 
 			settings.Copy(m_UriProperties);
+		}
+
+		/// <summary>
+		/// Override to add controls to the device.
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="factory"></param>
+		/// <param name="addControl"></param>
+		protected override void AddControls(RokuDeviceSettings settings, IDeviceFactory factory, Action<IDeviceControl> addControl)
+		{
+			base.AddControls(settings, factory, addControl);
+
+			addControl(new MockRouteSourceControl(this, 0));
 		}
 
 		#endregion
