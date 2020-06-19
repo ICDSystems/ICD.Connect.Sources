@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.0.0] - 2020-06-19
 ### Changed
  - MockTvTuner now implements IMockDevice
  - Using new logging context
