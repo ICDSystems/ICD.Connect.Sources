@@ -75,7 +75,7 @@
     <Compile Include="AbstractBarcoClickshareDevice.cs" />
     <Compile Include="BarcoClickshareDevice.cs" />
     <Compile Include="AbstractBarcoClickshareDeviceSettings.cs" />
-    <None Include="ObfuscationSettings.cs" />
+    <Compile Include="ObfuscationSettings.cs" />
     <Compile Include="BarcoClickshareDeviceSettings.cs" />
     <Compile Include="BarcoClickshareRouteSourceControl.cs" />
     <Compile Include="KrangPlugin.cs" />

@@ -20,13 +20,9 @@
     <DefineConstants>TRACE;STANDARD</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="ObfuscationSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="ICD.Connect.Sources.projectinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ObfuscationSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ICD.Connect.Devices\ICD.Connect.Devices\ICD.Connect.Devices_NetStandard.csproj" />
