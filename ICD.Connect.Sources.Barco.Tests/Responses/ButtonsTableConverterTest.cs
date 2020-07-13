@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using ICD.Common.Utils.Collections;
 using ICD.Common.Utils.Extensions;
-using ICD.Connect.Sources.Barco.Responses;
+using ICD.Connect.Sources.Barco.Responses.Common;
+using ICD.Connect.Sources.Barco.Responses.v1;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -27,12 +28,12 @@ namespace ICD.Connect.Sources.Barco.Tests.Responses
 		}
 	}";
 
-			ButtonsTable table = JsonConvert.DeserializeObject<ButtonsTable>(data);
+			ButtonsTable collection = JsonConvert.DeserializeObject<ButtonsTable>(data);
 
-			Dictionary<int, Button> dict = table.GetButtons().ToDictionary();
+			IcdHashSet<Button> set = collection.GetButtons().ToIcdHashSet();
 
-			Assert.AreEqual(1, dict.Count);
-			Assert.AreEqual(1, dict.Keys.First());
+			Assert.AreEqual(1, set.Count);
+			Assert.AreEqual(1, set.First().Id);
 		}
 	}
 }

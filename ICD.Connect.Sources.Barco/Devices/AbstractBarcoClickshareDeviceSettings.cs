@@ -5,7 +5,7 @@ using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
 using ICD.Connect.Settings.Attributes.SettingsProperties;
 
-namespace ICD.Connect.Sources.Barco
+namespace ICD.Connect.Sources.Barco.Devices
 {
 	/// <summary>
 	/// Settings for the BarcoClickshareDevice.
@@ -13,6 +13,7 @@ namespace ICD.Connect.Sources.Barco
 	public abstract class AbstractBarcoClickshareDeviceSettings : AbstractDeviceSettings, IUriSettings, IWebProxySettings
 	{
 		private const string PORT_ELEMENT = "Port";
+		private const string API_VERSION_ELEMENT = "ApiVersion";
 
 		private readonly UriProperties m_UriProperties;
 		private readonly WebProxyProperties m_WebProxyProperties;
@@ -21,6 +22,8 @@ namespace ICD.Connect.Sources.Barco
 
 		[OriginatorIdSettingsProperty(typeof(IWebPort))]
 		public int? Port { get; set; }
+
+		public string ApiVersion { get; set; }
 
 		#endregion
 
@@ -142,6 +145,7 @@ namespace ICD.Connect.Sources.Barco
 			base.WriteElements(writer);
 
 			writer.WriteElementString(PORT_ELEMENT, IcdXmlConvert.ToString(Port));
+			writer.WriteElementString(API_VERSION_ELEMENT, IcdXmlConvert.ToString(API_VERSION_ELEMENT));
 
 			m_UriProperties.WriteElements(writer);
 			m_WebProxyProperties.WriteElements(writer);
@@ -156,6 +160,7 @@ namespace ICD.Connect.Sources.Barco
 			base.ParseXml(xml);
 
 			Port = XmlUtils.TryReadChildElementContentAsInt(xml, PORT_ELEMENT);
+			ApiVersion = XmlUtils.TryReadChildElementContentAsString(xml, API_VERSION_ELEMENT);
 
 			m_UriProperties.ParseXml(xml);
 			m_WebProxyProperties.ParseXml(xml);

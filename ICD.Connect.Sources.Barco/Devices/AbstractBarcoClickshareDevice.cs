@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using ICD.Common.Logging.Activities;
 using ICD.Common.Logging.LoggingContexts;
-using ICD.Common.Utils.EventArguments;
 using ICD.Common.Properties;
 using ICD.Common.Utils;
+using ICD.Common.Utils.Collections;
+using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Common.Utils.Timers;
@@ -17,11 +18,13 @@ using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
 using ICD.Connect.Settings;
-using ICD.Connect.Sources.Barco.Responses;
-using Newtonsoft.Json;
+using ICD.Connect.Settings.Comparers;
+using ICD.Connect.Sources.Barco.API;
+using ICD.Connect.Sources.Barco.Devices.Controls;
+using ICD.Connect.Sources.Barco.Responses.Common;
 using ICD.Connect.Telemetry.Attributes;
 
-namespace ICD.Connect.Sources.Barco
+namespace ICD.Connect.Sources.Barco.Devices
 {
 	/// <summary>
 	/// Provides functionality for managing a Barco Clickshare.
@@ -41,6 +44,7 @@ namespace ICD.Connect.Sources.Barco
 		//
 		// Finally, there's no point polling as frequently if a request fails, so we gradually
 		// increment the timer length after each failure.
+
 		#region Constants
 
 		private const long SHARING_UPDATE_INTERVAL = 1000 * 5;
@@ -51,24 +55,14 @@ namespace ICD.Connect.Sources.Barco
 		// The number of times to check "sharing" before checking version/buttons
 		private const int INFO_UPDATE_OCCURRENCE = 10;
 
-		private const int STATUS_SUCCESS = 200;
-		//private const int STATUS_BAD_FORMAT = 400;
-		//private const int STATUS_NOT_WRITABLE = 403;
-		//private const int STATUS_BAD_PATH = 404;
-		//private const int STATUS_ERROR = 500;
-
-		private const string REQUEST_VERSION = "CurrentVersion";
-		private const string KEY_BUTTONS_TABLE = "/Buttons/ButtonTable";
-		private const string KEY_DEVICE_SHARING = "/DeviceInfo/Sharing";
-		private const string KEY_SOFTWARE_VERSION = "/Software/FirmwareVersion";
-		private const string KEY_DEVICE_MODEL = "/DeviceInfo/ModelName";
-		private const string KEY_DEVICE_SERIAL = "/DeviceInfo/SerialNumber";
-		private const string KEY_LAN = "/Network/Lan";
-		private const string KEY_WLAN = "/Network/Wlan";
-
-		private const string DEFAULT_VERSION = "v1.0";
-
 		private const string PORT_ACCEPT = "application/json";
+
+		// ReSharper disable once StaticMemberInGenericType
+		private static readonly Dictionary<Version, int> s_ApiVersions = new Dictionary<Version, int>(new UndefinedVersionEqualityComparer())
+		{
+			{new Version("1.0.0.0"), 1},
+			{new Version("2.0.0.0"), 2}
+		};
 
 		#endregion
 
@@ -127,16 +121,18 @@ namespace ICD.Connect.Sources.Barco
 		private readonly SafeTimer m_SharingTimer;
 		private readonly SafeCriticalSection m_SharingTimerSection;
 
-		private readonly Dictionary<int, Button> m_Buttons;
+		private readonly IcdHashSet<Button> m_Buttons;
 		private readonly SafeCriticalSection m_ButtonsSection;
 
 		private readonly UriProperties m_UriProperties;
 		private readonly WebProxyProperties m_WebProxyProperties;
 
+		private IBarcoClickshareApi m_Api;
 		private IWebPort m_Port;
+
 		private bool m_Sharing;
-		private string m_Version;
-		private string m_SoftwareVersion;
+		private Version m_Version;
+		private Version m_SoftwareVersion;
 		private long m_SharingUpdateInterval;
 		private int m_UpdateCount;
 		private int m_ConsecutivePortFailures;
@@ -158,10 +154,10 @@ namespace ICD.Connect.Sources.Barco
 		/// Gets the version of the api.
 		/// </summary>
 		[PublicAPI]
-		public string Version
+		public Version Version
 		{
 			get { return m_Version; }
-			private set
+			set
 			{
 				if (value == m_Version)
 					return;
@@ -170,7 +166,7 @@ namespace ICD.Connect.Sources.Barco
 
 				Logger.LogSetTo(eSeverity.Informational, "Version", m_Version);
 
-				OnVersionChanged.Raise(this, new StringEventArgs(m_Version));
+				OnVersionChanged.Raise(this, new StringEventArgs(m_Version.ToString()));
 			}
 		}
 
@@ -179,10 +175,10 @@ namespace ICD.Connect.Sources.Barco
 		/// </summary>
 		[PublicAPI]
 		[PropertyTelemetry(DeviceTelemetryNames.DEVICE_FIRMWARE_VERSION, null, DeviceTelemetryNames.DEVICE_FIRMWARE_VERSION_CHANGED)]
-		public string SoftwareVersion
+		public Version SoftwareVersion
 		{
 			get { return m_SoftwareVersion; }
-			private set
+			set
 			{
 				if (value == m_SoftwareVersion)
 					return;
@@ -191,7 +187,7 @@ namespace ICD.Connect.Sources.Barco
 
 				Logger.LogSetTo(eSeverity.Informational, "Software Version", m_SoftwareVersion);
 
-				OnSoftwareVersionChanged.Raise(this, new StringEventArgs(m_SoftwareVersion));
+				OnSoftwareVersionChanged.Raise(this, new StringEventArgs(m_SoftwareVersion.ToString()));
 			}
 		}
 
@@ -202,7 +198,7 @@ namespace ICD.Connect.Sources.Barco
 		public bool Sharing
 		{
 			get { return m_Sharing; }
-			private set
+			set
 			{
 				if (value == m_Sharing)
 					return;
@@ -222,7 +218,7 @@ namespace ICD.Connect.Sources.Barco
 		public bool LanDhcpEnabled
 		{
 			get { return m_LanDhcpEnabled; }
-			private set
+			set
 			{
 				if (m_LanDhcpEnabled == value)
 					return;
@@ -240,7 +236,7 @@ namespace ICD.Connect.Sources.Barco
 			{
 				return m_LanIpAddress;
 			}
-			private set
+			set
 			{
 				if (m_LanIpAddress == value)
 					return;
@@ -258,7 +254,7 @@ namespace ICD.Connect.Sources.Barco
 			{
 				return m_LanSubnetMask;
 			}
-			private set
+			set
 			{
 				if (m_LanSubnetMask == value)
 					return;
@@ -273,7 +269,7 @@ namespace ICD.Connect.Sources.Barco
 		public string LanGateway
 		{
 			get { return m_LanGateway; }
-			private set
+			set
 			{
 				if (m_LanGateway == value)
 					return;
@@ -288,7 +284,7 @@ namespace ICD.Connect.Sources.Barco
 		public string LanHostname
 		{
 			get { return m_LanHostname; }
-			private set
+			set
 			{
 				if (m_LanHostname == value)
 					return;
@@ -306,7 +302,7 @@ namespace ICD.Connect.Sources.Barco
 			{
 				return m_WlanIpAddress;
 			}
-			private set
+			set
 			{
 				if (m_WlanIpAddress == value)
 					return;
@@ -321,7 +317,7 @@ namespace ICD.Connect.Sources.Barco
 		public string WlanMacAddress
 		{
 			get { return m_WlanMacAddress; }
-			private set
+			set
 			{
 				if (m_WlanMacAddress == value)
 					return;
@@ -344,10 +340,9 @@ namespace ICD.Connect.Sources.Barco
 			m_UriProperties = new UriProperties();
 			m_WebProxyProperties = new WebProxyProperties();
 
-			m_Version = DEFAULT_VERSION;
 			m_SharingUpdateInterval = SHARING_UPDATE_INTERVAL;
 
-			m_Buttons = new Dictionary<int, Button>();
+			m_Buttons = new IcdHashSet<Button>();
 			m_ButtonsSection = new SafeCriticalSection();
 
 			m_SharingTimer = new SafeTimer(SharingTimerCallback, m_SharingUpdateInterval, m_SharingUpdateInterval);
@@ -415,9 +410,9 @@ namespace ICD.Connect.Sources.Barco
 		/// Gets the cached buttons.
 		/// </summary>
 		/// <returns></returns>
-		public IEnumerable<KeyValuePair<int, Button>> GetButtons()
+		public IEnumerable<Button> GetButtons()
 		{
-			return m_ButtonsSection.Execute(() => m_Buttons.OrderBy(p => p.Key).ToArray());
+			return m_ButtonsSection.Execute(() => m_Buttons.OrderBy(p => p.Id).ToArray());
 		}
 
 		#endregion
@@ -452,18 +447,18 @@ namespace ICD.Connect.Sources.Barco
 			try
 			{
 				bool oldSharing = Sharing;
-				PollSharingState();
+				Sharing = m_Api.GetSharingState(m_Port);
 
 				// If the sharing state changed or we've updated enough times, check the version and buttons table.
 				if (Sharing != oldSharing || m_UpdateCount == 0)
 				{
-					PollVersion();
-					PollSoftwareVersion();
-					PollButtonsTable();
-					PollModel();
-					PollSerialNumber();
-					PollLan();
-					PollWlan();
+					Version = m_Api.GetVersion(m_Port);
+					SoftwareVersion = m_Api.GetSoftwareVersion(m_Port);
+					UpdateButtons(m_Api.GetButtonsTable(m_Port));
+					Model = m_Api.GetModel(m_Port);
+					SerialNumber = m_Api.GetSerialNumber(m_Port);
+					UpdateLanInfo(m_Api.GetLan(m_Port));
+					UpdateWlanInfo(m_Api.GetWlan(m_Port));
 				}
 
 				m_UpdateCount = (m_UpdateCount + 1) % INFO_UPDATE_OCCURRENCE;
@@ -472,97 +467,6 @@ namespace ICD.Connect.Sources.Barco
 			{
 				Logger.Log(eSeverity.Error, "Error communicating with {0} - {1}", m_Port.Uri, e.Message);
 				IncrementUpdateInterval();
-			}
-		}
-
-		private void PollSharingState()
-		{
-			Poll<SharingStateResponse>(DEFAULT_VERSION + KEY_DEVICE_SHARING, ParseSharingState);
-		}
-
-		private void PollVersion()
-		{
-			if (Version != DEFAULT_VERSION)
-				return;
-
-			Poll<VersionResponse>(REQUEST_VERSION, ParseVersion);
-		}
-
-		private void PollSoftwareVersion()
-		{
-			if (!string.IsNullOrEmpty(SoftwareVersion))
-				return;
-
-			Poll<SoftwareVersionResponse>(DEFAULT_VERSION + KEY_SOFTWARE_VERSION, ParseSoftwareVersion);
-		}
-
-		private void PollButtonsTable()
-		{
-			Poll<ButtonsTableResponse>(DEFAULT_VERSION + KEY_BUTTONS_TABLE, ParseButtonsTable);
-		}
-
-		private void PollModel()
-		{
-			if (!string.IsNullOrEmpty(Model))
-				return;
-
-			Poll<ModelResponse>(DEFAULT_VERSION + KEY_DEVICE_MODEL, ParseModel);
-		}
-
-		private void PollSerialNumber()
-		{
-			if (!string.IsNullOrEmpty(SerialNumber))
-				return;
-
-			Poll<SerialNumberResponse>(DEFAULT_VERSION + KEY_DEVICE_SERIAL, ParseSerialNumber);
-		}
-
-		private void PollLan()
-		{
-			Poll<LanResponse>(DEFAULT_VERSION + KEY_LAN, ParseLan);
-		}
-
-		private void PollWlan()
-		{
-			Poll<WlanResponse>(DEFAULT_VERSION + KEY_WLAN, ParseWlan);
-		}
-
-		/// <summary>
-		/// Called when data is received from the physical device.
-		/// </summary>
-		/// <param name="relativeOrAbsoluteUri"></param>
-		/// <param name="responseCallback"></param>
-		private void Poll<TResponse>(string relativeOrAbsoluteUri, Action<TResponse> responseCallback)
-			where TResponse : IBarcoClickshareResponse
-		{
-			if (responseCallback == null)
-				throw new ArgumentNullException("responseCallback");
-
-			try
-			{
-				WebPortResponse portResponse = m_Port.Get(relativeOrAbsoluteUri);
-
-				if (portResponse.Success)
-				{
-					string data = (portResponse.DataAsString ?? string.Empty).Trim();
-					if (string.IsNullOrEmpty(data))
-						return;
-
-					TResponse response = JsonConvert.DeserializeObject<TResponse>(data);
-
-					if (response.Status != STATUS_SUCCESS)
-					{
-						LogError(response.Status, response.Message);
-						return;
-					}
-
-					responseCallback(response);
-				}
-			}
-			catch (Exception e)
-			{
-				Logger.Log(eSeverity.Error, e, "Failed to parse json - {0}", e.Message);
-				IncrementUpdateInterval();
 				return;
 			}
 
@@ -570,75 +474,10 @@ namespace ICD.Connect.Sources.Barco
 		}
 
 		/// <summary>
-		/// Updates sharing status from JSON.
-		/// </summary>
-		/// <param name="response"></param>
-		private void ParseSharingState(SharingStateResponse response)
-		{
-			Sharing = response.Data.Value;
-		}
-
-		/// <summary>
-		/// Updates buttons from JSON.
-		/// </summary>
-		/// <param name="response"></param>
-		private void ParseButtonsTable(ButtonsTableResponse response)
-		{
-			UpdateButtons(response.Data.Value);
-		}
-
-		/// <summary>
-		/// Updates version from JSON.
-		/// </summary>
-		/// <param name="response"></param>
-		private void ParseVersion(VersionResponse response)
-		{
-			Version = response.Data.Value;
-		}
-
-		/// <summary>
-		/// Updates software version from JSON.
-		/// </summary>
-		/// <param name="response"></param>
-		private void ParseSoftwareVersion(SoftwareVersionResponse response)
-		{
-			SoftwareVersion = response.Data.Value;
-		}
-
-		private void ParseModel(ModelResponse response)
-		{
-			Model = response.Data.Value;
-		}
-
-		private void ParseSerialNumber(SerialNumberResponse response)
-		{
-			SerialNumber = response.Data.Value;
-		}
-
-		private void ParseLan(LanResponse data)
-		{
-			LanInfo info = data.Data.Value;
-
-			LanDhcpEnabled = string.Equals(info.Addressing, "DHCP", StringComparison.OrdinalIgnoreCase);
-			LanIpAddress = info.IpAddress;
-			LanSubnetMask = info.SubnetMask;
-			LanGateway = info.DefaultGateway;
-			LanHostname = info.Hostname;
-		}
-
-		private void ParseWlan(WlanResponse data)
-		{
-			WlanInfo info = data.Data.Value;
-
-			WlanIpAddress = info.IpAddress;
-			WlanMacAddress = info.MacAddress;
-		}
-
-		/// <summary>
 		/// Updates the buttons from json.
 		/// </summary>
 		/// <param name="buttons"></param>
-		private void UpdateButtons(ButtonsTable buttons)
+		private void UpdateButtons(IButtonsCollection buttons)
 		{
 			bool changed;
 
@@ -646,14 +485,14 @@ namespace ICD.Connect.Sources.Barco
 
 			try
 			{
-				Dictionary<int, Button> newButtons = buttons.GetButtons().ToDictionary();
+				IcdHashSet<Button> newButtons = buttons.GetButtons().ToIcdHashSet();
 
-				changed = !newButtons.DictionaryEqual(m_Buttons);
+				changed = !newButtons.SetEquals(m_Buttons);
 
 				if (changed)
 				{
 					m_Buttons.Clear();
-					m_Buttons.Update(newButtons);
+					m_Buttons.AddRange(newButtons);
 				}
 			}
 			finally
@@ -665,17 +504,19 @@ namespace ICD.Connect.Sources.Barco
 				OnButtonsChanged.Raise(this);
 		}
 
-		/// <summary>
-		/// Logs the error response from the device.
-		/// </summary>
-		/// <param name="status"></param>
-		/// <param name="message"></param>
-		private void LogError(int status, string message)
+		private void UpdateLanInfo(LanInfo info)
 		{
-			message = string.Format("Error Code {0} - {1}", status, message);
-			Logger.Log(eSeverity.Error, message);
+			LanDhcpEnabled = string.Equals(info.Addressing, "DHCP", StringComparison.OrdinalIgnoreCase);
+			LanIpAddress = info.IpAddress;
+			LanSubnetMask = info.SubnetMask;
+			LanGateway = info.DefaultGateway;
+			LanHostname = info.Hostname;
+		}
 
-			IncrementUpdateInterval();
+		private void UpdateWlanInfo(WlanInfo info)
+		{
+			WlanIpAddress = info.IpAddress;
+			WlanMacAddress = info.MacAddress;
 		}
 
 		/// <summary>
@@ -808,8 +649,34 @@ namespace ICD.Connect.Sources.Barco
 					Logger.Log(eSeverity.Error, "No Web Port with id {0}", settings.Port);
 				}	
 			}
-
 			SetPort(port);
+
+			try
+			{
+				m_Api = ApiFactory(settings.ApiVersion);
+			}
+			catch (Exception)
+			{
+				Logger.Log(eSeverity.Error, "No API for version {0}", settings.ApiVersion);
+			}
+		}
+
+		private IBarcoClickshareApi ApiFactory(string versionString)
+		{
+			Version version = new Version(versionString);
+			int api;
+
+			s_ApiVersions.TryGetValue(version, out api);
+			switch (api)
+			{
+				case 1:
+					return new BarcoClickshareApiV1();
+				case 2:
+					return new BarcoClickshareApiV2();
+
+				default:
+					throw new Exception("Unable to determine clickshare API version");
+			}
 		}
 
 		/// <summary>

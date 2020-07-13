@@ -2,17 +2,8 @@
 using ICD.Common.Utils.Json;
 using Newtonsoft.Json;
 
-namespace ICD.Connect.Sources.Barco.Responses
+namespace ICD.Connect.Sources.Barco.Responses.Common
 {
-	[JsonConverter(typeof(LanResponseConverter))]
-	public sealed class LanResponse : AbstractClickshareResponse<LanInfo>
-	{
-	}
-
-	public sealed class LanResponseConverter : AbstractClickshareResponseConverter<LanResponse, LanInfo>
-	{
-	}
-
 	[JsonConverter(typeof(LanInfoConverter))]
 	public sealed class LanInfo
 	{
@@ -25,11 +16,11 @@ namespace ICD.Connect.Sources.Barco.Responses
 
 	public sealed class LanInfoConverter : AbstractGenericJsonConverter<LanInfo>
 	{
-		private const string KEY_NETWORK_ADDRESSING = "Addressing";
-		private const string KEY_NETWORK_IP_ADDRESS = "IpAddress";
-		private const string KEY_NETWORK_SUBNET_MASK = "SubnetMask";
-		private const string KEY_NETWORK_DEFAULT_GATEWAY = "DefaultGateway";
-		private const string KEY_NETWORK_HOSTNAME = "Hostname";
+		private const string KEY_NETWORK_ADDRESSING = "addressing";
+		private const string KEY_NETWORK_IP_ADDRESS = "ipaddress";
+		private const string KEY_NETWORK_SUBNET_MASK = "subnetmask";
+		private const string KEY_NETWORK_DEFAULT_GATEWAY = "defaultgateway";
+		private const string KEY_NETWORK_HOSTNAME = "hostname";
 
 		/// <summary>
 		/// Override to handle the current property value with the given name.
@@ -40,7 +31,8 @@ namespace ICD.Connect.Sources.Barco.Responses
 		/// <param name="serializer"></param>
 		protected override void ReadProperty(string property, JsonReader reader, LanInfo instance, JsonSerializer serializer)
 		{
-			switch (property)
+			// Supports API v1 & v2 which have different capitalization rules 
+			switch (property.ToLower())
 			{
 				case KEY_NETWORK_ADDRESSING:
 					instance.Addressing = reader.GetValueAsString();

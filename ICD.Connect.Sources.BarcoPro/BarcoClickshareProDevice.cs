@@ -1,6 +1,7 @@
 ﻿using System;
 using ICD.Common.Utils.Services.Logging;
 using ICD.Connect.Sources.Barco;
+using ICD.Connect.Sources.Barco.Devices;
 #if SIMPLSHARP
 using Crestron.SimplSharpPro.CrestronThread;
 #else

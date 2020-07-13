@@ -1,6 +1,8 @@
 ﻿using ICD.Common.Utils;
 using ICD.Connect.Devices.EventArguments;
 using ICD.Connect.Protocol.Network.Ports.Web;
+using ICD.Connect.Sources.Barco.Devices;
+using ICD.Connect.Sources.Barco.Responses.Common;
 #if SIMPLSHARP
 using System;
 using Crestron.SimplSharp;
@@ -127,22 +129,22 @@ namespace ICD.Connect.Sources.Barco
 		{
 			var buttons = m_Clickshare.GetButtons();
 
-			foreach (var kvp in buttons)
+			foreach (Button button in buttons)
 			{
 				var delegateToFire = SPlusButtonStatusChanged;
 				if (delegateToFire == null)
 					continue;
-				string lastConnected = kvp.Value.LastConnected.HasValue ? kvp.Value.LastConnected.Value.ToString("s") : "";
-				string lastPared = kvp.Value.LastPaired.HasValue ? kvp.Value.LastPaired.Value.ToString("s") : "";
+				string lastConnected = button.LastConnected.HasValue ? button.LastConnected.Value.ToString("s") : "";
+				string lastPared = button.LastPaired.HasValue ? button.LastPaired.Value.ToString("s") : "";
 
-				delegateToFire((ushort)kvp.Key, kvp.Value.Connected ? (ushort)1 : (ushort)0,(ushort)kvp.Value.ConnectionCount,
-				               new SimplSharpString(kvp.Value.Ip),
+				delegateToFire((ushort)button.Id, button.Connected ? (ushort)1 : (ushort)0,(ushort)button.ConnectionCount,
+				               new SimplSharpString(button.Ip),
 				               new SimplSharpString(lastConnected),
 							   new SimplSharpString(lastPared),
-				               new SimplSharpString(kvp.Value.MacAddress),
-				               new SimplSharpString(kvp.Value.SerialNumber),
-							   new SimplSharpString(kvp.Value.Status.ToString()),
-				               new SimplSharpString(kvp.Value.Version));
+				               new SimplSharpString(button.MacAddress),
+				               new SimplSharpString(button.SerialNumber),
+							   new SimplSharpString(button.Status.ToString()),
+				               new SimplSharpString(button.Version));
 			}
 		}
 

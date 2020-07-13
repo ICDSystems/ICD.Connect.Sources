@@ -4,13 +4,13 @@ using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Json;
 using Newtonsoft.Json;
 
-namespace ICD.Connect.Sources.Barco.Responses
+namespace ICD.Connect.Sources.Barco.Responses.Common
 {
 	/// <summary>
 	/// Represents a button registered with the Barco Clickshare.
 	/// </summary>
 	[JsonConverter(typeof(ButtonConverter))]
-	public class Button
+	public sealed class Button
 	{
 		public enum eStatus
 		{
@@ -20,6 +20,11 @@ namespace ICD.Connect.Sources.Barco.Responses
 		}
 
 		#region Properties
+
+		/// <summary>
+		/// Gets the ID of the button.
+		/// </summary>
+		public int Id { get; set; }
 
 		/// <summary>
 		/// Gets the connected state.
@@ -87,15 +92,16 @@ namespace ICD.Connect.Sources.Barco.Responses
 		}
 		*/
 
-		private const string PROP_CONNECTED = "Connected";
-		private const string PROP_CONNECTION_COUNT = "ConnectionCount";
-		private const string PROP_FIRMWARE_VERSION = "FirmwareVersion";
-		private const string PROP_IP_ADDRESS = "IpAddress";
-		private const string PROP_LAST_CONNECTED = "LastConnected";
-		private const string PROP_LAST_PAIRED = "LastPaired";
-		private const string PROP_MAC_ADDRESS = "MacAddress";
-		private const string PROP_SERIAL_NUMBER = "SerialNumber";
-		private const string PROP_STATUS = "Status";
+		private const string PROP_ID = "id";
+		private const string PROP_CONNECTED = "connected";
+		private const string PROP_CONNECTION_COUNT = "connectioncount";
+		private const string PROP_FIRMWARE_VERSION = "firmwareversion";
+		private const string PROP_IP_ADDRESS = "ipaddress";
+		private const string PROP_LAST_CONNECTED = "lastconnected";
+		private const string PROP_LAST_PAIRED = "lastpaired";
+		private const string PROP_MAC_ADDRESS = "macaddress";
+		private const string PROP_SERIAL_NUMBER = "serialnumber";
+		private const string PROP_STATUS = "status";
 
 		/// <summary>
 		/// Gets a value indicating whether this <see cref="T:Newtonsoft.Json.JsonConverter"/> can write JSON.
@@ -114,8 +120,12 @@ namespace ICD.Connect.Sources.Barco.Responses
 		/// <param name="serializer"></param>
 		protected override void ReadProperty(string property, JsonReader reader, Button instance, JsonSerializer serializer)
 		{
-			switch (property)
+			// Supports API v1 & v2 which have different capitalization rules 
+			switch (property.ToLower())
 			{
+				case PROP_ID:
+					instance.Id = reader.GetValueAsInt();
+					break;
 				case PROP_CONNECTED:
 					instance.Connected = reader.GetValueAsBool();
 					break;

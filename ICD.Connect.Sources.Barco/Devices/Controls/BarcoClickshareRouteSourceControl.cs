@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils;
+using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Extensions;
 using ICD.Connect.Routing;
 using ICD.Connect.Routing.Connections;
 using ICD.Connect.Routing.Controls;
 using ICD.Connect.Routing.EventArguments;
 
-namespace ICD.Connect.Sources.Barco
+namespace ICD.Connect.Sources.Barco.Devices.Controls
 {
 	public sealed class BarcoClickshareRouteSourceControl<TClickshare, TClickshareSettings> :
 		AbstractRouteSourceControl<TClickshare>

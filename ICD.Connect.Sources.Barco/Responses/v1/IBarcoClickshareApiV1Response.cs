@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace ICD.Connect.Sources.Barco.Responses
+namespace ICD.Connect.Sources.Barco.Responses.v1
 {
-	public interface IBarcoClickshareResponse
+	public interface IBarcoClickshareApiV1Response
 	{
 		int Status { get; set; }
 
@@ -11,7 +11,7 @@ namespace ICD.Connect.Sources.Barco.Responses
 		KeyValuePair<string, object> Data { get; set; }
 	}
 
-	public interface IBarcoClickshareResponse<T> : IBarcoClickshareResponse
+	public interface IBarcoClickshareApiV1Response<T> : IBarcoClickshareApiV1Response
 	{
 		new KeyValuePair<string, T> Data { get; set; }
 	}

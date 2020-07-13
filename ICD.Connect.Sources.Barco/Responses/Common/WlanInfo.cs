@@ -2,17 +2,8 @@
 using ICD.Common.Utils.Json;
 using Newtonsoft.Json;
 
-namespace ICD.Connect.Sources.Barco.Responses
+namespace ICD.Connect.Sources.Barco.Responses.Common
 {
-	[JsonConverter(typeof(WlanResponseConverter))]
-	public sealed class WlanResponse : AbstractClickshareResponse<WlanInfo>
-	{
-	}
-
-	public sealed class WlanResponseConverter : AbstractClickshareResponseConverter<WlanResponse, WlanInfo>
-	{
-	}
-
 	[JsonConverter(typeof(WlanInfoConverter))]
 	public sealed class WlanInfo
 	{
@@ -21,9 +12,9 @@ namespace ICD.Connect.Sources.Barco.Responses
 	}
 
 	public sealed class WlanInfoConverter : AbstractGenericJsonConverter<WlanInfo>
-	{	
-		private const string KEY_NETWORK_IP_ADDRESS = "IpAddress";
-		private const string KEY_NETWORK_MAC_ADDRESS = "MacAddress";
+	{
+		private const string KEY_NETWORK_IP_ADDRESS = "ipaddress";
+		private const string KEY_NETWORK_MAC_ADDRESS = "macaddress";
 
 		/// <summary>
 		/// Override to handle the current property value with the given name.
@@ -34,7 +25,8 @@ namespace ICD.Connect.Sources.Barco.Responses
 		/// <param name="serializer"></param>
 		protected override void ReadProperty(string property, JsonReader reader, WlanInfo instance, JsonSerializer serializer)
 		{
-			switch (property)
+			// Supports API v1 & v2 which have different capitalization rules 
+			switch (property.ToLower())
 			{
 				case KEY_NETWORK_IP_ADDRESS:
 					instance.IpAddress = reader.GetValueAsString();

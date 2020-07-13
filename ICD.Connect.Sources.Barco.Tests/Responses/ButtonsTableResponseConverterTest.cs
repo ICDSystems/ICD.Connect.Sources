@@ -1,4 +1,4 @@
-﻿using ICD.Connect.Sources.Barco.Responses;
+﻿using ICD.Connect.Sources.Barco.Responses.v1;
 using Newtonsoft.Json;
 using NUnit.Framework;
 

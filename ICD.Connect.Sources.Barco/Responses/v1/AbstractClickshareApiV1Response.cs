@@ -3,23 +3,23 @@ using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Json;
 using Newtonsoft.Json;
 
-namespace ICD.Connect.Sources.Barco.Responses
+namespace ICD.Connect.Sources.Barco.Responses.v1
 {
-	public abstract class AbstractClickshareResponse<T> : IBarcoClickshareResponse<T>
+	public abstract class AbstractClickshareApiV1Response<T> : IBarcoClickshareApiV1Response<T>
 	{
 		public int Status { get; set; }
 		public string Message { get; set; }
 		public KeyValuePair<string, T> Data { get; set; }
 
-		KeyValuePair<string, object> IBarcoClickshareResponse.Data
+		KeyValuePair<string, object> IBarcoClickshareApiV1Response.Data
 		{
 			get { return new KeyValuePair<string, object>(Data.Key, Data.Value); }
 			set { Data = new KeyValuePair<string, T>(value.Key, (T)value.Value); }
 		}
 	}
 
-	public abstract class AbstractClickshareResponseConverter<TResponse, TData> : AbstractGenericJsonConverter<TResponse>
-		where TResponse : IBarcoClickshareResponse<TData>
+	public abstract class AbstractClickshareApiV1ResponseConverter<TResponse, TData> : AbstractGenericJsonConverter<TResponse>
+		where TResponse : IBarcoClickshareApiV1Response<TData>
 	{
 		/*
 		{

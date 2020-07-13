@@ -1,31 +1,33 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ICD.Common.Utils.Collections;
 using ICD.Common.Utils.Json;
+using ICD.Connect.Sources.Barco.Responses.Common;
 using Newtonsoft.Json;
 
-namespace ICD.Connect.Sources.Barco.Responses
+namespace ICD.Connect.Sources.Barco.Responses.v1
 {
 	[JsonConverter(typeof(ButtonsTableConverter))]
-	public sealed class ButtonsTable
+	public sealed class ButtonsTable : IButtonsCollection
 	{
-		private readonly Dictionary<int, Button> m_Buttons;
+		private readonly IcdHashSet<Button> m_Buttons;
 
 		/// <summary>
 		/// Constructor.
 		/// </summary>
 		public ButtonsTable()
 		{
-			m_Buttons = new Dictionary<int, Button>();
+			m_Buttons = new IcdHashSet<Button>();
 		}
 
-		public IEnumerable<KeyValuePair<int, Button>> GetButtons()
+		public IEnumerable<Button> GetButtons()
 		{
 			return m_Buttons.ToArray();
 		}
 
-		public void AddButton(int key, Button value)
+		public void AddButton(Button value)
 		{
-			m_Buttons.Add(key, value);
+			m_Buttons.Add(value);
 		}
 	}
 
@@ -56,10 +58,11 @@ namespace ICD.Connect.Sources.Barco.Responses
 		/// <param name="serializer"></param>
 		protected override void ReadProperty(string property, JsonReader reader, ButtonsTable instance, JsonSerializer serializer)
 		{
-			int key = int.Parse(property);
+			int id = int.Parse(property);
 			Button value = serializer.Deserialize<Button>(reader);
+			value.Id = id;
 
-			instance.AddButton(key, value);
+			instance.AddButton(value);
 		}
 	}
 }

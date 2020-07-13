@@ -1,5 +1,5 @@
 ﻿using ICD.Connect.Settings.Attributes;
-using ICD.Connect.Sources.Barco;
+using ICD.Connect.Sources.Barco.Devices;
 
 namespace ICD.Connect.Sources.BarcoPro
 {

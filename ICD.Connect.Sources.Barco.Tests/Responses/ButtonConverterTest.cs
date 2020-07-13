@@ -1,6 +1,5 @@
 ﻿using System;
-using ICD.Common.Utils.Json;
-using ICD.Connect.Sources.Barco.Responses;
+using ICD.Connect.Sources.Barco.Responses.Common;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
