@@ -15,7 +15,7 @@ namespace ICD.Connect.Sources.Barco.API
 		private const string KEY_DEVICE_IDENTITY = "/configuration/system/device-identity";
 		private const string KEY_NETWORK = "/configuration/system/network";
 
-		private const string VERSION = "v2.0";
+		private const string VERSION = "v2";
 
 
 		public bool GetSharingState(IWebPort port)
