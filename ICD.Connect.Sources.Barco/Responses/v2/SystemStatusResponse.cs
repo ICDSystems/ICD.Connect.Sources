@@ -61,7 +61,7 @@ namespace ICD.Connect.Sources.Barco.Responses.v2
 					instance.TotalUptime = reader.GetValueAsInt();
 					break;
 				case PROP_FIRST_USED:
-					instance.FirstUsed = DateTime.Parse(reader.GetValueAsString());
+					instance.FirstUsed = reader.GetValueAsDateTime();
 					break;
 				case PROP_IN_USE:
 					instance.InUse = reader.GetValueAsBool();

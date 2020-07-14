@@ -63,7 +63,7 @@ namespace ICD.Connect.Sources.Barco.Responses.v2
 					instance.Data = new KeyValuePair<string, Version>(key, instance.Data.Value);
 					break;
 				case PROP_VALUE:
-					Version value = new Version(reader.GetValueAsString());
+					Version value = new Version(reader.GetValueAsString().Remove(new List<char>{'v'}));
 					instance.Data = new KeyValuePair<string, Version>(instance.Data.Key, value);
 					break;
 			}

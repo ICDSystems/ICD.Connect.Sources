@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Sources.Barco.Responses.Common;
 using ICD.Connect.Sources.Barco.Responses.v1;
@@ -46,9 +47,9 @@ namespace ICD.Connect.Sources.Barco.API
 			return Poll<SoftwareVersionResponse, Version>(port, VERSION + KEY_SOFTWARE_VERSION, r => new Version(r.Data.Value));
 		}
 
-		public IButtonsCollection GetButtonsTable(IWebPort port)
+		public IEnumerable<Button> GetButtonsTable(IWebPort port)
 		{
-			return Poll<ButtonsTableResponse, IButtonsCollection>(port, VERSION + KEY_BUTTONS_TABLE, r => r.Data.Value);
+			return Poll<ButtonsTableResponse, IEnumerable<Button>>(port, VERSION + KEY_BUTTONS_TABLE, r => r.Data.Value.GetButtons());
 		}
 
 		public string GetModel(IWebPort port)
@@ -77,7 +78,7 @@ namespace ICD.Connect.Sources.Barco.API
 		/// <param name="port"></param>
 		/// <param name="relativeOrAbsoluteUri"></param>
 		/// <param name="responseCallback"></param>
-		private TOutput Poll<TResponse, TOutput>(IWebPort port, string relativeOrAbsoluteUri, Func<TResponse, TOutput> responseCallback)
+		private static TOutput Poll<TResponse, TOutput>(IWebPort port, string relativeOrAbsoluteUri, Func<TResponse, TOutput> responseCallback)
 			where TResponse : IBarcoClickshareApiV1Response
 		{
 			if (responseCallback == null)

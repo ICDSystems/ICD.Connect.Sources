@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Sources.Barco.Responses.Common;
 using ICD.Connect.Sources.Barco.Responses.v2;
@@ -33,9 +35,9 @@ namespace ICD.Connect.Sources.Barco.API
 			return Poll<SoftwareVersionResponse, Version>(port, VERSION + KEY_SOFTWARE_VERSION, r => r.Version);
 		}
 
-		public IButtonsCollection GetButtonsTable(IWebPort port)
+		public IEnumerable<Button> GetButtonsTable(IWebPort port)
 		{
-			return Poll<Buttons, Buttons>(port, VERSION + KEY_BUTTONS, r => r);
+			return Poll<Button[], Button[]>(port, VERSION + KEY_BUTTONS, r => r);
 		}
 
 		public string GetModel(IWebPort port)
@@ -50,12 +52,12 @@ namespace ICD.Connect.Sources.Barco.API
 
 		public LanInfo GetLan(IWebPort port)
 		{
-			return Poll<NetworkSettingsResponse, LanInfo>(port, VERSION + KEY_NETWORK, r => r.Wired);
+			return Poll<NetworkSettingsResponse, LanInfo>(port, VERSION + KEY_NETWORK, r => r.Wired.FirstOrDefault());
 		}
 
 		public WlanInfo GetWlan(IWebPort port)
 		{
-			return Poll<NetworkSettingsResponse, WlanInfo>(port, VERSION + KEY_NETWORK, r => r.Wireless);
+			return Poll<NetworkSettingsResponse, WlanInfo>(port, VERSION + KEY_NETWORK, r => r.Wireless.FirstOrDefault());
 		}
 
 		/// <summary>
@@ -64,8 +66,7 @@ namespace ICD.Connect.Sources.Barco.API
 		/// <param name="port"></param>
 		/// <param name="relativeOrAbsoluteUri"></param>
 		/// <param name="responseCallback"></param>
-		private TOutput Poll<TResponse, TOutput>(IWebPort port, string relativeOrAbsoluteUri, Func<TResponse, TOutput> responseCallback)
-			where TResponse : IBarcoClickshareApiV2Response
+		private static TOutput Poll<TResponse, TOutput>(IWebPort port, string relativeOrAbsoluteUri, Func<TResponse, TOutput> responseCallback)
 		{
 			if (responseCallback == null)
 				throw new ArgumentNullException("responseCallback");

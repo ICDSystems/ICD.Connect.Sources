@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Sources.Barco.Responses.Common;
 
@@ -12,7 +13,7 @@ namespace ICD.Connect.Sources.Barco.API
 
 		Version GetSoftwareVersion(IWebPort port);
 
-		IButtonsCollection GetButtonsTable(IWebPort port);
+		IEnumerable<Button> GetButtonsTable(IWebPort port);
 
 		string GetModel(IWebPort port);
 

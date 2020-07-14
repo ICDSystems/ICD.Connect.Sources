@@ -1,4 +1,6 @@
-﻿using ICD.Common.Utils.Extensions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using ICD.Common.Utils.Extensions;
 using ICD.Connect.Sources.Barco.Responses.Common;
 using Newtonsoft.Json;
 
@@ -9,9 +11,9 @@ namespace ICD.Connect.Sources.Barco.Responses.v2
 	{
 		public string HostName { get; set; }
 
-		public LanInfo Wired { get; set; }
+		public IEnumerable<LanInfo> Wired { get; set; }
 
-		public WlanInfo Wireless { get; set; }
+		public IEnumerable<WlanInfo> Wireless { get; set; }
 	}
 
 	public sealed class NetworkSettingsResponseConverter : AbstractBarcoClickshareApiV2ResponseConverter<NetworkSettingsResponse>
@@ -28,10 +30,10 @@ namespace ICD.Connect.Sources.Barco.Responses.v2
 					instance.HostName = reader.GetValueAsString();
 					break;
 				case PROP_WIRED:
-					instance.Wired = serializer.Deserialize<LanInfo>(reader);
+					instance.Wired = serializer.DeserializeArray<LanInfo>(reader).ToArray();
 					break;
 				case PROP_WIRELESS:
-					instance.Wireless = serializer.Deserialize<WlanInfo>(reader);
+					instance.Wireless = serializer.DeserializeArray<WlanInfo>(reader).ToArray();
 					break;
 
 				default:

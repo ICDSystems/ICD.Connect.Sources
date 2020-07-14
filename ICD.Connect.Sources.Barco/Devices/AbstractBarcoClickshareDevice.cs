@@ -477,7 +477,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		/// Updates the buttons from json.
 		/// </summary>
 		/// <param name="buttons"></param>
-		private void UpdateButtons(IButtonsCollection buttons)
+		private void UpdateButtons(IEnumerable<Button> buttons)
 		{
 			bool changed;
 
@@ -485,7 +485,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 
 			try
 			{
-				IcdHashSet<Button> newButtons = buttons.GetButtons().ToIcdHashSet();
+				IcdHashSet<Button> newButtons = buttons.ToIcdHashSet();
 
 				changed = !newButtons.SetEquals(m_Buttons);
 
