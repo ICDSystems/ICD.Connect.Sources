@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+ - Barco Clickshare CX30 support through implementation of their V2 API
 
 ## [7.0.0] - 2020-06-19
 ### Changed
