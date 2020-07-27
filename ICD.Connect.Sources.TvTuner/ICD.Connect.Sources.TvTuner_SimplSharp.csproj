@@ -89,6 +89,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proxies\ProxyTvTunerSettings.cs" />
     <Compile Include="Proxies\TvTunerApi.cs" />
+    <Compile Include="Streaming\IStreamTvTunerDevice.cs" />
+    <Compile Include="Streaming\StreamTvTunerDevice.cs" />
+    <Compile Include="Streaming\StreamTvTunerDeviceSettings.cs" />
+    <Compile Include="Streaming\StreamTvTunerRouteSourceControl.cs" />
     <Compile Include="TvPresets\ITvPresets.cs" />
     <Compile Include="TvPresets\SPlusInterfaces\SPlusTvPresetsInterface.cs" />
     <Compile Include="TvPresets\SPlusInterfaces\XmlTvPresetsFactory.cs" />
