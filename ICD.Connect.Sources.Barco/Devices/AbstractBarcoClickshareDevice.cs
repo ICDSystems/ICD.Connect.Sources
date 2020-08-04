@@ -57,12 +57,13 @@ namespace ICD.Connect.Sources.Barco.Devices
 
 		private const string PORT_ACCEPT = "application/json";
 
-		// ReSharper disable once StaticMemberInGenericType
-		private static readonly Dictionary<Version, int> s_ApiVersions = new Dictionary<Version, int>(new UndefinedVersionEqualityComparer())
-		{
-			{new Version("1.0.0.0"), 1},
-			{new Version("2.0.0.0"), 2}
-		};
+		// ReSharper disable once StaticFieldInGenericType
+		private static readonly Dictionary<Version, Func<IBarcoClickshareApi>> s_ApiVersions =
+			new Dictionary<Version, Func<IBarcoClickshareApi>>(new UndefinedVersionEqualityComparer())
+			{
+				{new Version("1.0.0.0"), () => new BarcoClickshareApiV1()},
+				{new Version("2.0.0.0"), () => new BarcoClickshareApiV2()}
+			};
 
 		#endregion
 
@@ -157,7 +158,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public Version Version
 		{
 			get { return m_Version; }
-			set
+			private set
 			{
 				if (value == m_Version)
 					return;
@@ -178,7 +179,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public Version SoftwareVersion
 		{
 			get { return m_SoftwareVersion; }
-			set
+			private set
 			{
 				if (value == m_SoftwareVersion)
 					return;
@@ -198,7 +199,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public bool Sharing
 		{
 			get { return m_Sharing; }
-			set
+			private set
 			{
 				if (value == m_Sharing)
 					return;
@@ -218,7 +219,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public bool LanDhcpEnabled
 		{
 			get { return m_LanDhcpEnabled; }
-			set
+			private set
 			{
 				if (m_LanDhcpEnabled == value)
 					return;
@@ -236,7 +237,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			{
 				return m_LanIpAddress;
 			}
-			set
+			private set
 			{
 				if (m_LanIpAddress == value)
 					return;
@@ -254,7 +255,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			{
 				return m_LanSubnetMask;
 			}
-			set
+			private set
 			{
 				if (m_LanSubnetMask == value)
 					return;
@@ -269,7 +270,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public string LanGateway
 		{
 			get { return m_LanGateway; }
-			set
+			private set
 			{
 				if (m_LanGateway == value)
 					return;
@@ -284,7 +285,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public string LanHostname
 		{
 			get { return m_LanHostname; }
-			set
+			private set
 			{
 				if (m_LanHostname == value)
 					return;
@@ -302,7 +303,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			{
 				return m_WlanIpAddress;
 			}
-			set
+			private set
 			{
 				if (m_WlanIpAddress == value)
 					return;
@@ -317,7 +318,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public string WlanMacAddress
 		{
 			get { return m_WlanMacAddress; }
-			set
+			private set
 			{
 				if (m_WlanMacAddress == value)
 					return;
@@ -661,22 +662,14 @@ namespace ICD.Connect.Sources.Barco.Devices
 			}
 		}
 
-		private IBarcoClickshareApi ApiFactory(string versionString)
+		private static IBarcoClickshareApi ApiFactory(string versionString)
 		{
 			Version version = new Version(versionString);
-			int api;
+			Func<IBarcoClickshareApi> factory;
+			if (!s_ApiVersions.TryGetValue(version, out factory))
+				throw new Exception("Unable to determine clickshare API version");
 
-			s_ApiVersions.TryGetValue(version, out api);
-			switch (api)
-			{
-				case 1:
-					return new BarcoClickshareApiV1();
-				case 2:
-					return new BarcoClickshareApiV2();
-
-				default:
-					throw new Exception("Unable to determine clickshare API version");
-			}
+			return factory();
 		}
 
 		/// <summary>

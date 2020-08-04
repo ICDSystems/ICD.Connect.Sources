@@ -15,6 +15,8 @@ namespace ICD.Connect.Sources.Barco.Devices
 		private const string PORT_ELEMENT = "Port";
 		private const string API_VERSION_ELEMENT = "ApiVersion";
 
+		private const string DEFAULT_API_VERSION = "v1.0";
+
 		private readonly UriProperties m_UriProperties;
 		private readonly WebProxyProperties m_WebProxyProperties;
 
@@ -160,7 +162,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			base.ParseXml(xml);
 
 			Port = XmlUtils.TryReadChildElementContentAsInt(xml, PORT_ELEMENT);
-			ApiVersion = XmlUtils.TryReadChildElementContentAsString(xml, API_VERSION_ELEMENT);
+			ApiVersion = XmlUtils.TryReadChildElementContentAsString(xml, API_VERSION_ELEMENT) ?? DEFAULT_API_VERSION;
 
 			m_UriProperties.ParseXml(xml);
 			m_WebProxyProperties.ParseXml(xml);
