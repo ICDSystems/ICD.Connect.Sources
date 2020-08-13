@@ -14,6 +14,7 @@ using ICD.Connect.API.Nodes;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 using ICD.Connect.Devices.EventArguments;
+using ICD.Connect.Devices.Telemetry;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
