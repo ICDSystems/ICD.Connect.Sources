@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.0.1] - 2020-08-13
+### Changed
+ - Telemetry namespace changed
+
 ## [7.0.0] - 2020-06-19
 ### Changed
  - MockTvTuner now implements IMockDevice
