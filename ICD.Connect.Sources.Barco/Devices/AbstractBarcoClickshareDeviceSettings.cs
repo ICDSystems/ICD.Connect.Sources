@@ -15,7 +15,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		private const string PORT_ELEMENT = "Port";
 		private const string API_VERSION_ELEMENT = "ApiVersion";
 
-		private const string DEFAULT_API_VERSION = "v1.0";
+		private const string DEFAULT_API_VERSION = "1.0";
 
 		private readonly UriProperties m_UriProperties;
 		private readonly WebProxyProperties m_WebProxyProperties;

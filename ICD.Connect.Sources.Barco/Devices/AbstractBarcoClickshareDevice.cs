@@ -657,9 +657,10 @@ namespace ICD.Connect.Sources.Barco.Devices
 			{
 				m_Api = ApiFactory(settings.ApiVersion);
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 				Logger.Log(eSeverity.Error, "No API for version {0}", settings.ApiVersion);
+				Logger.Log(eSeverity.Error, "API factory failed - {0}", e.Message);
 			}
 		}
 

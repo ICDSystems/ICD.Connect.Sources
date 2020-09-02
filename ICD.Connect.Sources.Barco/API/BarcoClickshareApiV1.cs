@@ -39,7 +39,7 @@ namespace ICD.Connect.Sources.Barco.API
 
 		public Version GetVersion(IWebPort port)
 		{
-			return Poll<VersionResponse, Version>(port, REQUEST_VERSION, r => new Version(r.Data.Value));
+			return Poll<VersionResponse, Version>(port, REQUEST_VERSION, r => new Version(r.Data.Value.Replace("v", string.Empty)));
 		}
 
 		public Version GetSoftwareVersion(IWebPort port)
