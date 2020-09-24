@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
  - Barco Clickshare CX30 support through implementation of their V2 API
 
+## [7.0.2] - 2020-09-24
+### Changed
+ - Fixed a bug where clickshare activities were not being initialized
+
 ## [7.0.1] - 2020-08-13
 ### Changed
  - Telemetry namespace changed

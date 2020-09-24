@@ -202,17 +202,23 @@ namespace ICD.Connect.Sources.Barco.Devices
 			get { return m_Sharing; }
 			private set
 			{
-				if (value == m_Sharing)
-					return;
+				try
+				{
+					if (value == m_Sharing)
+						return;
 
-				m_Sharing = value;
+					m_Sharing = value;
 
-				Logger.LogSetTo(eSeverity.Informational, "Sharing", m_Sharing);
-				Activities.LogActivity(m_Sharing
-					                   ? new Activity(Activity.ePriority.High, "Sharing", "Sharing", eSeverity.Informational)
-					                   : new Activity(Activity.ePriority.Low, "Sharing", "Not Sharing", eSeverity.Informational));
+					Logger.LogSetTo(eSeverity.Informational, "Sharing", m_Sharing);
 
-				OnSharingStatusChanged.Raise(this, new BoolEventArgs(m_Sharing));
+					OnSharingStatusChanged.Raise(this, new BoolEventArgs(m_Sharing));
+				}
+				finally
+				{
+					Activities.LogActivity(m_Sharing
+						                       ? new Activity(Activity.ePriority.High, "Sharing", "Sharing", eSeverity.Informational)
+						                       : new Activity(Activity.ePriority.Low, "Sharing", "Not Sharing", eSeverity.Informational));
+				}
 			}
 		}
 
@@ -349,6 +355,9 @@ namespace ICD.Connect.Sources.Barco.Devices
 
 			m_SharingTimer = new SafeTimer(SharingTimerCallback, m_SharingUpdateInterval, m_SharingUpdateInterval);
 			m_SharingTimerSection = new SafeCriticalSection();
+
+			// Initialize activities
+			Sharing = false;
 		}
 
 		#endregion
