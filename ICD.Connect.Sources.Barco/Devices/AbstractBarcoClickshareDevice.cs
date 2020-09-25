@@ -54,7 +54,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		private const int MAX_PORT_FAILURES_FOR_OFFLINE = 4;
 
 		// The number of times to check "sharing" before checking version/buttons
-		private const int INFO_UPDATE_OCCURRENCE = 10;
+		protected const int INFO_UPDATE_OCCURRENCE = 10;
 
 		private const string PORT_ACCEPT = "application/json";
 
@@ -159,7 +159,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public Version Version
 		{
 			get { return m_Version; }
-			private set
+			protected set
 			{
 				if (value == m_Version)
 					return;
@@ -180,7 +180,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public Version SoftwareVersion
 		{
 			get { return m_SoftwareVersion; }
-			private set
+			protected set
 			{
 				if (value == m_SoftwareVersion)
 					return;
@@ -200,7 +200,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public bool Sharing
 		{
 			get { return m_Sharing; }
-			private set
+			protected set
 			{
 				try
 				{
@@ -226,7 +226,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public bool LanDhcpEnabled
 		{
 			get { return m_LanDhcpEnabled; }
-			private set
+			protected set
 			{
 				if (m_LanDhcpEnabled == value)
 					return;
@@ -244,7 +244,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			{
 				return m_LanIpAddress;
 			}
-			private set
+			protected set
 			{
 				if (m_LanIpAddress == value)
 					return;
@@ -262,7 +262,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			{
 				return m_LanSubnetMask;
 			}
-			private set
+			protected set
 			{
 				if (m_LanSubnetMask == value)
 					return;
@@ -277,7 +277,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public string LanGateway
 		{
 			get { return m_LanGateway; }
-			private set
+			protected set
 			{
 				if (m_LanGateway == value)
 					return;
@@ -292,7 +292,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public string LanHostname
 		{
 			get { return m_LanHostname; }
-			private set
+			protected set
 			{
 				if (m_LanHostname == value)
 					return;
@@ -310,7 +310,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			{
 				return m_WlanIpAddress;
 			}
-			private set
+			protected set
 			{
 				if (m_WlanIpAddress == value)
 					return;
@@ -325,7 +325,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public string WlanMacAddress
 		{
 			get { return m_WlanMacAddress; }
-			private set
+			protected set
 			{
 				if (m_WlanMacAddress == value)
 					return;
@@ -334,6 +334,16 @@ namespace ICD.Connect.Sources.Barco.Devices
 
 				OnWlanMacAddressChanged.Raise(this, new StringEventArgs(value));
 			}
+		}
+
+		protected IBarcoClickshareApi Api { get { return m_Api; } }
+
+		protected IWebPort Port { get { return m_Port; } }
+
+		protected int UpdateCount
+		{
+			get { return m_UpdateCount; }
+			set { m_UpdateCount = value; }
 		}
 
 		#endregion
@@ -488,7 +498,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		/// Updates the buttons from json.
 		/// </summary>
 		/// <param name="buttons"></param>
-		private void UpdateButtons(IEnumerable<Button> buttons)
+		protected void UpdateButtons(IEnumerable<Button> buttons)
 		{
 			bool changed;
 
@@ -515,7 +525,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 				OnButtonsChanged.Raise(this);
 		}
 
-		private void UpdateLanInfo(LanInfo info)
+		protected void UpdateLanInfo(LanInfo info)
 		{
 			LanDhcpEnabled = string.Equals(info.Addressing, "DHCP", StringComparison.OrdinalIgnoreCase);
 			LanIpAddress = info.IpAddress;
@@ -524,7 +534,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			LanHostname = info.Hostname;
 		}
 
-		private void UpdateWlanInfo(WlanInfo info)
+		protected void UpdateWlanInfo(WlanInfo info)
 		{
 			WlanIpAddress = info.IpAddress;
 			WlanMacAddress = info.MacAddress;
@@ -533,7 +543,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		/// <summary>
 		/// Resets the update interval to the initial default.
 		/// </summary>
-		private void ResetUpdateInterval()
+		protected void ResetUpdateInterval()
 		{
 			m_SharingUpdateInterval = SHARING_UPDATE_INTERVAL;
 			m_SharingTimer.Reset(m_SharingUpdateInterval, m_SharingUpdateInterval);
@@ -545,7 +555,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		/// <summary>
 		/// Increments the update interval up to the failure limit.
 		/// </summary>
-		private void IncrementUpdateInterval()
+		protected void IncrementUpdateInterval()
 		{
 			m_SharingUpdateInterval += FAILURE_UPDATE_INTERVAL_INCREMENT;
 			if (m_SharingUpdateInterval > FAILURE_UPDATE_INTERVAL_LIMIT)

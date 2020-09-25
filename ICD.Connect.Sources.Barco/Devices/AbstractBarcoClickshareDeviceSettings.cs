@@ -1,4 +1,5 @@
 ﻿using System;
+using ICD.Common.Properties;
 using ICD.Common.Utils.Xml;
 using ICD.Connect.Devices;
 using ICD.Connect.Protocol.Network.Ports.Web;
@@ -15,12 +16,25 @@ namespace ICD.Connect.Sources.Barco.Devices
 		private const string PORT_ELEMENT = "Port";
 		private const string API_VERSION_ELEMENT = "ApiVersion";
 
-		private const string DEFAULT_API_VERSION = "1.0";
-
 		private readonly UriProperties m_UriProperties;
 		private readonly WebProxyProperties m_WebProxyProperties;
 
 		#region Properties
+
+		/// <summary>
+		/// Default API version to use for the device if not in config
+		/// </summary>
+		[HiddenSettingsProperty]
+		[NotNull]
+		protected virtual string DefaultApiVersion { get { return "1.0"; }}
+
+
+		/// <summary>
+		/// Default port number to use for the device if not in the config
+		/// </summary>
+		[HiddenSettingsProperty]
+		[CanBeNull]
+		protected virtual ushort? DefaultPortNumber {get { return 4001; }}
 
 		[OriginatorIdSettingsProperty(typeof(IWebPort))]
 		public int? Port { get; set; }
@@ -162,7 +176,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			base.ParseXml(xml);
 
 			Port = XmlUtils.TryReadChildElementContentAsInt(xml, PORT_ELEMENT);
-			ApiVersion = XmlUtils.TryReadChildElementContentAsString(xml, API_VERSION_ELEMENT) ?? DEFAULT_API_VERSION;
+			ApiVersion = XmlUtils.TryReadChildElementContentAsString(xml, API_VERSION_ELEMENT) ?? DefaultApiVersion;
 
 			m_UriProperties.ParseXml(xml);
 			m_WebProxyProperties.ParseXml(xml);
@@ -172,7 +186,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 
 		private void UpdateUriDefaults()
 		{
-			m_UriProperties.ApplyDefaultValues(null, null, null, 4001, Uri.UriSchemeHttps, null, null, null);
+			m_UriProperties.ApplyDefaultValues(null, null, null, DefaultPortNumber, Uri.UriSchemeHttps, null, null, null);
 		}
 	}
 }

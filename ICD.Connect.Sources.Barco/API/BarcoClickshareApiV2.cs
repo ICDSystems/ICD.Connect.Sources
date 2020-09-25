@@ -16,6 +16,7 @@ namespace ICD.Connect.Sources.Barco.API
 		private const string KEY_SOFTWARE_VERSION = "/configuration/system/updates/current";
 		private const string KEY_DEVICE_IDENTITY = "/configuration/system/device-identity";
 		private const string KEY_NETWORK = "/configuration/system/network";
+		private const string KEY_PERIPHERALS = "/configuration/peripherals";
 
 		private const string VERSION = "v2";
 
@@ -58,6 +59,11 @@ namespace ICD.Connect.Sources.Barco.API
 		public WlanInfo GetWlan(IWebPort port)
 		{
 			return Poll<NetworkSettingsResponse, WlanInfo>(port, VERSION + KEY_NETWORK, r => r.Wireless.FirstOrDefault());
+		}
+
+		public IEnumerable<UsbPeripheral> GetPeripherals(IWebPort port)
+		{
+			return Poll<UsbPeripheral[], UsbPeripheral[]>(port, VERSION + KEY_PERIPHERALS, r => r);
 		}
 
 		/// <summary>
