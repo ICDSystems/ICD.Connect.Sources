@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
  - MockTvTuner now implements IMockDevice
  - Using new logging context
 
+## [6.5.0] - 2020-10-06
+### Changed
+ - BarcoClickshare - Implemented StartSetings to start communications with device
+
 ## [6.4.0] - 2020-03-20
 ### Changed
  - Fixed web requests to use new web port response.

@@ -353,7 +353,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			m_Buttons = new IcdHashSet<Button>();
 			m_ButtonsSection = new SafeCriticalSection();
 
-			m_SharingTimer = new SafeTimer(SharingTimerCallback, m_SharingUpdateInterval, m_SharingUpdateInterval);
+			m_SharingTimer = SafeTimer.Stopped(SharingTimerCallback);
 			m_SharingTimerSection = new SafeCriticalSection();
 
 			// Initialize activities
@@ -694,6 +694,18 @@ namespace ICD.Connect.Sources.Barco.Devices
 			base.AddControls(settings, factory, addControl);
 
 			addControl(new BarcoClickshareRouteSourceControl<AbstractBarcoClickshareDevice<T>, T>(this, 0));
+		}
+
+		/// <summary>
+		/// Override to add actions on StartSettings
+		/// This should be used to start communications with devices and perform initial actions
+		/// </summary>
+		protected override void StartSettingsFinal()
+		{
+			base.StartSettingsFinal();
+
+			// Start the clickshare polling timer
+			ResetUpdateInterval();
 		}
 
 		#endregion
