@@ -147,7 +147,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			base.WriteElements(writer);
 
 			writer.WriteElementString(PORT_ELEMENT, IcdXmlConvert.ToString(Port));
-			writer.WriteElementString(API_VERSION_ELEMENT, IcdXmlConvert.ToString(API_VERSION_ELEMENT));
+			writer.WriteElementString(API_VERSION_ELEMENT, IcdXmlConvert.ToString(ApiVersion));
 
 			m_UriProperties.WriteElements(writer);
 			m_WebProxyProperties.WriteElements(writer);
