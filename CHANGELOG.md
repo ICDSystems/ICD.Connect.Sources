@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
  - Barco Clickshare CX30 support through implementation of their V2 API
  - IStreamTvTunerDevice for TV Tuner devices that stream from a URI
  - StreamTvTunerDevice - implementation of IStreamTvTunerDevice
+ 
+### Changed
+ - Barco Clickshare - Moved telemetry properties to Monitored Device Info
 
 ## [7.0.2] - 2020-09-24
 ### Changed

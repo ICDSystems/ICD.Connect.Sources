@@ -72,7 +72,7 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 				if (Sharing != oldSharing || UpdateCount == 0)
 				{
 					Version = Api.GetVersion(Port);
-					SoftwareVersion = Api.GetSoftwareVersion(Port);
+					MonitoredDeviceInfo.FirmwareVersion = Api.GetSoftwareVersion(Port).ToString();
 					UpdateButtons(Api.GetButtonsTable(Port));
 					MonitoredDeviceInfo.Model = Api.GetModel(Port);
 					MonitoredDeviceInfo.SerialNumber = Api.GetSerialNumber(Port);

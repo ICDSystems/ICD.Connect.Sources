@@ -15,7 +15,6 @@ using ICD.Connect.API.Nodes;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 using ICD.Connect.Devices.EventArguments;
-using ICD.Connect.Devices.Telemetry;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
@@ -23,7 +22,6 @@ using ICD.Connect.Settings;
 using ICD.Connect.Sources.Barco.API;
 using ICD.Connect.Sources.Barco.Devices.Controls;
 using ICD.Connect.Sources.Barco.Responses.Common;
-using ICD.Connect.Telemetry.Attributes;
 
 namespace ICD.Connect.Sources.Barco.Devices
 {
@@ -77,13 +75,6 @@ namespace ICD.Connect.Sources.Barco.Devices
 		public event EventHandler<StringEventArgs> OnVersionChanged;
 
 		/// <summary>
-		/// Raised when we receive a new software version.
-		/// </summary>
-		[PublicAPI]
-		[EventTelemetry(DeviceTelemetryNames.DEVICE_FIRMWARE_VERSION_CHANGED)]
-		public event EventHandler<StringEventArgs> OnSoftwareVersionChanged;
-
-		/// <summary>
 		/// Raised when the first button starts sharing, or all buttons have stopped sharing.
 		/// </summary>
 		[PublicAPI]
@@ -94,27 +85,6 @@ namespace ICD.Connect.Sources.Barco.Devices
 		/// </summary>
 		[PublicAPI]
 		public event EventHandler OnButtonsChanged;
-
-		[EventTelemetry(DeviceTelemetryNames.DEVICE_DHCP_STATUS_CHANGED)]
-		public event EventHandler<BoolEventArgs> OnLanDhcpEnabledChanged;
-
-		[EventTelemetry(DeviceTelemetryNames.DEVICE_IP_ADDRESS_CHANGED)]
-		public event EventHandler<StringEventArgs> OnLanIpAddressChanged;
-
-		[EventTelemetry(DeviceTelemetryNames.DEVICE_IP_SUBNET_CHANGED)]
-		public event EventHandler<StringEventArgs> OnLanSubnetMaskChanged;
-
-		[EventTelemetry(DeviceTelemetryNames.DEVICE_IP_GATEWAY_CHANGED)]
-		public event EventHandler<StringEventArgs> OnLanGatewayChanged;
-
-		[EventTelemetry(DeviceTelemetryNames.DEVICE_HOSTNAME_CHANGED)]
-		public event EventHandler<StringEventArgs> OnLanHostnameChanged;
-
-		[EventTelemetry(DeviceTelemetryNames.DEVICE_IP_ADDRESS_SECONDARY_CHANGED)]
-		public event EventHandler<StringEventArgs> OnWlanIpAddressChanged;
-
-		[EventTelemetry(DeviceTelemetryNames.DEVICE_MAC_ADDRESS_SECONDARY_CHANGED)]
-		public event EventHandler<StringEventArgs> OnWlanMacAddressChanged;
 
 		#endregion
 
@@ -134,19 +104,9 @@ namespace ICD.Connect.Sources.Barco.Devices
 
 		private bool m_Sharing;
 		private Version m_Version;
-		private Version m_SoftwareVersion;
 		private long m_SharingUpdateInterval;
 		private int m_UpdateCount;
 		private int m_ConsecutivePortFailures;
-
-		private bool m_LanDhcpEnabled;
-		private string m_LanIpAddress;
-		private string m_LanSubnetMask;
-		private string m_LanGateway;
-		private string m_LanHostname;
-
-		private string m_WlanIpAddress;
-		private string m_WlanMacAddress;
 
 		#endregion
 
@@ -169,27 +129,6 @@ namespace ICD.Connect.Sources.Barco.Devices
 				Logger.LogSetTo(eSeverity.Informational, "Version", m_Version);
 
 				OnVersionChanged.Raise(this, new StringEventArgs(m_Version.ToString()));
-			}
-		}
-
-		/// <summary>
-		/// Gets the software version running on the clickshare.
-		/// </summary>
-		[PublicAPI]
-		[PropertyTelemetry(DeviceTelemetryNames.DEVICE_FIRMWARE_VERSION, null, DeviceTelemetryNames.DEVICE_FIRMWARE_VERSION_CHANGED)]
-		public Version SoftwareVersion
-		{
-			get { return m_SoftwareVersion; }
-			protected set
-			{
-				if (value == m_SoftwareVersion)
-					return;
-
-				m_SoftwareVersion = value;
-
-				Logger.LogSetTo(eSeverity.Informational, "Software Version", m_SoftwareVersion);
-
-				OnSoftwareVersionChanged.Raise(this, new StringEventArgs(m_SoftwareVersion.ToString()));
 			}
 		}
 
@@ -219,120 +158,6 @@ namespace ICD.Connect.Sources.Barco.Devices
 						                       ? new Activity(Activity.ePriority.High, "Sharing", "Sharing", eSeverity.Informational)
 						                       : new Activity(Activity.ePriority.Low, "Sharing", "Not Sharing", eSeverity.Informational));
 				}
-			}
-		}
-
-		[PropertyTelemetry(DeviceTelemetryNames.DEVICE_DHCP_STATUS, null, DeviceTelemetryNames.DEVICE_DHCP_STATUS_CHANGED)]
-		public bool LanDhcpEnabled
-		{
-			get { return m_LanDhcpEnabled; }
-			protected set
-			{
-				if (m_LanDhcpEnabled == value)
-					return;
-
-				m_LanDhcpEnabled = value;
-
-				OnLanDhcpEnabledChanged.Raise(this, new BoolEventArgs(value));
-			}
-		}
-
-		[PropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_ADDRESS, null, DeviceTelemetryNames.DEVICE_IP_ADDRESS_CHANGED)]
-		public string LanIpAddress
-		{
-			get
-			{
-				return m_LanIpAddress;
-			}
-			protected set
-			{
-				if (m_LanIpAddress == value)
-					return;
-
-				m_LanIpAddress = value;
-
-				OnLanIpAddressChanged.Raise(this, new StringEventArgs(value));
-			}
-		}
-
-		[PropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_SUBNET, null, DeviceTelemetryNames.DEVICE_IP_SUBNET_CHANGED)]
-		public string LanSubnetMask
-		{
-			get
-			{
-				return m_LanSubnetMask;
-			}
-			protected set
-			{
-				if (m_LanSubnetMask == value)
-					return;
-
-				m_LanSubnetMask = value;
-
-				OnLanSubnetMaskChanged.Raise(this, new StringEventArgs(value));
-			}
-		}
-
-		[PropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_GATEWAY, null, DeviceTelemetryNames.DEVICE_IP_GATEWAY_CHANGED)]
-		public string LanGateway
-		{
-			get { return m_LanGateway; }
-			protected set
-			{
-				if (m_LanGateway == value)
-					return;
-
-				m_LanGateway = value;
-
-				OnLanGatewayChanged.Raise(this, new StringEventArgs(value));
-			}
-		}
-
-		[PropertyTelemetry(DeviceTelemetryNames.DEVICE_HOSTNAME, null, DeviceTelemetryNames.DEVICE_HOSTNAME_CHANGED)]
-		public string LanHostname
-		{
-			get { return m_LanHostname; }
-			protected set
-			{
-				if (m_LanHostname == value)
-					return;
-
-				m_LanHostname = value;
-
-				OnLanHostnameChanged.Raise(this, new StringEventArgs(value));
-			}
-		}
-
-		[PropertyTelemetry(DeviceTelemetryNames.DEVICE_IP_ADDRESS_SECONDARY, null, DeviceTelemetryNames.DEVICE_IP_ADDRESS_SECONDARY_CHANGED)]
-		public string WlanIpAddress
-		{
-			get
-			{
-				return m_WlanIpAddress;
-			}
-			protected set
-			{
-				if (m_WlanIpAddress == value)
-					return;
-
-				m_WlanIpAddress = value;
-
-				OnWlanIpAddressChanged.Raise(this, new StringEventArgs(value));
-			}
-		}
-
-		[PropertyTelemetry(DeviceTelemetryNames.DEVICE_MAC_ADDRESS_SECONDARY, null, DeviceTelemetryNames.DEVICE_MAC_ADDRESS_SECONDARY_CHANGED)]
-		public string WlanMacAddress
-		{
-			get { return m_WlanMacAddress; }
-			protected set
-			{
-				if (m_WlanMacAddress == value)
-					return;
-
-				m_WlanMacAddress = value;
-
-				OnWlanMacAddressChanged.Raise(this, new StringEventArgs(value));
 			}
 		}
 
@@ -380,7 +205,6 @@ namespace ICD.Connect.Sources.Barco.Devices
 		protected override void DisposeFinal(bool disposing)
 		{
 			OnVersionChanged = null;
-			OnSoftwareVersionChanged = null;
 			OnSharingStatusChanged = null;
 			OnButtonsChanged = null;
 
@@ -474,10 +298,10 @@ namespace ICD.Connect.Sources.Barco.Devices
 				if (Sharing != oldSharing || m_UpdateCount == 0)
 				{
 					Version = m_Api.GetVersion(m_Port);
-					SoftwareVersion = m_Api.GetSoftwareVersion(m_Port);
+					MonitoredDeviceInfo.FirmwareVersion = m_Api.GetSoftwareVersion(m_Port).ToString();
 					UpdateButtons(m_Api.GetButtonsTable(m_Port));
-					Model = m_Api.GetModel(m_Port);
-					SerialNumber = m_Api.GetSerialNumber(m_Port);
+					MonitoredDeviceInfo.Model = m_Api.GetModel(m_Port);
+					MonitoredDeviceInfo.SerialNumber = m_Api.GetSerialNumber(m_Port);
 					UpdateLanInfo(m_Api.GetLan(m_Port));
 					UpdateWlanInfo(m_Api.GetWlan(m_Port));
 				}
@@ -527,17 +351,19 @@ namespace ICD.Connect.Sources.Barco.Devices
 
 		protected void UpdateLanInfo(LanInfo info)
 		{
-			LanDhcpEnabled = string.Equals(info.Addressing, "DHCP", StringComparison.OrdinalIgnoreCase);
-			LanIpAddress = info.IpAddress;
-			LanSubnetMask = info.SubnetMask;
-			LanGateway = info.DefaultGateway;
-			LanHostname = info.Hostname;
+			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(1).Name = "LAN";
+			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(1).Dhcp = string.Equals(info.Addressing, "DHCP", StringComparison.OrdinalIgnoreCase);
+			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(1).Ipv4Address = info.IpAddress;
+			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(1).Ipv4SubnetMask = info.SubnetMask;
+			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(1).Ipv4Gateway = info.DefaultGateway;
+			MonitoredDeviceInfo.NetworkInfo.Hostname = info.Hostname;
 		}
 
 		protected void UpdateWlanInfo(WlanInfo info)
 		{
-			WlanIpAddress = info.IpAddress;
-			WlanMacAddress = info.MacAddress;
+			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(2).Name = "WLAN";
+			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(2).Ipv4Address = info.IpAddress;
+			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(2).MacAddress = info.MacAddress;
 		}
 
 		/// <summary>
@@ -731,7 +557,6 @@ namespace ICD.Connect.Sources.Barco.Devices
 			base.BuildConsoleStatus(addRow);
 
 			addRow("Version", Version);
-			addRow("Software Version", SoftwareVersion);
 			addRow("Sharing", Sharing);
 		}
 
