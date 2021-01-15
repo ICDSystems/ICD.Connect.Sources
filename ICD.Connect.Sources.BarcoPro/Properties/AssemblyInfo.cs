@@ -4,4 +4,4 @@ using System.Reflection;
 [assembly: AssemblyCompany("ICD Systems")]
 [assembly: AssemblyProduct("ICD.Connect.Sources.BarcoPro")]
 [assembly: AssemblyCopyright("Copyright © ICD Systems 2021")]
-[assembly: AssemblyVersion("7.0.2.0")]
+[assembly: AssemblyVersion("7.1.0.0")]
