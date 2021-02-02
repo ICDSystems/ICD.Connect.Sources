@@ -556,7 +556,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		{
 			base.BuildConsoleStatus(addRow);
 
-			addRow("Version", Version);
+			addRow("API Version", Version);
 			addRow("Sharing", Sharing);
 		}
 
