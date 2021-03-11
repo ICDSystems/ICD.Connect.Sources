@@ -351,19 +351,19 @@ namespace ICD.Connect.Sources.Barco.Devices
 
 		protected void UpdateLanInfo(LanInfo info)
 		{
-			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(1).Name = "LAN";
-			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(1).Dhcp = string.Equals(info.Addressing, "DHCP", StringComparison.OrdinalIgnoreCase);
-			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(1).Ipv4Address = info.IpAddress;
-			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(1).Ipv4SubnetMask = info.SubnetMask;
-			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(1).Ipv4Gateway = info.DefaultGateway;
+			MonitoredDeviceInfo.NetworkInfo.Adapters.GetOrAddAdapter(1).Name = "LAN";
+			MonitoredDeviceInfo.NetworkInfo.Adapters.GetOrAddAdapter(1).Dhcp = string.Equals(info.Addressing, "DHCP", StringComparison.OrdinalIgnoreCase);
+			MonitoredDeviceInfo.NetworkInfo.Adapters.GetOrAddAdapter(1).Ipv4Address = info.IpAddress;
+			MonitoredDeviceInfo.NetworkInfo.Adapters.GetOrAddAdapter(1).Ipv4SubnetMask = info.SubnetMask;
+			MonitoredDeviceInfo.NetworkInfo.Adapters.GetOrAddAdapter(1).Ipv4Gateway = info.DefaultGateway;
 			MonitoredDeviceInfo.NetworkInfo.Hostname = info.Hostname;
 		}
 
 		protected void UpdateWlanInfo(WlanInfo info)
 		{
-			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(2).Name = "WLAN";
-			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(2).Ipv4Address = info.IpAddress;
-			MonitoredDeviceInfo.NetworkInfo.GetOrAddAdapter(2).MacAddress = info.MacAddress;
+			MonitoredDeviceInfo.NetworkInfo.Adapters.GetOrAddAdapter(2).Name = "WLAN";
+			MonitoredDeviceInfo.NetworkInfo.Adapters.GetOrAddAdapter(2).Ipv4Address = info.IpAddress;
+			MonitoredDeviceInfo.NetworkInfo.Adapters.GetOrAddAdapter(2).MacAddress = info.MacAddress;
 		}
 
 		/// <summary>
