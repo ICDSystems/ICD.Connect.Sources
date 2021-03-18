@@ -92,7 +92,6 @@
     <Compile Include="Streaming\IStreamTvTunerDevice.cs" />
     <Compile Include="Streaming\StreamTvTunerDevice.cs" />
     <Compile Include="Streaming\StreamTvTunerDeviceSettings.cs" />
-    <Compile Include="Streaming\StreamTvTunerRouteSourceControl.cs" />
     <Compile Include="TvPresets\ITvPresets.cs" />
     <Compile Include="TvPresets\SPlusInterfaces\SPlusTvPresetsInterface.cs" />
     <Compile Include="TvPresets\SPlusInterfaces\XmlTvPresetsFactory.cs" />

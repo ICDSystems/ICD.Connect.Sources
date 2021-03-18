@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Changed
  - Barco Clickshare - Clarify API Version in console status
+ - Remove StreamTvTunerRouteSourceControl & have StreamTvTunerDevice use new StreamSourceDeviceRoutingControl
 
 ## [7.1.0] - 2021-01-14
 ### Added

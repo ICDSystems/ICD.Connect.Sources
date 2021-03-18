@@ -9,6 +9,7 @@ using ICD.Connect.API.Commands;
 using ICD.Connect.API.Nodes;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
+using ICD.Connect.Routing.Devices.Streaming;
 using ICD.Connect.Settings;
 
 namespace ICD.Connect.Sources.TvTuner.Streaming
@@ -60,7 +61,7 @@ namespace ICD.Connect.Sources.TvTuner.Streaming
 		{
 			base.AddControls(settings, factory, addControl);
 
-			addControl(new StreamTvTunerRouteSourceControl(this, 0));
+			addControl(new StreamSourceDeviceRoutingControl(this, 0));
 		}
 
 		/// <summary>
