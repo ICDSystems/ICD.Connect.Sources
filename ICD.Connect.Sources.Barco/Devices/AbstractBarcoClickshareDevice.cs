@@ -15,6 +15,7 @@ using ICD.Connect.API.Nodes;
 using ICD.Connect.Devices;
 using ICD.Connect.Devices.Controls;
 using ICD.Connect.Devices.EventArguments;
+using ICD.Connect.Devices.Telemetry.DeviceInfo;
 using ICD.Connect.Protocol.Extensions;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Protocol.Network.Settings;
@@ -361,9 +362,12 @@ namespace ICD.Connect.Sources.Barco.Devices
 
 		protected void UpdateWlanInfo(WlanInfo info)
 		{
+			IcdPhysicalAddress mac;
+			IcdPhysicalAddress.TryParse(info.MacAddress, out mac);
+
 			MonitoredDeviceInfo.NetworkInfo.Adapters.GetOrAddAdapter(2).Name = "WLAN";
 			MonitoredDeviceInfo.NetworkInfo.Adapters.GetOrAddAdapter(2).Ipv4Address = info.IpAddress;
-			MonitoredDeviceInfo.NetworkInfo.Adapters.GetOrAddAdapter(2).MacAddress = info.MacAddress;
+			MonitoredDeviceInfo.NetworkInfo.Adapters.GetOrAddAdapter(2).MacAddress = mac;
 		}
 
 		/// <summary>
