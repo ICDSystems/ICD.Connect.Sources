@@ -1,5 +1,6 @@
 ﻿using System;
 using ICD.Common.Properties;
+using ICD.Common.Utils;
 using ICD.Common.Utils.Extensions;
 using ICD.Common.Utils.Json;
 using Newtonsoft.Json;
@@ -120,42 +121,49 @@ namespace ICD.Connect.Sources.Barco.Responses.Common
 		/// <param name="serializer"></param>
 		protected override void ReadProperty(string property, JsonReader reader, Button instance, JsonSerializer serializer)
 		{
-			// Supports API v1 & v2 which have different capitalization rules 
-			switch (property.ToLower())
+			try
 			{
-				case PROP_ID:
-					instance.Id = reader.GetValueAsInt();
-					break;
-				case PROP_CONNECTED:
-					instance.Connected = reader.GetValueAsBool();
-					break;
-				case PROP_CONNECTION_COUNT:
-					instance.ConnectionCount = reader.GetValueAsInt();
-					break;
-				case PROP_FIRMWARE_VERSION:
-					instance.Version = reader.GetValueAsString();
-					break;
-				case PROP_IP_ADDRESS:
-					instance.Ip = reader.GetValueAsString();
-					break;
-				case PROP_LAST_CONNECTED:
-					instance.LastConnected = reader.GetValueAsDateTime().ToUniversalTime();
-					break;
-				case PROP_LAST_PAIRED:
-					instance.LastPaired = reader.GetValueAsDateTime().ToUniversalTime();
-					break;
-				case PROP_MAC_ADDRESS:
-					instance.MacAddress = reader.GetValueAsString();
-					break;
-				case PROP_SERIAL_NUMBER:
-					instance.SerialNumber = reader.GetValueAsString();
-					break;
-				case PROP_STATUS:
-					instance.Status = reader.GetValueAsEnum<Button.eStatus>();
-					break;
-				default:
-					base.ReadProperty(property, reader, instance, serializer);
-					break;
+				// Supports API v1 & v2 which have different capitalization rules
+				switch (property.ToLower())
+				{
+					case PROP_ID:
+						instance.Id = reader.GetValueAsInt();
+						break;
+					case PROP_CONNECTED:
+						instance.Connected = reader.GetValueAsBool();
+						break;
+					case PROP_CONNECTION_COUNT:
+						instance.ConnectionCount = reader.GetValueAsInt();
+						break;
+					case PROP_FIRMWARE_VERSION:
+						instance.Version = reader.GetValueAsString();
+						break;
+					case PROP_IP_ADDRESS:
+						instance.Ip = reader.GetValueAsString();
+						break;
+					case PROP_LAST_CONNECTED:
+						instance.LastConnected = reader.GetValueAsDateTime().ToUniversalTime();
+						break;
+					case PROP_LAST_PAIRED:
+						instance.LastPaired = reader.GetValueAsDateTime().ToUniversalTime();
+						break;
+					case PROP_MAC_ADDRESS:
+						instance.MacAddress = reader.GetValueAsString();
+						break;
+					case PROP_SERIAL_NUMBER:
+						instance.SerialNumber = reader.GetValueAsString();
+						break;
+					case PROP_STATUS:
+						instance.Status = reader.GetValueAsEnum<Button.eStatus>();
+						break;
+					default:
+						base.ReadProperty(property, reader, instance, serializer);
+						break;
+				}
+			}
+			catch (Exception)
+			{
+				IcdErrorLog.Error("Failed to read Barco Clickshare button property - \"{0}\"", property);
 			}
 		}
 	}
