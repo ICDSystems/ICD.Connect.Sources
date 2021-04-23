@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+ - AppleTv driver, a source routing device that can be controlled with an IR port.
+
 ### Changed
  - Barco Clickshare - Clarify API Version in console status
  - Remove StreamTvTunerRouteSourceControl & have StreamTvTunerDevice use new StreamSourceDeviceRoutingControl
