@@ -13,6 +13,7 @@ using ICD.Connect.Conferencing.DialContexts;
 using ICD.Connect.Conferencing.EventArguments;
 using ICD.Connect.Conferencing.IncomingCalls;
 using ICD.Connect.Conferencing.Participants;
+using ICD.Connect.Conferencing.Participants.Enums;
 using ICD.Connect.Sources.Barco.Responses.v2;
 
 namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
