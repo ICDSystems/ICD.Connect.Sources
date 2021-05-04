@@ -18,7 +18,7 @@ using ICD.Connect.Sources.Barco.Responses.v2;
 
 namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 {
-	public sealed class BarcoClickshareConferenceDeviceConferenceControl : AbstractConferenceDeviceControl<BarcoClickshareConferenceDevice, TraditionalConference>
+	public sealed class BarcoClickshareConferenceDeviceConferenceControl : AbstractConferenceDeviceControl<BarcoClickshareConferenceDevice, Conference>
 	{
 		#region Events
 
@@ -32,23 +32,13 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 		/// </summary>
 		public override event EventHandler<GenericEventArgs<IIncomingCall>> OnIncomingCallRemoved;
 
-		/// <summary>
-		/// Raised when a conference is added to the dialing control.
-		/// </summary>
-		public override event EventHandler<ConferenceEventArgs> OnConferenceAdded;
-
-		/// <summary>
-		/// Raised when a conference is removed from the dialing control.
-		/// </summary>
-		public override event EventHandler<ConferenceEventArgs> OnConferenceRemoved;
-
 		#endregion
 
 		private readonly IcdHashSet<UsbPeripheral> m_ConferencePeripherals;
 		private readonly SafeCriticalSection m_ConferencePeripheralsSection;
 
 		[CanBeNull]
-		private TraditionalConference m_ActiveConference;
+		private Conference m_ActiveConference;
 
 		#region Properties
 
@@ -69,7 +59,7 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 
 			Subscribe(parent);
 
-			SupportedConferenceFeatures = eConferenceFeatures.None;
+			SupportedConferenceControlFeatures = eConferenceControlFeatures.None;
 		}
 
 		protected override void DisposeFinal(bool disposing)
@@ -83,7 +73,7 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 
 		#region Methods
 
-		public override IEnumerable<TraditionalConference> GetConferences()
+		public override IEnumerable<Conference> GetConferences()
 		{
 			if (m_ActiveConference != null)
 				yield return m_ActiveConference;
@@ -119,6 +109,16 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 			throw new NotSupportedException();
 		}
 
+		public override void StartPersonalMeeting()
+		{
+			throw new NotSupportedException();
+		}
+
+		public override void EnableCallLock(bool enabled)
+		{
+			throw new NotSupportedException();
+		}
+
 		#endregion
 
 		#region Private Methods
@@ -144,7 +144,7 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 
 			DateTime now = IcdEnvironment.GetUtcTime();
 
-			ThinTraditionalParticipant participant = new ThinTraditionalParticipant
+			ThinParticipant participant = new ThinParticipant
 			{
 				HangupCallback = HangupParticipant
 			};
@@ -155,10 +155,10 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 			participant.SetStart(now);
 			participant.SetStatus(eParticipantStatus.Connected);
 
-			m_ActiveConference = new TraditionalConference();
+			m_ActiveConference = new Conference();
 			m_ActiveConference.AddParticipant(participant);
 
-			OnConferenceAdded.Raise(this, new ConferenceEventArgs(m_ActiveConference));
+			RaiseOnConferenceAdded(this, new ConferenceEventArgs(m_ActiveConference));
 		}
 
 		private void EndConference()
@@ -171,14 +171,14 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 			var endedConference = m_ActiveConference;
 			m_ActiveConference = null;
 
-			OnConferenceRemoved.Raise(this, new ConferenceEventArgs(endedConference));
+			RaiseOnConferenceRemoved(this, new ConferenceEventArgs(endedConference));
 		}
 
 		private void TransitionCallTypeToAudio()
 		{
 			if (m_ActiveConference != null)
 				m_ActiveConference.GetParticipants()
-				                  .Cast<ThinTraditionalParticipant>()
+				                  .Cast<ThinParticipant>()
 				                  .ForEach(p => p.SetCallType(eCallType.Audio));
 		}
 
@@ -186,7 +186,7 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 		{
 			if (m_ActiveConference != null)
 				m_ActiveConference.GetParticipants()
-								  .Cast<ThinTraditionalParticipant>()
+								  .Cast<ThinParticipant>()
 				                  .ForEach(p => p.SetCallType(eCallType.Video));
 		}
 
@@ -230,7 +230,7 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 			return AnyCamerasInUse() ? eCallType.Video : AnyMicrophonesInUse() ? eCallType.Audio : eCallType.Unknown;
 		}
 
-		private void HangupParticipant(ThinTraditionalParticipant participant)
+		private void HangupParticipant(ThinParticipant participant)
 		{
 			participant.SetStatus(eParticipantStatus.Disconnected);
 			participant.SetEnd(IcdEnvironment.GetUtcTime());
