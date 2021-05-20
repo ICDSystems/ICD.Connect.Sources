@@ -3,8 +3,4 @@
 	public interface IBarcoClickshareApiV2Response
 	{
 	}
-
-	public interface IBarcoClickshareApiV2Response<T> : IBarcoClickshareApiV2Response
-	{
-	}
 }
