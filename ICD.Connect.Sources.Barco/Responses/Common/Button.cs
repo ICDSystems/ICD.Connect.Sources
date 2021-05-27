@@ -142,10 +142,14 @@ namespace ICD.Connect.Sources.Barco.Responses.Common
 						instance.Ip = reader.GetValueAsString();
 						break;
 					case PROP_LAST_CONNECTED:
-						instance.LastConnected = reader.GetValueAsDateTime().ToUniversalTime();
+						instance.LastConnected = string.IsNullOrEmpty(reader.GetValueAsString())
+							                         ? default(DateTime?)
+							                         : reader.GetValueAsDateTime().ToUniversalTime();
 						break;
 					case PROP_LAST_PAIRED:
-						instance.LastPaired = reader.GetValueAsDateTime().ToUniversalTime();
+						instance.LastPaired = string.IsNullOrEmpty(reader.GetValueAsString())
+							                      ? default(DateTime?)
+							                      : reader.GetValueAsDateTime().ToUniversalTime();
 						break;
 					case PROP_MAC_ADDRESS:
 						instance.MacAddress = reader.GetValueAsString();
