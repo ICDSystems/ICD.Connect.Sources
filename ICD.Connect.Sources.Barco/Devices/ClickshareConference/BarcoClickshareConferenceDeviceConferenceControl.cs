@@ -18,7 +18,7 @@ using ICD.Connect.Sources.Barco.Responses.v2;
 
 namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 {
-	public sealed class BarcoClickshareConferenceDeviceConferenceControl : AbstractConferenceDeviceControl<BarcoClickshareConferenceDevice, Conference>
+	public sealed class BarcoClickshareConferenceDeviceConferenceControl : AbstractConferenceDeviceControl<BarcoClickshareConferenceDevice, ThinConference>
 	{
 		#region Events
 
@@ -38,7 +38,7 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 		private readonly SafeCriticalSection m_ConferencePeripheralsSection;
 
 		[CanBeNull]
-		private Conference m_ActiveConference;
+		private ThinConference m_ActiveConference;
 
 		#region Properties
 
@@ -73,7 +73,7 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 
 		#region Methods
 
-		public override IEnumerable<Conference> GetConferences()
+		public override IEnumerable<ThinConference> GetConferences()
 		{
 			if (m_ActiveConference != null)
 				yield return m_ActiveConference;
@@ -155,7 +155,7 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 			participant.SetStart(now);
 			participant.SetStatus(eParticipantStatus.Connected);
 
-			m_ActiveConference = new Conference();
+			m_ActiveConference = new ThinConference();
 			m_ActiveConference.AddParticipant(participant);
 
 			RaiseOnConferenceAdded(this, new ConferenceEventArgs(m_ActiveConference));
