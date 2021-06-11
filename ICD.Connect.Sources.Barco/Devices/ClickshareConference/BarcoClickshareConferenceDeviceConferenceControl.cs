@@ -156,9 +156,11 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 			participant.SetStatus(eParticipantStatus.Connected);
 
 			m_ActiveConference = new ThinConference();
-			m_ActiveConference.AddParticipant(participant);
 
 			RaiseOnConferenceAdded(this, new ConferenceEventArgs(m_ActiveConference));
+
+			// ReSharper disable once PossibleNullReferenceException
+			m_ActiveConference.AddParticipant(participant);
 		}
 
 		private void EndConference()
