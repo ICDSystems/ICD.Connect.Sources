@@ -168,7 +168,7 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 			if (m_ActiveConference == null)
 				return;
 
-			m_ActiveConference.Hangup();
+			m_ActiveConference.EndConference();
 
 			var endedConference = m_ActiveConference;
 			m_ActiveConference = null;
