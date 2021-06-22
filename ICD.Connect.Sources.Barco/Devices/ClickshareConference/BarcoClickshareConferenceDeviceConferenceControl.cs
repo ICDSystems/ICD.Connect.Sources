@@ -12,7 +12,6 @@ using ICD.Connect.Conferencing.Controls.Dialing;
 using ICD.Connect.Conferencing.DialContexts;
 using ICD.Connect.Conferencing.EventArguments;
 using ICD.Connect.Conferencing.IncomingCalls;
-using ICD.Connect.Conferencing.Participants;
 using ICD.Connect.Conferencing.Participants.Enums;
 using ICD.Connect.Sources.Barco.Responses.v2;
 
@@ -31,6 +30,9 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 		/// Raised when an incoming call is removed from the dialing control.
 		/// </summary>
 		public override event EventHandler<GenericEventArgs<IIncomingCall>> OnIncomingCallRemoved;
+
+		public override event EventHandler<ConferenceEventArgs> OnConferenceAdded;
+		public override event EventHandler<ConferenceEventArgs> OnConferenceRemoved;
 
 		#endregion
 
@@ -144,23 +146,19 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 
 			DateTime now = IcdEnvironment.GetUtcTime();
 
-			ThinParticipant participant = new ThinParticipant
+			ThinConference conference = new ThinConference
 			{
-				HangupCallback = HangupParticipant
+				Name = "Clickshare Conference",
+				AnswerState = eCallAnswerState.Answered,
+				CallType = DetermineCallTypeFromPeripherals(),
+				DialTime = now,
+				StartTime = now,
+				Status = eConferenceStatus.Connected
 			};
-			participant.SetName("Clickshare Conference");
-			participant.SetAnswerState(eCallAnswerState.Answered);
-			participant.SetCallType(DetermineCallTypeFromPeripherals());
-			participant.SetDialTime(now);
-			participant.SetStart(now);
-			participant.SetStatus(eParticipantStatus.Connected);
 
-			m_ActiveConference = new ThinConference();
+			m_ActiveConference = conference;
 
-			RaiseOnConferenceAdded(this, new ConferenceEventArgs(m_ActiveConference));
-
-			// ReSharper disable once PossibleNullReferenceException
-			m_ActiveConference.AddParticipant(participant);
+			OnConferenceAdded.Raise(this, conference);
 		}
 
 		private void EndConference()
@@ -168,28 +166,25 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 			if (m_ActiveConference == null)
 				return;
 
-			m_ActiveConference.EndConference();
+			m_ActiveConference.EndTime = IcdEnvironment.GetUtcTime();
+			m_ActiveConference.Status = eConferenceStatus.Disconnected;
 
-			var endedConference = m_ActiveConference;
+			ThinConference endedConference = m_ActiveConference;
 			m_ActiveConference = null;
 
-			RaiseOnConferenceRemoved(this, new ConferenceEventArgs(endedConference));
+			OnConferenceRemoved.Raise(this, endedConference);
 		}
 
 		private void TransitionCallTypeToAudio()
 		{
 			if (m_ActiveConference != null)
-				m_ActiveConference.GetParticipants()
-				                  .Cast<ThinParticipant>()
-				                  .ForEach(p => p.SetCallType(eCallType.Audio));
+				m_ActiveConference.CallType = eCallType.Audio;
 		}
 
 		private void TransitionCallTypeToVideo()
 		{
 			if (m_ActiveConference != null)
-				m_ActiveConference.GetParticipants()
-								  .Cast<ThinParticipant>()
-				                  .ForEach(p => p.SetCallType(eCallType.Video));
+				m_ActiveConference.CallType = eCallType.Video;
 		}
 
 		private bool AnyCamerasOrMicrophonesInUse()
@@ -230,15 +225,6 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 		private eCallType DetermineCallTypeFromPeripherals()
 		{
 			return AnyCamerasInUse() ? eCallType.Video : AnyMicrophonesInUse() ? eCallType.Audio : eCallType.Unknown;
-		}
-
-		private void HangupParticipant(ThinParticipant participant)
-		{
-			participant.SetStatus(eParticipantStatus.Disconnected);
-			participant.SetEnd(IcdEnvironment.GetUtcTime());
-
-			if (m_ActiveConference != null)
-				m_ActiveConference.RemoveParticipant(participant);
 		}
 
 		#endregion
