@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Changed
  - Barco Clickshare - Clarify API Version in console status
+ - Barco Clickshare - Copy API Version on CopySettings
+ - Bacro Clickshare - Don't request WLAN settings for CSM-1 devices (unsupported)
+ - Barco ClickshareConference - Don't start a conference if just speaker is being used
 
 ## [7.1.0] - 2021-01-14
 ### Added
