@@ -7,6 +7,8 @@ namespace ICD.Connect.Sources.Barco.API
 {
 	public interface IBarcoClickshareApi
 	{
+		string ApiVersion { get; }
+
 		bool GetSharingState(IWebPort port);
 
 		Version GetVersion(IWebPort port);

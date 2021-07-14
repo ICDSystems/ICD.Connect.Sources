@@ -457,6 +457,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			base.CopySettingsFinal(settings);
 
 			settings.Port = m_Port == null ? (int?)null : m_Port.Id;
+			settings.ApiVersion = Api.ApiVersion;
 
 			settings.Copy(m_UriProperties);
 			settings.Copy(m_WebProxyProperties);
@@ -470,6 +471,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			base.ClearSettingsFinal();
 
 			SetPort(null);
+			m_Api = null;
 
 			m_UriProperties.ClearUriProperties();
 			m_WebProxyProperties.ClearProxyProperties();

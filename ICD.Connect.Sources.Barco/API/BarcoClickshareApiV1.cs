@@ -30,6 +30,12 @@ namespace ICD.Connect.Sources.Barco.API
 
 		#endregion
 
+		#region Properties
+
+		public string ApiVersion { get { return "1.0"; } }
+
+		#endregion
+
 		#region Polling
 
 		public bool GetSharingState(IWebPort port)
