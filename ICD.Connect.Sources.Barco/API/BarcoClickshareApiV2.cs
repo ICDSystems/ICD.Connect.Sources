@@ -20,6 +20,8 @@ namespace ICD.Connect.Sources.Barco.API
 
 		private const string VERSION = "v2";
 
+		public string ApiVersion{get { return "2.0"; }}
+
 
 		public bool GetSharingState(IWebPort port)
 		{

@@ -57,6 +57,8 @@ namespace ICD.Connect.Sources.Barco.Devices
 
 		private const string PORT_ACCEPT = "application/json";
 
+		private const string CSM_ONE_MODEL = "CSM-1";
+
 		// ReSharper disable once StaticFieldInGenericType
 		private static readonly Dictionary<Version, Func<IBarcoClickshareApi>> s_ApiVersions =
 			new Dictionary<Version, Func<IBarcoClickshareApi>>(new UndefinedVersionEqualityComparer())
@@ -304,7 +306,9 @@ namespace ICD.Connect.Sources.Barco.Devices
 					MonitoredDeviceInfo.Model = m_Api.GetModel(m_Port);
 					MonitoredDeviceInfo.SerialNumber = m_Api.GetSerialNumber(m_Port);
 					UpdateLanInfo(m_Api.GetLan(m_Port));
-					UpdateWlanInfo(m_Api.GetWlan(m_Port));
+					// CSM-1 API doesn't support GetWlan
+					if (!string.IsNullOrEmpty(MonitoredDeviceInfo.Model) && MonitoredDeviceInfo.Model != CSM_ONE_MODEL)
+						UpdateWlanInfo(m_Api.GetWlan(m_Port));
 				}
 
 				m_UpdateCount = (m_UpdateCount + 1) % INFO_UPDATE_OCCURRENCE;
@@ -457,6 +461,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			base.CopySettingsFinal(settings);
 
 			settings.Port = m_Port == null ? (int?)null : m_Port.Id;
+			settings.ApiVersion = Api.ApiVersion;
 
 			settings.Copy(m_UriProperties);
 			settings.Copy(m_WebProxyProperties);
@@ -470,6 +475,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			base.ClearSettingsFinal();
 
 			SetPort(null);
+			m_Api = null;
 
 			m_UriProperties.ClearUriProperties();
 			m_WebProxyProperties.ClearProxyProperties();

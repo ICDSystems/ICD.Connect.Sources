@@ -15,6 +15,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
  - Remove StreamTvTunerRouteSourceControl & have StreamTvTunerDevice use new StreamSourceDeviceRoutingControl
  - BarcoClickshareConferenceDevice now implements IByodHubDevice
 
+## [7.1.1] - 2021-07-16
+### Changed
+ - Barco Clickshare - Clarify API Version in console status
+ - Barco Clickshare - Copy API Version on CopySettings
+ - Bacro Clickshare - Don't request WLAN settings for CSM-1 devices (unsupported)
+ - Barco ClickshareConference - Don't start a conference if just speaker is being used
+
 ## [7.1.0] - 2021-01-14
 ### Added
  - Barco Clickshare CX30 support through implementation of their V2 API

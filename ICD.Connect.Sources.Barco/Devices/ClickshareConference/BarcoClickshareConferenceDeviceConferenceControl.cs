@@ -6,6 +6,7 @@ using ICD.Common.Utils;
 using ICD.Common.Utils.Collections;
 using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Extensions;
+using ICD.Connect.API.Nodes;
 using ICD.Connect.Conferencing.Conferences;
 using ICD.Connect.Conferencing.Controls.Dialing;
 using ICD.Connect.Conferencing.DialContexts;
@@ -123,10 +124,10 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 
 		private void UpdateConferenceState()
 		{
-			if (m_ActiveConference == null && AnyUsbPeripheralsInUse())
+			if (m_ActiveConference == null && AnyCamerasOrMicrophonesInUse())
 				StartConference();
 
-			else if (m_ActiveConference != null && m_ActiveConference.IsActive() && !AnyUsbPeripheralsInUse())
+			else if (m_ActiveConference != null && m_ActiveConference.IsActive() && !AnyCamerasOrMicrophonesInUse())
 				EndConference();
 
 			else if (m_ActiveConference != null && m_ActiveConference.CallType.HasFlag(eCallType.Video) && !AnyCamerasInUse())
@@ -188,13 +189,9 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 				                  .ForEach(p => p.SetCallType(eCallType.Video));
 		}
 
-		/// <summary>
-		/// Helper method to check if any USB peripherals are in use.
-		/// </summary>
-		/// <returns></returns>
-		private bool AnyUsbPeripheralsInUse()
+		private bool AnyCamerasOrMicrophonesInUse()
 		{
-			return AnyCamerasInUse() || AnyMicrophonesInUse() || AnySpeakersInUse();
+			return AnyCamerasInUse() || AnyMicrophonesInUse();
 		}
 
 		/// <summary>
@@ -217,17 +214,6 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 			return m_ConferencePeripheralsSection.Execute(() => m_ConferencePeripherals
 			                                                    .SelectMany(p => p.Microphones)
 			                                                    .Any(m => m.InUse));
-		}
-
-		/// <summary>
-		/// Flattens all speaker peripherals and checks if any are being used.
-		/// </summary>
-		/// <returns></returns>
-		private bool AnySpeakersInUse()
-		{
-			return m_ConferencePeripheralsSection.Execute(() => m_ConferencePeripherals
-			                                                    .SelectMany(p => p.Speakers)
-			                                                    .Any(s => s.InUse));
 		}
 
 		/// <summary>
@@ -291,6 +277,21 @@ namespace ICD.Connect.Sources.Barco.Devices.ClickshareConference
 			}
 
 			UpdateConferenceState();
+		}
+
+		#endregion
+
+		#region Console
+
+		/// <summary>
+		/// Calls the delegate for each console status item.
+		/// </summary>
+		/// <param name="addRow"></param>
+		public override void BuildConsoleStatus(AddStatusRowDelegate addRow)
+		{
+			base.BuildConsoleStatus(addRow);
+			addRow("Any Cameras In Use", AnyCamerasInUse());
+			addRow("Any Microphones In Use", AnyMicrophonesInUse());
 		}
 
 		#endregion
