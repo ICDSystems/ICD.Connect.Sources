@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [7.2.1] - 2021-08-03
+### Changed
+ - Barco Clickshare - Fixed handling of null datetime responses for buttons
+
 ## [7.2.0] - 2021-05-14
 ### Added
  - AppleTv driver, a source routing device that can be controlled with an IR port.
