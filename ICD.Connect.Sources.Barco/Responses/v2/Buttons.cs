@@ -1,8 +1,13 @@
-﻿using System.Collections.Generic;
+﻿#if NETFRAMEWORK
+extern alias RealNewtonsoft;
+using RealNewtonsoft.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
+using System.Collections.Generic;
 using System.Linq;
 using ICD.Common.Utils.Collections;
 using ICD.Connect.Sources.Barco.Responses.Common;
-using Newtonsoft.Json;
 
 namespace ICD.Connect.Sources.Barco.Responses.v2
 {

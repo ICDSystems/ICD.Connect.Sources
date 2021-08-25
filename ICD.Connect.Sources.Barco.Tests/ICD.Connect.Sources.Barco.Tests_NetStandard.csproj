@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
 	<RootNamespace>ICD.Connect.Sources.Barco.Tests</RootNamespace>
 	<AssemblyName>ICD.Connect.Sources.Barco.Tests</AssemblyName>
 	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -33,6 +33,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\ICD.Connect.Sources.Barco\ICD.Connect.Sources.Barco_NetStandard.csproj" />
+    <PackageReference Condition="'$(TargetFramework)' == 'net472'" Include="Newtonsoft.Json" Version="13.0.1" Aliases="RealNewtonsoft"/>
   </ItemGroup>
 
   <ItemGroup>

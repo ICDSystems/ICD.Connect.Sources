@@ -1,6 +1,11 @@
-﻿using System;
-using ICD.Connect.Sources.Barco.Responses.Common;
+﻿#if NETFRAMEWORK
+extern alias RealNewtonsoft;
+using RealNewtonsoft.Newtonsoft.Json;
+#else
 using Newtonsoft.Json;
+#endif
+using System;
+using ICD.Connect.Sources.Barco.Responses.Common;
 using NUnit.Framework;
 
 namespace ICD.Connect.Sources.Barco.Tests.Responses

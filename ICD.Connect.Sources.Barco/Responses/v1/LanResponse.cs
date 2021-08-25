@@ -1,5 +1,10 @@
-﻿using ICD.Connect.Sources.Barco.Responses.Common;
+﻿#if NETFRAMEWORK
+extern alias RealNewtonsoft;
+using RealNewtonsoft.Newtonsoft.Json;
+#else
 using Newtonsoft.Json;
+#endif
+using ICD.Connect.Sources.Barco.Responses.Common;
 
 namespace ICD.Connect.Sources.Barco.Responses.v1
 {
