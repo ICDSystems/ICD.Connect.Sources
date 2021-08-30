@@ -1,9 +1,14 @@
-﻿using System;
+﻿#if NETFRAMEWORK
+extern alias RealNewtonsoft;
+using RealNewtonsoft.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
+using System;
 using System.Collections.Generic;
 using ICD.Connect.Protocol.Network.Ports.Web;
 using ICD.Connect.Sources.Barco.Responses.Common;
 using ICD.Connect.Sources.Barco.Responses.v1;
-using Newtonsoft.Json;
 
 namespace ICD.Connect.Sources.Barco.API
 {
