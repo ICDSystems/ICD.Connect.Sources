@@ -12,13 +12,19 @@ using ICD.Connect.Protocol.Network.Settings;
 using ICD.Connect.Routing.Mock.Source;
 using ICD.Connect.Settings;
 using System.Collections.Generic;
+using ICD.Common.Utils.EventArguments;
 using ICD.Common.Utils.Timers;
+using ICD.Connect.Protocol.Network.Ports.Web.WebQueues;
 
 namespace ICD.Connect.Sources.Roku
 {
 	public sealed class RokuDevice : AbstractDevice<RokuDeviceSettings>
 	{
 		private const long APP_REFRESH_MILLISECONDS = 10 * 60 * 1000;
+
+		private const string APPS_QUERY = "/query/apps";
+		private const string ACTIVE_APP_QUERY = "/query/active-app";
+		private const string DEVICE_INFORMATION_QUERY = "/query/device-info";
 
 		#region Private Fields
 
@@ -27,6 +33,7 @@ namespace ICD.Connect.Sources.Roku
 		private readonly List<RokuApp> m_AppList;
 		private readonly SafeTimer m_AppTimer;
 
+		private readonly WebQueue m_RequestQueue;
 		private IWebPort m_Port;
 		private RokuApp m_ActiveApp;
 		private RokuDeviceInformation m_DeviceInformation;
@@ -41,6 +48,8 @@ namespace ICD.Connect.Sources.Roku
 
 		#endregion
 
+		#region Constructor
+
 		/// <summary>
 		/// Constructor.
 		/// </summary>
@@ -50,12 +59,19 @@ namespace ICD.Connect.Sources.Roku
 			m_UriProperties = new UriProperties();
 			m_AppList = new List<RokuApp>();
 			m_AppTimer = SafeTimer.Stopped(RefreshApps);
+
+			m_RequestQueue = new WebQueue();
 		}
+
+		#endregion
+
+		#region Methods
 
 		protected override void DisposeFinal(bool disposing)
 		{
 			base.DisposeFinal(disposing);
 
+			m_RequestQueue.Dispose();
 			m_AppTimer.Dispose();
 		}
 
@@ -69,77 +85,177 @@ namespace ICD.Connect.Sources.Roku
 			return m_Section.Execute(() => m_AppList.ToArray());
 		}
 
-		#region Port Callbacks
-
-		/// <summary>
-		/// Sets the port for communication with the service.
-		/// </summary>
-		/// <param name="port"></param>
-		[PublicAPI]
-		public void SetPort(IWebPort port)
+		public string GetAppIconUrl(int appId)
 		{
-			if (port == m_Port)
-				return;
-
-			m_AppTimer.Stop();
-
-			ConfigurePort(port);
-
-			Unsubscribe(m_Port);
-
-			if (port != null)
-				port.Accept = "application/xml";
-
-			m_Port = port;
-			Subscribe(m_Port);
-
-			UpdateCachedOnlineStatus();
-
-			if (port != null)
+			IcdUriBuilder builder = new IcdUriBuilder(m_Port.Uri)
 			{
-				RefreshDeviceInformation();
-				m_AppTimer.Reset(0, APP_REFRESH_MILLISECONDS);
+				Path = string.Format("/query/icon/{0}", appId)
+			};
+
+			return builder.ToString();
+		}
+
+		#endregion
+
+		#region API
+
+		public enum eRokuKeys
+		{
+			Home,
+			Rev,
+			Fwd,
+			Play,
+			Select,
+			Left,
+			Right,
+			Down,
+			Up,
+			Back,
+			InstantReplay,
+			Info,
+			Backspace,
+			Search,
+			Enter
+		}
+
+		public void RefreshApps()
+		{
+			Get(APPS_QUERY, response => ParseApps(response.DataAsString));
+		}
+
+		public void RefreshActiveApp()
+		{
+			Get(ACTIVE_APP_QUERY, response => ParseActiveApp(response.DataAsString));
+		}
+
+		public void RefreshDeviceInformation()
+		{
+			Get(DEVICE_INFORMATION_QUERY, response => ParseDeviceInformation(response.DataAsString));
+		}
+
+		/// <summary>
+		/// Sends an HTTP POST command to press and release a specific key
+		/// </summary>
+		/// <param name="key"></param>
+		public void Keypress(eRokuKeys key)
+		{
+			Post(string.Format("/keypress/{0}", key), response => {});
+		}
+
+		/// <summary>
+		/// Sends an HTTP POST command to press and hold a specific key
+		/// </summary>
+		/// <param name="key"></param>
+		public void Keydown(eRokuKeys key)
+		{
+			Post(string.Format("/keydown/{0}", key), response => {});
+		}
+
+		/// <summary>
+		/// Sends an HTTP POST command to release a specific key
+		/// </summary>
+		/// <param name="key"></param>
+		public void Keyup(eRokuKeys key)
+		{
+			Post(string.Format("/keyup/{0}", key), response => {});
+		}
+
+		public void KeypressKeyboard(string message)
+		{
+		    foreach (char messageChar in message)
+		        Post(string.Format("/keypress/Lit_{0}", messageChar), response => {});
+		}
+
+		public void LaunchApp(int appId)
+		{
+			Post(string.Format("/launch/{0}", appId), response => {});
+		}
+
+		public void InstallApp(int channelId)
+		{
+			Post(string.Format("/install/{0}", channelId), response => {});
+		}
+
+		public void RokuSearch(IEnumerable<KeyValuePair<eRokuSearchPar, string>> parameters)
+		{
+			string query = new RokuSearchQueryBuilder().Append(parameters).ToString();
+			Post(string.Format("/search/browse{0}", query), response => {});
+		}
+
+		private void Get(string path, Action<WebPortResponse> callback)
+		{
+			path = Uri.EscapeUriString(path);
+			IcdWebRequest request = CreateRequest(path, IcdWebRequest.eWebRequestType.Get, null, callback);
+			m_RequestQueue.Enqueue(request);
+		}
+
+		private void Post(string path, Action<WebPortResponse> callback)
+		{
+			path = Uri.EscapeUriString(path);
+			IcdWebRequest request = CreateRequest(path, IcdWebRequest.eWebRequestType.Post, new byte[0], callback);
+			m_RequestQueue.Enqueue(request);
+		}
+
+		#endregion
+
+		#region Private Methods
+
+		private IcdWebRequest CreateRequest(string path, IcdWebRequest.eWebRequestType requestType, byte[] data, Action<WebPortResponse> callback)
+        {
+			return new IcdWebRequest
+			{
+				RelativeOrAbsoluteUri = path,
+				RequestType = requestType,
+				Data = data,
+				Callback = callback
+			};
+        }
+
+		private void ParseApps(string xml)
+        {
+	        m_Section.Enter();
+
+	        try
+	        {
+		        IEnumerable<RokuApp> apps = RokuApp.ReadAppsFromXml(xml);
+
+		        m_AppList.Clear();
+		        m_AppList.AddRange(apps);
+	        }
+	        finally
+	        {
+		        m_Section.Leave();
+	        }
+		}
+
+		private void ParseActiveApp(string xml)
+        {
+	        m_Section.Enter();
+
+	        try
+	        {
+		        RokuApp activeApp = RokuApp.ReadActiveAppFromXml(xml);
+		        m_ActiveApp = activeApp;
+	        }
+	        finally
+	        {
+		        m_Section.Leave();
+	        }
+		}
+
+		private void ParseDeviceInformation(string xml)
+		{
+			m_Section.Enter();
+
+			try
+			{
+				RokuDeviceInformation deviceInformation = RokuDeviceInformation.ReadDeviceInformationFromXml(xml);
+				m_DeviceInformation = deviceInformation;
 			}
-		}
-
-		/// <summary>
-		/// Configures the given port for communication with the device.
-		/// </summary>
-		/// <param name="port"></param>
-		private void ConfigurePort(IWebPort port)
-		{
-			// URI
-			if (port != null)
-				port.ApplyDeviceConfiguration(m_UriProperties);
-		}
-
-		/// <summary>
-		/// Subscribe to the port events.
-		/// </summary>
-		/// <param name="port"></param>
-		private void Subscribe(IWebPort port)
-		{
-			if (port == null)
-				return;
-
-			port.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
-		}
-
-		/// <summary>
-		/// Unsubscribe from the port events.
-		/// </summary>
-		/// <param name="port"></param>
-		private void Unsubscribe(IWebPort port)
-		{
-			if (port == null)
-				return;
-
-			port.OnIsOnlineStateChanged -= PortOnIsOnlineStateChanged;
-		}
-
-		private void PortOnIsOnlineStateChanged(object sender, DeviceBaseOnlineStateApiEventArgs e)
-		{
-			UpdateCachedOnlineStatus();
+			finally
+			{
+				m_Section.Leave();
+			}
 		}
 
 		#endregion
@@ -214,161 +330,80 @@ namespace ICD.Connect.Sources.Roku
 
 		#endregion
 
-		#region GET Methods
+		#region Port Callbacks
 
-		public void RefreshApps()
+		/// <summary>
+		/// Sets the port for communication with the service.
+		/// </summary>
+		/// <param name="port"></param>
+		[PublicAPI]
+		public void SetPort(IWebPort port)
 		{
-			m_Section.Enter();
+			if (port == m_Port)
+				return;
 
-			try
+			m_AppTimer.Stop();
+
+			ConfigurePort(port);
+
+			Unsubscribe(m_Port);
+
+			if (port != null)
+				port.Accept = "application/xml";
+
+			m_Port = port;
+			Subscribe(m_Port);
+
+			m_RequestQueue.SetPort(m_Port);
+
+			UpdateCachedOnlineStatus();
+
+			if (port != null)
 			{
-				string xml = Get("/query/apps");
-				IEnumerable<RokuApp> apps = RokuApp.ReadAppsFromXml(xml);
-
-				m_AppList.Clear();
-				m_AppList.AddRange(apps);
+				RefreshDeviceInformation();
+				m_AppTimer.Reset(0, APP_REFRESH_MILLISECONDS);
 			}
-			finally
-			{
-				m_Section.Leave();
-			}
-		}
-
-		public void RefreshActiveApp()
-		{
-			m_Section.Enter();
-
-			try
-			{
-				string xml = Get("/query/active-app");
-				RokuApp activeApp = RokuApp.ReadActiveAppFromXml(xml);
-
-				m_ActiveApp = activeApp;
-			}
-			finally
-			{
-				m_Section.Leave();
-			}
-		}
-
-		public void RefreshDeviceInformation()
-		{
-			m_Section.Enter();
-
-			try
-			{
-				string xml = Get("/query/device-info");
-				RokuDeviceInformation deviceInformation = RokuDeviceInformation.ReadDeviceInformationFromXml(xml);
-
-				m_DeviceInformation = deviceInformation;
-			}
-			finally
-			{
-				m_Section.Leave();
-			}
-		}
-
-		public string GetAppIconUrl(int appId)
-		{
-			IcdUriBuilder builder = new IcdUriBuilder(m_Port.Uri)
-			{
-				Path = string.Format("/query/icon/{0}", appId)
-			};
-
-			return builder.ToString();
-		}
-
-		private string Get(string path)
-		{
-			path = Uri.EscapeUriString(path);
-			return m_Port.Get(path).DataAsString;
-		}
-
-		#endregion
-
-		#region POST Methods
-
-		#region Keypress Methods
-
-		public enum eRokuKeys
-		{
-			Home,
-			Rev,
-			Fwd,
-			Play,
-			Select,
-			Left,
-			Right,
-			Down,
-			Up,
-			Back,
-			InstantReplay,
-			Info,
-			Backspace,
-			Search,
-			Enter
 		}
 
 		/// <summary>
-		/// Sends an HTTP POST command to press and release a specific key
+		/// Configures the given port for communication with the device.
 		/// </summary>
-		/// <param name="key"></param>
-		public void Keypress(eRokuKeys key)
+		/// <param name="port"></param>
+		private void ConfigurePort(IWebPort port)
 		{
-			Post(string.Format("/keypress/{0}", key));
+			// URI
+			if (port != null)
+				port.ApplyDeviceConfiguration(m_UriProperties);
 		}
 
 		/// <summary>
-		/// Sends an HTTP POST command to press and hold a specific key
+		/// Subscribe to the port events.
 		/// </summary>
-		/// <param name="key"></param>
-		public void Keydown(eRokuKeys key)
+		/// <param name="port"></param>
+		private void Subscribe(IWebPort port)
 		{
-			Post(string.Format("/keydown/{0}", key));
+			if (port == null)
+				return;
+
+			port.OnIsOnlineStateChanged += PortOnIsOnlineStateChanged;
 		}
 
 		/// <summary>
-		/// Sends an HTTP POST command to release a specific key
+		/// Unsubscribe from the port events.
 		/// </summary>
-		/// <param name="key"></param>
-		public void Keyup(eRokuKeys key)
+		/// <param name="port"></param>
+		private void Unsubscribe(IWebPort port)
 		{
-			Post(string.Format("/keyup/{0}", key));
+			if (port == null)
+				return;
+
+			port.OnIsOnlineStateChanged -= PortOnIsOnlineStateChanged;
 		}
 
-		public void KeypressKeyboard(string message)
+		private void PortOnIsOnlineStateChanged(object sender, DeviceBaseOnlineStateApiEventArgs e)
 		{
-		    foreach (char messageChar in message)
-		        Post(string.Format("/keypress/Lit_{0}", messageChar));
+			UpdateCachedOnlineStatus();
 		}
-
-		#endregion
-
-		public void LaunchApp(int appId)
-		{
-			Post(string.Format("/launch/{0}", appId));
-		}
-
-		public void InstallApp(int channelId)
-		{
-			Post(string.Format("/install/{0}", channelId));
-		}
-
-		#region Search
-
-		public void RokuSearch(IEnumerable<KeyValuePair<eRokuSearchPar, string>> parameters)
-		{
-			string query = new RokuSearchQueryBuilder().Append(parameters).ToString();
-			Post(string.Format("/search/browse{0}", query));
-		}
-
-		private void Post(string path)
-		{
-			path = Uri.EscapeUriString(path);
-			m_Port.Post(path, new byte[0]);
-		}
-
-		#endregion
 
 		#endregion
 
