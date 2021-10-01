@@ -86,16 +86,11 @@ namespace ICD.Connect.Sources.Barco.API
 
 			WebPortResponse portResponse;
 
-			try
-			{
-				portResponse = port.Get(relativeOrAbsoluteUri);
-			}
-			catch (Exception e)
-			{
-				throw new Exception("Failed to make request - " + e.Message, e);
-			}
+			portResponse = port.Get(relativeOrAbsoluteUri);
 
-			if (!portResponse.Success)
+			if (!portResponse.GotResponse)
+				throw new Exception("Failed to make request");
+			if (!portResponse.IsSuccessCode)
 				throw new Exception("Request failed with code " + portResponse.StatusCode);
 
 			string data = (portResponse.DataAsString ?? string.Empty).Trim();

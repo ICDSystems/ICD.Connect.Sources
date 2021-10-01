@@ -95,18 +95,11 @@ namespace ICD.Connect.Sources.Barco.API
 			if (responseCallback == null)
 				throw new ArgumentNullException("responseCallback");
 
-			WebPortResponse portResponse;
+			WebPortResponse portResponse = port.Get(relativeOrAbsoluteUri);
+			if (!portResponse.GotResponse)
+				throw new Exception("Failed to make request");
 
-			try
-			{
-				portResponse = port.Get(relativeOrAbsoluteUri);
-			}
-			catch (Exception e)
-			{
-				throw new Exception("Failed to make request - " + e.Message, e);
-			}
-
-			if (!portResponse.Success)
+			if (!portResponse.IsSuccessCode)
 				throw new Exception("Request failed with code " + portResponse.StatusCode);
 
 			string data = (portResponse.DataAsString ?? string.Empty).Trim();
