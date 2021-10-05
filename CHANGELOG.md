@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [17.2.2] - 2021-10-04
+### Changed
+ - Barco Clickshare - removed SafeCriticalSection.TryEnter, modified polling timer to not be recurring, to prevent poll method re-entry
+
 ## [7.2.1] - 2021-08-03
 ### Changed
  - Barco Clickshare - Fixed handling of null datetime responses for buttons

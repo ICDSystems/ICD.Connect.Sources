@@ -94,7 +94,6 @@ namespace ICD.Connect.Sources.Barco.Devices
 		#region Fields
 
 		private readonly SafeTimer m_SharingTimer;
-		private readonly SafeCriticalSection m_SharingTimerSection;
 
 		private readonly IcdHashSet<Button> m_Buttons;
 		private readonly SafeCriticalSection m_ButtonsSection;
@@ -192,7 +191,6 @@ namespace ICD.Connect.Sources.Barco.Devices
 			m_ButtonsSection = new SafeCriticalSection();
 
 			m_SharingTimer = SafeTimer.Stopped(SharingTimerCallback);
-			m_SharingTimerSection = new SafeCriticalSection();
 
 			// Initialize activities
 			Sharing = false;
@@ -272,18 +270,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 		/// </summary>
 		private void SharingTimerCallback()
 		{
-			// Still updating since last time
-			if (!m_SharingTimerSection.TryEnter())
-				return;
-
-			try
-			{
-				PollDevice();
-			}
-			finally
-			{
-				m_SharingTimerSection.Leave();
-			}
+			PollDevice();
 		}
 
 		protected virtual void PollDevice()
@@ -380,7 +367,8 @@ namespace ICD.Connect.Sources.Barco.Devices
 		protected void ResetUpdateInterval()
 		{
 			m_SharingUpdateInterval = SHARING_UPDATE_INTERVAL;
-			m_SharingTimer.Reset(m_SharingUpdateInterval, m_SharingUpdateInterval);
+
+			m_SharingTimer.Reset(m_SharingUpdateInterval);
 
 			m_ConsecutivePortFailures = 0;
 			UpdateCachedOnlineStatus();
@@ -395,7 +383,7 @@ namespace ICD.Connect.Sources.Barco.Devices
 			if (m_SharingUpdateInterval > FAILURE_UPDATE_INTERVAL_LIMIT)
 				m_SharingUpdateInterval = FAILURE_UPDATE_INTERVAL_LIMIT;
 
-			m_SharingTimer.Reset(m_SharingUpdateInterval, m_SharingUpdateInterval);
+			m_SharingTimer.Reset(m_SharingUpdateInterval);
 
 			m_ConsecutivePortFailures++;
 			UpdateCachedOnlineStatus();
