@@ -95,7 +95,7 @@ namespace ICD.Connect.Sources.Barco.API
 			if (responseCallback == null)
 				throw new ArgumentNullException("responseCallback");
 
-			WebPortResponse portResponse = port.Get(relativeOrAbsoluteUri);
+			WebPortResponse portResponse = port.Get(relativeOrAbsoluteUri, null);
 			if (!portResponse.GotResponse)
 				throw new Exception("Failed to make request");
 
