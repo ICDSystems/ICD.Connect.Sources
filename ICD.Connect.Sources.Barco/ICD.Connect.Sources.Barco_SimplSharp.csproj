@@ -80,7 +80,6 @@
     <Compile Include="Devices\ClickshareConference\BarcoClickshareConferenceDevice.cs" />
     <Compile Include="Devices\ClickshareConference\BarcoClickshareConferenceDeviceConferenceControl.cs" />
     <Compile Include="Devices\ClickshareConference\BarcoClickshareConferenceDeviceSettings.cs" />
-    <Compile Include="ObfuscationSettings.cs" />
     <Compile Include="Devices\BarcoClickshareDeviceSettings.cs" />
     <Compile Include="Devices\Controls\BarcoClickshareRouteSourceControl.cs" />
     <Compile Include="KrangPlugin.cs" />
